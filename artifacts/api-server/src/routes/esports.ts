@@ -29,7 +29,7 @@ const logoCache = new Map<string, { body: Buffer; contentType: string }>();
 router.get("/esports/assets/logo", async (req: Request, res, next) => {
   const rawUrl = typeof req.query.url === "string" ? req.query.url : "";
   let url: URL;
-  try { url = new URL(rawUrl); if (url.protocol !== "https:" || !["images.pandascore.co", "cdn.pandascore.co"].includes(url.hostname)) return res.status(400).json({ error: "Unsupported logo URL" }); }
+  try { url = new URL(rawUrl); if (url.protocol !== "https:" || !["images.pandascore.co", "cdn.pandascore.co", "cdn-api.pandascore.co"].includes(url.hostname)) return res.status(400).json({ error: "Unsupported logo URL" }); }
   catch { return res.status(400).json({ error: "Invalid logo URL" }); }
   const cachedLogo = logoCache.get(url.href);
   if (cachedLogo) return res.type(cachedLogo.contentType).set("Cache-Control", "public, max-age=86400").send(cachedLogo.body);

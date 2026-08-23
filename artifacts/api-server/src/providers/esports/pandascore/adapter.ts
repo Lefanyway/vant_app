@@ -13,8 +13,8 @@ type RawMatch = {
 
 const games: Record<string, Game> = {
   valorant: { id: "valorant", name: "VALORANT", shortName: "VALORANT" },
-  csgo: { id: "cs2", name: "Counter-Strike 2", shortName: "CS2" },
-  lol: { id: "lol", name: "League of Legends", shortName: "LoL" },
+  "cs-go": { id: "cs2", name: "Counter-Strike 2", shortName: "CS2" },
+  "league-of-legends": { id: "lol", name: "League of Legends", shortName: "LoL" },
 };
 const providerSlug: Record<GameId, string> = { valorant: "valorant", cs2: "csgo", lol: "lol" };
 const vantGameId = (slug?: string): GameId => games[slug ?? ""]?.id ?? "valorant";
