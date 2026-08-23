@@ -19,6 +19,7 @@ export type Team = {
 
 export type Match = {
   id: string;
+  startTime?: string;
   game: Game;
   tournament: string;
   time: string;
@@ -30,6 +31,7 @@ export type Match = {
   format: "BO1" | "BO3" | "BO5";
   detail: string;
   competitionLogoUrl?: string;
+  streams?: { url: string; language?: string; official?: boolean }[];
 };
 
 export const teams: Team[] = [

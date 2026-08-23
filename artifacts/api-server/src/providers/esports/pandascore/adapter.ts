@@ -120,13 +120,17 @@ export class PandaScoreAdapter implements EsportsDataProvider {
   async getMatchDetails(id: string): Promise<MatchDetails | null> {
     const match = await this.getMatch(id);
     if (!match) return null;
-    const past = await this.getPastMatches(match.gameId);
-    const teamIds = new Set([match.homeTeam.id, match.awayTeam.id]);
-    const h2h = past.filter((item) => item.id !== match.id && item.homeTeam.id !== "tbd" && teamIds.has(item.homeTeam.id) && teamIds.has(item.awayTeam.id)).slice(0, 20);
-    const recentMatches = [match.homeTeam, match.awayTeam].map((team) => ({
-      teamId: team.id,
-      matches: past.filter((item) => item.id !== match.id && (item.homeTeam.id === team.id || item.awayTeam.id === team.id)).slice(0, 5),
-    }));
+    const externalId = (team: Team) => team.externalIds[0]?.id;
+    const recentFor = async (team: Team) => {
+      const { rows } = await this.client.fetchAllPages<RawMatch>(`/${providerSlug[match.gameId]}/matches/past`, { "filter[opponent_id]": externalId(team), sort: "-begin_at" }, 2);
+      return rows.map((row) => this.mapMatch(row)).filter((item) => item.id !== match.id).slice(0, 5);
+    };
+    const h2hRows = externalId(match.homeTeam) && externalId(match.awayTeam)
+      ? await this.client.fetchAllPages<RawMatch>(`/${providerSlug[match.gameId]}/matches/past`, { "filter[opponent_id]": externalId(match.homeTeam), sort: "-begin_at" }, 2)
+      : { rows: [] as RawMatch[], pages: 0 };
+    const h2h = h2hRows.rows.map((row) => this.mapMatch(row)).filter((item) => item.id !== match.id && ((item.homeTeam.id === match.homeTeam.id && item.awayTeam.id === match.awayTeam.id) || (item.homeTeam.id === match.awayTeam.id && item.awayTeam.id === match.homeTeam.id))).slice(0, 20);
+    const [homeRecent, awayRecent] = await Promise.all([recentFor(match.homeTeam), recentFor(match.awayTeam)]);
+    const recentMatches = [{ teamId: match.homeTeam.id, matches: homeRecent }, { teamId: match.awayTeam.id, matches: awayRecent }];
     return {
       match,
       // PandaScore exposes that games exist, but this payload does not expose map names or map scores.
