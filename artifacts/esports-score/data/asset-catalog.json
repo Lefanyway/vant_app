@@ -1,0 +1,38 @@
+{
+  "games": [
+    { "id": "valorant", "name": "VALORANT", "aliases": ["Valorant"] },
+    { "id": "cs2", "name": "Counter-Strike 2", "aliases": ["CS2", "Counter Strike"] },
+    { "id": "lol", "name": "League of Legends", "aliases": ["LoL", "League"] }
+  ],
+  "teams": [
+    { "id": "loud", "name": "LOUD", "game": "Valorant", "aliases": [] },
+    { "id": "sentinels", "name": "Sentinels", "game": "Valorant", "aliases": [] },
+    { "id": "g2-esports", "name": "G2 Esports", "game": "Valorant", "aliases": ["G2"] },
+    { "id": "mibr", "name": "MIBR", "game": "Valorant", "aliases": [] },
+    { "id": "nrg", "name": "NRG", "game": "Valorant", "aliases": [] },
+    { "id": "100-thieves", "name": "100 Thieves", "game": "Valorant", "aliases": ["100T"] },
+    { "id": "furia", "name": "FURIA", "game": "CS2", "aliases": [] },
+    { "id": "leviatan", "name": "Leviatán", "game": "Valorant", "aliases": ["Leviatan"] },
+    { "id": "kru-esports", "name": "KRÜ Esports", "game": "Valorant", "aliases": ["KRU", "KRU Esports"] }
+  ],
+  "competitions": [
+    { "id": "vct-americas", "name": "VCT Americas", "game": "Valorant", "aliases": [] },
+    { "id": "vct-emea", "name": "VCT EMEA", "game": "Valorant", "aliases": [] },
+    { "id": "vct-pacific", "name": "VCT Pacific", "game": "Valorant", "aliases": [] },
+    { "id": "vct-china", "name": "VCT China", "game": "Valorant", "aliases": [] },
+    { "id": "valorant-masters", "name": "VALORANT Masters", "game": "Valorant", "aliases": ["Masters"] },
+    { "id": "valorant-champions", "name": "VALORANT Champions", "game": "Valorant", "aliases": ["Champions"] },
+    { "id": "challengers-brazil", "name": "Challengers Brazil", "game": "Valorant", "aliases": [] },
+    { "id": "blast-premier", "name": "BLAST Premier", "game": "CS2", "aliases": [] },
+    { "id": "iem", "name": "Intel Extreme Masters", "game": "CS2", "aliases": ["IEM"] },
+    { "id": "esl-pro-league", "name": "ESL Pro League", "game": "CS2", "aliases": [] },
+    { "id": "pgl-major", "name": "PGL Major", "game": "CS2", "aliases": [] },
+    { "id": "cct-global-finals", "name": "CCT Global Finals", "game": "CS2", "aliases": [] },
+    { "id": "lck", "name": "LCK", "game": "League of Legends", "aliases": [] },
+    { "id": "lec", "name": "LEC", "game": "League of Legends", "aliases": [] },
+    { "id": "lpl", "name": "LPL", "game": "League of Legends", "aliases": [] },
+    { "id": "lcs", "name": "LCS", "game": "League of Legends", "aliases": [] },
+    { "id": "msi", "name": "Mid-Season Invitational", "game": "League of Legends", "aliases": ["MSI"] },
+    { "id": "worlds", "name": "Worlds", "game": "League of Legends", "aliases": ["World Championship"] }
+  ]
+}

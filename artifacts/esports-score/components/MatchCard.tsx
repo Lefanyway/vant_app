@@ -3,10 +3,10 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 import { Match } from "@/lib/data";
 import { useColors } from "@/hooks/useColors";
 import { useApp } from "@/context/AppContext";
+import { ResolvedLogo } from "@/components/ResolvedLogo";
 
 export function TeamBadge({ name, short, color }: { name: string; short: string; color: string }) {
-  const colors = useColors();
-  return <View style={[styles.teamBadge, { backgroundColor: color + "22", borderColor: color + "66" }]}><Text style={[styles.teamBadgeText, { color }]}>{short}</Text></View>;
+  return <View style={styles.teamBadge}><ResolvedLogo type="team" name={name} size={38} /></View>;
 }
 
 export function MatchCard({ match, onPress }: { match: Match; onPress: () => void }) {
@@ -44,7 +44,6 @@ const styles = StyleSheet.create({
   teamRight: { alignItems: "center" },
   teamName: { fontSize: 13, fontWeight: "600", textAlign: "center" },
   teamBadge: { width: 38, height: 38, borderRadius: 12, borderWidth: 1, alignItems: "center", justifyContent: "center" },
-  teamBadgeText: { fontSize: 12, fontWeight: "800" },
   scoreColumn: { alignItems: "center", minWidth: 62 },
   liveText: { fontSize: 10, fontWeight: "800", letterSpacing: 1, marginBottom: 2 },
   time: { fontSize: 16, fontWeight: "800", marginBottom: 2 },

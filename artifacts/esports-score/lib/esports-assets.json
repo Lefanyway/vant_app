@@ -1,0 +1,122 @@
+{
+  "games": {
+    "valorant": {
+      "logo": "assets/generated/games/valorant.png",
+      "source": "Wikimedia Commons",
+      "status": "resolved"
+    },
+    "lol": {
+      "logo": "assets/generated/games/lol.png",
+      "source": "Wikimedia Commons",
+      "status": "resolved"
+    }
+  },
+  "teams": {
+    "loud": {
+      "source": "Wikimedia Commons",
+      "status": "error"
+    },
+    "sentinels": {
+      "source": "Wikimedia Commons",
+      "status": "error"
+    },
+    "g2-esports": {
+      "source": "Wikimedia Commons",
+      "status": "error"
+    },
+    "mibr": {
+      "source": "Wikimedia Commons",
+      "status": "error"
+    },
+    "nrg": {
+      "source": "Wikimedia Commons",
+      "status": "error"
+    },
+    "100-thieves": {
+      "source": "Wikimedia Commons",
+      "status": "error"
+    },
+    "leviatan": {
+      "source": "Wikimedia Commons",
+      "status": "error"
+    },
+    "kru-esports": {
+      "source": "Wikimedia Commons",
+      "status": "error"
+    }
+  },
+  "competitions": {
+    "vct-americas": {
+      "source": "Wikimedia Commons",
+      "status": "error"
+    },
+    "vct-emea": {
+      "source": "Wikimedia Commons",
+      "status": "error"
+    },
+    "vct-pacific": {
+      "source": "Wikimedia Commons",
+      "status": "error"
+    },
+    "vct-china": {
+      "source": "Wikimedia Commons",
+      "status": "error"
+    },
+    "valorant-masters": {
+      "source": "Wikimedia Commons",
+      "status": "error"
+    },
+    "valorant-champions": {
+      "source": "Wikimedia Commons",
+      "status": "error"
+    },
+    "challengers-brazil": {
+      "source": "Wikimedia Commons",
+      "status": "error"
+    },
+    "blast-premier": {
+      "source": "Wikimedia Commons",
+      "status": "error"
+    },
+    "iem": {
+      "source": "Wikimedia Commons",
+      "status": "error"
+    },
+    "esl-pro-league": {
+      "source": "Wikimedia Commons",
+      "status": "error"
+    },
+    "pgl-major": {
+      "source": "Wikimedia Commons",
+      "status": "error"
+    },
+    "cct-global-finals": {
+      "source": "Wikimedia Commons",
+      "status": "error"
+    },
+    "lck": {
+      "source": "Wikimedia Commons",
+      "status": "error"
+    },
+    "lec": {
+      "source": "Wikimedia Commons",
+      "status": "error"
+    },
+    "lpl": {
+      "source": "Wikimedia Commons",
+      "status": "error"
+    },
+    "lcs": {
+      "source": "Wikimedia Commons",
+      "status": "error"
+    },
+    "msi": {
+      "source": "Wikimedia Commons",
+      "status": "error"
+    },
+    "worlds": {
+      "source": "Wikimedia Commons",
+      "status": "error"
+    }
+  }
+}

@@ -1,8 +1,11 @@
+import { Feather } from "@expo/vector-icons";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useColors } from "@/hooks/useColors";
+import { ResolvedLogo } from "@/components/ResolvedLogo";
 
-export type GameFilter = "Valorant" | "CS2" | "League of Legends";
-const items: { label: GameFilter; short: string; key: "valorant" | "cs2" | "lol" }[] = [
+export type GameFilter = "All" | "Valorant" | "CS2" | "League of Legends";
+const items: { label: GameFilter; short: string; key?: "valorant" | "cs2" | "lol" }[] = [
+  { label: "All", short: "Todos" },
   { label: "Valorant", short: "V", key: "valorant" },
   { label: "CS2", short: "CS", key: "cs2" },
   { label: "League of Legends", short: "LoL", key: "lol" },
@@ -12,8 +15,8 @@ export function GameTabs({ selected, onChange }: { selected: GameFilter; onChang
   const colors = useColors();
   return <View style={[styles.container, { borderBottomColor: colors.border }]}>{items.map((item) => {
     const active = selected === item.label;
-    return <Pressable key={item.label} onPress={() => onChange(item.label)} accessibilityLabel={`${item.label} logo missing asset`} style={styles.item}><View style={[styles.logo, { backgroundColor: active ? colors.accent : colors.card, borderColor: active ? colors.primary : colors.border }]} /><Text style={[styles.label, { color: active ? colors.foreground : colors.mutedForeground }]}>{item.short}</Text>{active && <View style={[styles.indicator, { backgroundColor: colors.primary }]} />}</Pressable>;
+    return <Pressable key={item.label} onPress={() => onChange(item.label)} accessibilityLabel={item.label === "All" ? "All followed games" : `${item.label} logo`} style={styles.item}><View style={styles.logo}>{item.key ? <ResolvedLogo type="game" name={item.label} size={30} /> : <Feather name="layers" size={20} color={active ? colors.primary : colors.mutedForeground} />}</View><Text style={[styles.label, { color: active ? colors.foreground : colors.mutedForeground }]}>{item.short}</Text>{active && <View style={[styles.indicator, { backgroundColor: colors.primary }]} />}</Pressable>;
   })}</View>;
 }
 
-const styles = StyleSheet.create({ container: { flexDirection: "row", alignItems: "stretch", borderBottomWidth: 1, marginBottom: 16 }, item: { minWidth: 78, alignItems: "center", paddingVertical: 8, marginRight: 8, position: "relative" }, logo: { width: 30, height: 30, borderRadius: 8, borderWidth: 1, alignItems: "center", justifyContent: "center" }, label: { fontSize: 12, fontWeight: "600", marginTop: 6 }, indicator: { position: "absolute", bottom: -1, height: 2, width: 30, borderRadius: 1 } });
+const styles = StyleSheet.create({ container: { flexDirection: "row", alignItems: "stretch", borderBottomWidth: 1, marginBottom: 16 }, item: { minWidth: 72, alignItems: "center", paddingVertical: 8, marginRight: 8, position: "relative" }, logo: { width: 32, height: 32, alignItems: "center", justifyContent: "center" }, label: { fontSize: 12, fontWeight: "600", marginTop: 6 }, indicator: { position: "absolute", bottom: -1, height: 2, width: 30, borderRadius: 1 } });
