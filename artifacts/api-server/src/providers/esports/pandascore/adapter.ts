@@ -8,8 +8,10 @@ type RawMatch = { id: number; begin_at?: string; status?: string; number_of_game
 const games: Record<string, Game> = { valorant: { id: "valorant", name: "VALORANT", shortName: "VALORANT" }, csgo: { id: "cs2", name: "Counter-Strike 2", shortName: "CS2" }, "league-of-legends": { id: "lol", name: "League of Legends", shortName: "LoL" } };
 const gameId = (slug?: string): GameId => games[slug ?? ""]?.id ?? "valorant";
 const internalId = (provider: string, id: number) => `${provider}:${id}`;
-const mapTeam = (raw: RawTeam, game: GameId): Team => ({ id: internalId("pandascore", raw.id), externalIds: [{ provider: "pandascore", id: String(raw.id) }], name: raw.name, acronym: raw.acronym, logoUrl: raw.image_url, country: raw.location, gameId: game });
-const mapCompetition = (raw: RawLeague, game: GameId): Competition => ({ id: internalId("pandascore", raw.id), externalIds: [{ provider: "pandascore", id: String(raw.id) }], name: raw.name, slug: raw.slug, logoUrl: raw.image_url, gameId: game });
+
+const cachedLogoUrl = (url?: string) => url ? `/api/esports/assets/logo?url=${encodeURIComponent(url)}` : undefined;
+const mapTeam = (raw: RawTeam, game: GameId): Team => ({ id: internalId("pandascore", raw.id), externalIds: [{ provider: "pandascore", id: String(raw.id) }], name: raw.name, acronym: raw.acronym, logoUrl: cachedLogoUrl(raw.image_url), country: raw.location, gameId: game });
+const mapCompetition = (raw: RawLeague, game: GameId): Competition => ({ id: internalId("pandascore", raw.id), externalIds: [{ provider: "pandascore", id: String(raw.id) }], name: raw.name, slug: raw.slug, logoUrl: cachedLogoUrl(raw.image_url), gameId: game });
 
 export class PandaScoreAdapter implements EsportsDataProvider {
   name = "pandascore";

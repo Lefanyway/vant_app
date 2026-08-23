@@ -14,6 +14,7 @@ export type Team = {
   short: string;
   color: string;
   game: Game;
+  logoUrl?: string;
 };
 
 export type Match = {
@@ -28,6 +29,7 @@ export type Match = {
   scoreB?: number;
   format: "BO1" | "BO3" | "BO5";
   detail: string;
+  competitionLogoUrl?: string;
 };
 
 export const teams: Team[] = [

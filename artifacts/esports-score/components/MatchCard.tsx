@@ -5,8 +5,8 @@ import { useColors } from "@/hooks/useColors";
 import { useApp } from "@/context/AppContext";
 import { ResolvedLogo } from "@/components/ResolvedLogo";
 
-export function TeamBadge({ name, short, color }: { name: string; short: string; color: string }) {
-  return <View style={styles.teamBadge}><ResolvedLogo type="team" name={name} size={38} /></View>;
+export function TeamBadge({ name, short, color, logoUrl }: { name: string; short: string; color: string; logoUrl?: string }) {
+  return <View style={styles.teamBadge}><ResolvedLogo type="team" name={name} size={38} logoUrl={logoUrl} /></View>;
 }
 
 export function MatchCard({ match, onPress }: { match: Match; onPress: () => void }) {
