@@ -4,8 +4,9 @@ import { useMemo, useState } from "react";
 import { Pressable, RefreshControl, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { CompetitionCard } from "@/components/CompetitionCard";
+import { CompetitionListItem } from "@/components/CompetitionListItem";
 import { GameFilter, GameTabs } from "@/components/GameTabs";
-import { matches } from "@/lib/data";
+import { competitionsByGame, matches } from "@/lib/data";
 import { useColors } from "@/hooks/useColors";
 
 export default function Home() {
@@ -19,7 +20,7 @@ export default function Home() {
     <View style={[styles.segment, { backgroundColor: colors.card, borderColor: colors.border }]}><Pressable onPress={() => setMode("Matches")} style={[styles.segmentItem, mode === "Matches" && { backgroundColor: colors.secondary }]}><Text style={[styles.segmentText, { color: mode === "Matches" ? colors.foreground : colors.mutedForeground }]}>MATCHES</Text></Pressable><Pressable onPress={() => setMode("Competitions")} style={[styles.segmentItem, mode === "Competitions" && { backgroundColor: colors.secondary }]}><Text style={[styles.segmentText, { color: mode === "Competitions" ? colors.foreground : colors.mutedForeground }]}>COMPETITIONS</Text></Pressable></View>
     <View style={styles.filters}><Pressable style={styles.filterLink}><Feather name="sliders" size={14} color={colors.primary} /><Text style={[styles.filterText, { color: colors.primary }]}>Filters</Text></Pressable><Pressable style={styles.filterLink}><Feather name="radio" size={14} color={colors.mutedForeground} /><Text style={[styles.filterText, { color: colors.mutedForeground }]}>Live</Text></Pressable><View style={styles.today}><Feather name="chevron-left" size={16} color={colors.mutedForeground} /><Text style={[styles.todayText, { color: colors.foreground }]}>Today</Text><Feather name="chevron-right" size={16} color={colors.mutedForeground} /></View></View>
     <Text style={[styles.sectionLabel, { color: colors.mutedForeground }]}>{mode === "Matches" ? "TODAY" : "COMPETITIONS"}</Text>
-    {mode === "Matches" ? Object.entries(grouped).map(([name, competitionMatches]) => <CompetitionCard key={name} name={name} game={game} matches={competitionMatches} onMatchPress={(match) => router.push(`/match/${match.id}`)} />) : <View style={[styles.empty, { backgroundColor: colors.card, borderColor: colors.border }]}><Feather name="flag" size={22} color={colors.mutedForeground} /><Text style={[styles.emptyTitle, { color: colors.foreground }]}>Competitions are coming together here</Text><Text style={[styles.emptyText, { color: colors.mutedForeground }]}>Follow a tournament to keep its fixtures close.</Text></View>}
+    {mode === "Matches" ? Object.entries(grouped).map(([name, competitionMatches]) => <CompetitionCard key={name} name={name} game={game} matches={competitionMatches} onMatchPress={(match) => router.push(`/match/${match.id}`)} />) : <View>{competitionsByGame[game].map((competition) => <CompetitionListItem key={competition.name} name={competition.name} region={competition.region} />)}</View>}
     {filtered.length === 0 && <View style={styles.emptyInline}><Text style={[styles.emptyText, { color: colors.mutedForeground }]}>No {game} matches found for today.</Text></View>}
   </ScrollView>;
 }

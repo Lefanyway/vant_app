@@ -63,3 +63,30 @@ export const players = [
   ["johnqt", "johnqt", "Viper", "187", "11", "15", "8"],
   ["zekken", "zekken", "Raze", "241", "16", "13", "5"],
 ];
+
+export const competitionsByGame: Record<Game, { name: string; region: string }[]> = {
+  Valorant: [
+    { name: "VCT Americas", region: "Americas" },
+    { name: "VCT EMEA", region: "EMEA" },
+    { name: "VCT Pacific", region: "Pacific" },
+    { name: "VCT China", region: "China" },
+    { name: "VALORANT Masters", region: "International" },
+    { name: "VALORANT Champions", region: "World Championship" },
+    { name: "Challengers Brazil", region: "Brazil" },
+  ],
+  CS2: [
+    { name: "BLAST Premier", region: "International" },
+    { name: "Intel Extreme Masters", region: "International" },
+    { name: "ESL Pro League", region: "International" },
+    { name: "PGL Major", region: "Major Championship" },
+    { name: "CCT Global Finals", region: "International" },
+  ],
+  "League of Legends": [
+    { name: "LCK", region: "Korea" },
+    { name: "LEC", region: "EMEA" },
+    { name: "LPL", region: "China" },
+    { name: "LCS", region: "Americas" },
+    { name: "Mid-Season Invitational", region: "International" },
+    { name: "Worlds", region: "World Championship" },
+  ],
+};
