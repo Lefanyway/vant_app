@@ -3,16 +3,19 @@ export type MatchStatus = "scheduled" | "live" | "finished" | "cancelled" | "pos
 export type ExternalId = { provider: string; id: string };
 export type Game = { id: GameId; name: string; shortName: string; logoUrl?: string };
 export type Team = { id: string; externalIds: ExternalId[]; name: string; acronym?: string; logoUrl?: string; country?: string; gameId: GameId };
-export type Competition = { id: string; externalIds: ExternalId[]; name: string; slug?: string; logoUrl?: string; region?: string; gameId: GameId };
+export type Competition = { id: string; externalIds: ExternalId[]; name: string; slug?: string; logoUrl?: string; region?: string; serieName?: string; gameId: GameId };
+export type Stream = { url: string; language?: string; official?: boolean };
 export type Match = {
   id: string; externalIds: ExternalId[]; gameId: GameId; competition: Competition;
   homeTeam: Team; awayTeam: Team; startTime: string; status: MatchStatus; bestOf?: 1 | 3 | 5;
-  homeScore?: number; awayScore?: number; live?: { currentMap?: number; mapName?: string; homeRounds?: number; awayRounds?: number };
+  homeScore?: number; awayScore?: number; streams?: Stream[];
 };
 export type MatchQuery = { game?: GameId; date?: string; from?: string; to?: string; timezone?: string };
 export type SearchResult = { type: "team" | "competition" | "game"; id: string; name: string; gameId?: GameId; logoUrl?: string };
+export type ProviderCapabilities = { schedules: boolean; results: boolean; runningMatches: boolean; historicalStats: boolean; liveTelemetry: boolean };
 export type EsportsDataProvider = {
   name: string;
+  capabilities: Record<GameId, ProviderCapabilities>;
   getGames(): Promise<Game[]>;
   getMatches(query?: MatchQuery): Promise<Match[]>;
   getLiveMatches(game?: GameId): Promise<Match[]>;
