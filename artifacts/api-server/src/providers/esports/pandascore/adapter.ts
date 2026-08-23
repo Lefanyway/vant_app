@@ -1,5 +1,6 @@
 import { PandaScoreClient } from "./client";
 import type { Competition, EsportsDataProvider, Game, GameId, Match, MatchQuery, MatchStatus, SearchResult, Team } from "../types";
+import { localDayBounds } from "../date";
 
 type RawTeam = { id: number; name: string; acronym?: string; image_url?: string; location?: string };
 type RawLeague = { id: number; name: string; slug?: string; image_url?: string };
@@ -15,12 +16,27 @@ export class PandaScoreAdapter implements EsportsDataProvider {
   constructor(private readonly client: PandaScoreClient) {}
   async getGames() { return Object.values(games); }
   async getMatches(query: MatchQuery = {}): Promise<Match[]> {
-    const rows = await this.client.request<RawMatch[]>("/matches", { sort: "begin_at", per_page: 100 });
-    return rows.filter((row) => !query.game || gameId(row.videogame?.slug) === query.game).map((row) => {
+    const dayBounds = query.date ? localDayBounds(query.date, query.timezone) : undefined;
+    const rows: RawMatch[] = [];
+    for (let page = 1; page <= 50; page += 1) {
+      const chunk = await this.client.request<RawMatch[]>("/matches", {
+        sort: "begin_at", page, per_page: 100, "begin_at[gte]": query.from ? localDayBounds(query.from, query.timezone).start : dayBounds?.start,
+        "begin_at[lte]": query.to ? localDayBounds(query.to, query.timezone).end : dayBounds?.end,
+      });
+      rows.push(...chunk);
+      if (chunk.length < 100) break;
+    }
+    const start = query.from ? Date.parse(localDayBounds(query.from, query.timezone).start) : dayBounds ? Date.parse(dayBounds.start) : undefined;
+    const end = query.to ? Date.parse(localDayBounds(query.to, query.timezone).end) : dayBounds ? Date.parse(dayBounds.end) : undefined;
+    const normalized = rows.filter((row) => !query.game || gameId(row.videogame?.slug) === query.game).map((row) => {
       const game = gameId(row.videogame?.slug); const opponents = row.opponents ?? []; const home = mapTeam(opponents[0]?.opponent ?? { id: 0, name: "Unknown" }, game); const away = mapTeam(opponents[1]?.opponent ?? { id: 0, name: "Unknown" }, game);
       const competition = mapCompetition(row.league ?? { id: 0, name: row.tournament?.name ?? "Unknown" }, game);
-      const status: MatchStatus = row.status === "running" ? "live" : row.status === "finished" ? "finished" : "scheduled";
+      const status: MatchStatus = row.status === "running" ? "live" : row.status === "finished" ? "finished" : row.status === "canceled" ? "cancelled" : row.status === "postponed" ? "postponed" : "scheduled";
       return { id: internalId("pandascore", row.id), externalIds: [{ provider: "pandascore", id: String(row.id) }], gameId: game, competition, homeTeam: home, awayTeam: away, startTime: row.begin_at ?? new Date(0).toISOString(), status, bestOf: (row.number_of_games === 5 ? 5 : row.number_of_games === 1 ? 1 : 3) as 1 | 3 | 5, homeScore: row.results?.find((score) => score.team_id === opponents[0]?.opponent.id)?.score, awayScore: row.results?.find((score) => score.team_id === opponents[1]?.opponent.id)?.score };
+    }).filter((match) => (start === undefined || Date.parse(match.startTime) >= start) && (end === undefined || Date.parse(match.startTime) < end));
+    return normalized.sort((a, b) => {
+      const rank = (status: MatchStatus) => status === "live" ? 0 : status === "scheduled" ? 1 : 2;
+      return rank(a.status) - rank(b.status) || Date.parse(a.startTime) - Date.parse(b.startTime);
     });
   }
   async getLiveMatches(game?: GameId) { return (await this.getMatches({ game })).filter((match) => match.status === "live"); }

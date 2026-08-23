@@ -24,6 +24,10 @@ export async function fetchMatches(game?: string, date = new Date().toISOString(
   return rows.map((row): Match => ({ id: row.id, game: gameName(row.gameId), tournament: row.competition.name, time: row.status === "live" ? "LIVE" : new Date(row.startTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }), status: row.status === "live" ? "Live" : row.status === "finished" ? "Finished" : "Upcoming", teamA: team(row.homeTeam), teamB: team(row.awayTeam), scoreA: row.homeScore, scoreB: row.awayScore, format: row.bestOf === 1 ? "BO1" : row.bestOf === 5 ? "BO5" : "BO3", detail: row.status === "finished" ? "Final result" : row.status === "live" ? "Live now" : "Scheduled" }));
 }
 
+export async function fetchMatch(id: string) {
+  return request<ApiMatch>(`/matches/${encodeURIComponent(id)}`);
+}
+
 export async function fetchCompetitions(game?: string) {
   const suffix = game ? `?game=${encodeURIComponent(game)}` : "";
   return request<ApiCompetition[]>(`/competitions${suffix}`);

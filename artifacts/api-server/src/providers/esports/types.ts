@@ -9,7 +9,7 @@ export type Match = {
   homeTeam: Team; awayTeam: Team; startTime: string; status: MatchStatus; bestOf?: 1 | 3 | 5;
   homeScore?: number; awayScore?: number; live?: { currentMap?: number; mapName?: string; homeRounds?: number; awayRounds?: number };
 };
-export type MatchQuery = { game?: GameId; date?: string; timezone?: string };
+export type MatchQuery = { game?: GameId; date?: string; from?: string; to?: string; timezone?: string };
 export type SearchResult = { type: "team" | "competition" | "game"; id: string; name: string; gameId?: GameId; logoUrl?: string };
 export type EsportsDataProvider = {
   name: string;
