@@ -10,6 +10,16 @@ export type Match = {
   homeTeam: Team; awayTeam: Team; startTime: string; status: MatchStatus; bestOf?: 1 | 3 | 5;
   homeScore?: number; awayScore?: number; streams?: Stream[];
 };
+export type MatchDetails = {
+  match: Match;
+  maps: { id: string; mapName?: string; mapNumber: number; homeScore?: number; awayScore?: number }[];
+  playerStats: unknown[];
+  economy: null;
+  veto: null;
+  headToHead: Match[];
+  recentMatches: { teamId: string; matches: Match[] }[];
+  capabilities: { maps: boolean; playerStats: boolean; economy: boolean; veto: boolean; headToHead: boolean; recentMatches: boolean };
+};
 export type MatchQuery = { game?: GameId; date?: string; from?: string; to?: string; timezone?: string };
 export type SearchResult = { type: "team" | "competition" | "game"; id: string; name: string; gameId?: GameId; logoUrl?: string };
 export type ProviderCapabilities = { schedules: boolean; results: boolean; runningMatches: boolean; historicalStats: boolean; liveTelemetry: boolean };
@@ -22,6 +32,7 @@ export type EsportsDataProvider = {
   getUpcomingMatches(game?: GameId): Promise<Match[]>;
   getPastMatches(game?: GameId): Promise<Match[]>;
   getMatch(id: string): Promise<Match | null>;
+  getMatchDetails?(id: string): Promise<MatchDetails | null>;
   getCompetitions(game?: GameId): Promise<Competition[]>;
   getCompetition(id: string): Promise<Competition | null>;
   getTeams(game?: GameId): Promise<Team[]>;

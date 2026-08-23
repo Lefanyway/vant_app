@@ -1,5 +1,5 @@
 import { PandaScoreClient } from "./client";
-import type { Competition, EsportsDataProvider, Game, GameId, Match, MatchQuery, MatchStatus, ProviderCapabilities, SearchResult, Team } from "../types";
+import type { Competition, EsportsDataProvider, Game, GameId, Match, MatchDetails, MatchQuery, MatchStatus, ProviderCapabilities, SearchResult, Team } from "../types";
 import { localDayBounds } from "../date";
 
 type RawTeam = { id: number; name: string; acronym?: string; image_url?: string; location?: string };
@@ -115,6 +115,29 @@ export class PandaScoreAdapter implements EsportsDataProvider {
     } catch {
       return null;
     }
+  }
+
+  async getMatchDetails(id: string): Promise<MatchDetails | null> {
+    const match = await this.getMatch(id);
+    if (!match) return null;
+    const past = await this.getPastMatches(match.gameId);
+    const teamIds = new Set([match.homeTeam.id, match.awayTeam.id]);
+    const h2h = past.filter((item) => item.id !== match.id && item.homeTeam.id !== "tbd" && teamIds.has(item.homeTeam.id) && teamIds.has(item.awayTeam.id)).slice(0, 20);
+    const recentMatches = [match.homeTeam, match.awayTeam].map((team) => ({
+      teamId: team.id,
+      matches: past.filter((item) => item.id !== match.id && (item.homeTeam.id === team.id || item.awayTeam.id === team.id)).slice(0, 5),
+    }));
+    return {
+      match,
+      // PandaScore exposes that games exist, but this payload does not expose map names or map scores.
+      maps: [],
+      playerStats: [],
+      economy: null,
+      veto: null,
+      headToHead: h2h,
+      recentMatches,
+      capabilities: { maps: false, playerStats: false, economy: false, veto: false, headToHead: true, recentMatches: true },
+    };
   }
 
   async getCompetitions(game?: GameId): Promise<Competition[]> {

@@ -3,6 +3,7 @@ import type { Match, Team } from "@/lib/data";
 type ApiTeam = { id: string; name: string; acronym?: string; logoUrl?: string; country?: string; gameId: string };
 type ApiCompetition = { id: string; name: string; region?: string; serieName?: string; logoUrl?: string };
 type ApiMatch = { id: string; gameId: string; competition: ApiCompetition; homeTeam: ApiTeam; awayTeam: ApiTeam; startTime: string; status: "scheduled" | "live" | "finished" | "cancelled" | "postponed"; bestOf?: 1 | 3 | 5; homeScore?: number; awayScore?: number; streams?: { url: string; language?: string; official?: boolean }[] };
+export type MatchDetails = { match: ApiMatch; maps: { id: string; mapName?: string; mapNumber: number; homeScore?: number; awayScore?: number }[]; playerStats: unknown[]; economy: null; veto: null; headToHead: ApiMatch[]; recentMatches: { teamId: string; matches: ApiMatch[] }[]; capabilities: { maps: boolean; playerStats: boolean; economy: boolean; veto: boolean; headToHead: boolean; recentMatches: boolean } };
 export type ApiSearchResult = { type: "team" | "competition" | "game"; id: string; name: string; gameId?: string; logoUrl?: string };
 
 const baseUrl = process.env.EXPO_PUBLIC_API_BASE_URL ?? "";
@@ -39,6 +40,10 @@ export async function fetchMatches(game?: string, date = localDateKey(new Date()
 }
 
 export async function fetchMatch(id: string) { return toMatch(await request<ApiMatch>(`/matches/${encodeURIComponent(id)}`)); }
+export async function fetchMatchDetails(id: string) {
+  const details = await request<MatchDetails>(`/matches/${encodeURIComponent(id)}/details`);
+  return { ...details, match: toMatch(details.match), headToHead: details.headToHead.map(toMatch), recentMatches: details.recentMatches.map((group) => ({ ...group, matches: group.matches.map(toMatch) })) };
+}
 
 export async function fetchLiveMatches(game?: string) {
   const suffix = game ? `?game=${encodeURIComponent(game)}` : "";
