@@ -1,0 +1,24 @@
+kind = "mobile"
+previewPath = "/"
+title = "EsportsScore"
+description = "Um app mobile-first para acompanhar partidas, resultados, times favoritos e notificações de esports de Valorant, Counter-Strike 2 e League of Legends em um só lugar."
+version = "1.0.0"
+id = "artifacts/esports-score"
+router = "expo-domain"
+
+[[services]]
+name = "expo"
+ensurePreviewReachable = "/status"
+paths = [ "/" ]
+localPort = 20859
+
+[services.development]
+run = "pnpm --filter @workspace/esports-score run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/esports-score", "run", "build" ]
+run = [ "pnpm", "--filter", "@workspace/esports-score", "run", "serve" ]
+
+[services.env]
+PORT = "20859"
+BASE_PATH = "/"

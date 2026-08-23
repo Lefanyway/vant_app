@@ -1,0 +1,24 @@
+import { Feather } from "@expo/vector-icons";
+import { router } from "expo-router";
+import { useMemo, useState } from "react";
+import { Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { MatchCard } from "@/components/MatchCard";
+import { matches, Game } from "@/lib/data";
+import { useColors } from "@/hooks/useColors";
+
+const filters = ["All", "Valorant", "CS2", "League of Legends"] as const;
+export default function Home() {
+  const colors = useColors(); const insets = useSafeAreaInsets(); const [filter, setFilter] = useState<(typeof filters)[number]>("All"); const [refreshing, setRefreshing] = useState(false);
+  const filtered = useMemo(() => filter === "All" ? matches : matches.filter((m) => m.game === filter), [filter]);
+  const live = filtered.filter((m) => m.status === "Live"); const upcoming = filtered.filter((m) => m.status === "Upcoming"); const finished = filtered.filter((m) => m.status === "Finished");
+  return <ScrollView style={[styles.screen, { backgroundColor: colors.background }]} contentContainerStyle={{ paddingTop: Math.max(insets.top, 18), paddingBottom: 105 }} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); setTimeout(() => setRefreshing(false), 650); }} tintColor={colors.primary} />}>
+    <View style={styles.header}><View><Text style={[styles.eyebrow, { color: colors.primary }]}>SUNDAY · AUG 23</Text><Text style={[styles.title, { color: colors.foreground }]}>Good evening, <Text style={{ color: colors.primary }}>fan.</Text></Text></View><Pressable onPress={() => router.push("/profile")} style={[styles.iconButton, { backgroundColor: colors.card, borderColor: colors.border }]}><Feather name="bell" size={18} color={colors.foreground} /></Pressable></View>
+    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filters}>{filters.map((item) => <Pressable key={item} onPress={() => setFilter(item)} style={[styles.filter, { backgroundColor: filter === item ? colors.primary : colors.card, borderColor: filter === item ? colors.primary : colors.border }]}><Text style={[styles.filterText, { color: filter === item ? colors.primaryForeground : colors.mutedForeground }]}>{item}</Text></Pressable>)}</ScrollView>
+    {live.length > 0 && <Section title="LIVE NOW" accent={colors.destructive}>{live.map((match) => <MatchCard key={match.id} match={match} onPress={() => router.push(`/match/${match.id}`)} />)}</Section>}
+    {upcoming.length > 0 && <Section title="UPCOMING TODAY">{upcoming.map((match) => <MatchCard key={match.id} match={match} onPress={() => router.push(`/match/${match.id}`)} />)}</Section>}
+    {finished.length > 0 && <Section title="RESULTS"><View style={styles.resultRow}><View><Text style={[styles.resultTournament, { color: colors.mutedForeground }]}>LEC SUMMER · FINISHED</Text><Text style={[styles.resultTeams, { color: colors.foreground }]}>G2 Esports <Text style={{ color: colors.mutedForeground }}>vs</Text> Fnatic</Text></View><Text style={[styles.resultScore, { color: colors.foreground }]}>2 — 1</Text></View></Section>}
+  </ScrollView>;
+}
+function Section({ title, accent, children }: { title: string; accent?: string; children: React.ReactNode }) { const colors = useColors(); return <View style={styles.section}><View style={styles.sectionHeader}><Text style={[styles.sectionTitle, { color: accent ?? colors.mutedForeground }]}>{title}</Text><View style={[styles.line, { backgroundColor: colors.border }]} /></View>{children}</View>; }
+const styles = StyleSheet.create({ screen: { flex: 1, paddingHorizontal: 16 }, header: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }, eyebrow: { fontSize: 10, fontWeight: "800", letterSpacing: 1.4, marginBottom: 7 }, title: { fontSize: 25, fontWeight: "700", letterSpacing: -0.7 }, iconButton: { width: 42, height: 42, borderRadius: 14, borderWidth: 1, alignItems: "center", justifyContent: "center" }, filters: { gap: 8, paddingBottom: 24 }, filter: { paddingHorizontal: 15, paddingVertical: 9, borderRadius: 10, borderWidth: 1 }, filterText: { fontSize: 12, fontWeight: "700" }, section: { marginBottom: 20 }, sectionHeader: { flexDirection: "row", alignItems: "center", gap: 10, marginBottom: 10 }, sectionTitle: { fontSize: 10, fontWeight: "800", letterSpacing: 1.2 }, line: { height: 1, flex: 1 }, resultRow: { backgroundColor: "#121619", borderRadius: 14, borderWidth: 1, borderColor: "#243034", padding: 16, flexDirection: "row", justifyContent: "space-between", alignItems: "center" }, resultTournament: { fontSize: 10, fontWeight: "700", marginBottom: 8 }, resultTeams: { fontSize: 14, fontWeight: "700" }, resultScore: { fontSize: 20, fontWeight: "800" } });
