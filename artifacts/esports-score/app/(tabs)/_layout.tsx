@@ -22,7 +22,6 @@ function NativeTabLayout() {
       <NativeTabs.Trigger name="matches"><Icon sf={{ default: 'calendar', selected: 'calendar' }} /><Label>Matches</Label></NativeTabs.Trigger>
       <NativeTabs.Trigger name="following"><Icon sf={{ default: 'star', selected: 'star.fill' }} /><Label>Following</Label></NativeTabs.Trigger>
       <NativeTabs.Trigger name="search"><Icon sf={{ default: 'magnifyingglass', selected: 'magnifyingglass' }} /><Label>Search</Label></NativeTabs.Trigger>
-      <NativeTabs.Trigger name="profile"><Icon sf={{ default: 'person', selected: 'person.fill' }} /><Label>Profile</Label></NativeTabs.Trigger>
     </NativeTabs>
   );
 }
@@ -80,7 +79,7 @@ function ClassicTabLayout() {
       <Tabs.Screen name="matches" options={{ title: 'Matches', tabBarIcon: ({ color }) => <Feather name="calendar" size={22} color={color} /> }} />
       <Tabs.Screen name="following" options={{ title: 'Following', tabBarIcon: ({ color }) => <Feather name="star" size={22} color={color} /> }} />
       <Tabs.Screen name="search" options={{ title: 'Search', tabBarIcon: ({ color }) => <Feather name="search" size={22} color={color} /> }} />
-      <Tabs.Screen name="profile" options={{ title: 'Profile', tabBarIcon: ({ color }) => <Feather name="user" size={22} color={color} /> }} />
+      <Tabs.Screen name="profile" options={{ href: null }} />
     </Tabs>
   );
 }

@@ -1,5 +1,12 @@
 export type Game = "Valorant" | "CS2" | "League of Legends";
 export type MatchStatus = "Live" | "Upcoming" | "Finished";
+export type Player = { id: string; name: string; role?: string };
+export type Tournament = { id: string; name: string; game: Game };
+export type Series = { id: string; format: "BO1" | "BO3" | "BO5"; matchId: string };
+export type GameMap = { name: string; scoreA?: number; scoreB?: number; status: "scheduled" | "live" | "finished" };
+export type PlayerStats = { playerId: string; kills: number; deaths: number; assists: number; rating?: number };
+export type Favorite = { entityId: string; entityType: "team" | "tournament" };
+export type NotificationPreference = { before30: boolean; before5: boolean; start: boolean; result: boolean; spoilerFree: boolean };
 
 export type Team = {
   id: string;

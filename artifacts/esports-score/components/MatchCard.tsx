@@ -17,7 +17,7 @@ export function MatchCard({ match, onPress }: { match: Match; onPress: () => voi
     <Pressable testID={`match-${match.id}`} onPress={onPress} style={({ pressed }) => [styles.card, { backgroundColor: colors.card, borderColor: colors.border, opacity: pressed ? 0.82 : 1 }]}>
       <View style={styles.cardTop}>
         <View style={styles.tournament}><View style={[styles.gameDot, { backgroundColor: match.teamA.color }]} /><Text style={[styles.tournamentText, { color: colors.mutedForeground }]}>{match.game}  ·  {match.tournament}</Text></View>
-        <Pressable testID={`favorite-${match.id}`} onPress={() => toggleFavorite(match.teamA.id)} hitSlop={10}><Feather name={isFollowed ? "star" : "star"} size={17} color={isFollowed ? colors.primary : colors.mutedForeground} /></Pressable>
+        <Pressable testID={`favorite-${match.id}`} onPress={() => toggleFavorite(match.teamA.id)} hitSlop={10}><Feather name={isFollowed ? "heart" : "heart"} size={17} color={isFollowed ? colors.primary : colors.mutedForeground} /></Pressable>
       </View>
       <View style={styles.cardMain}>
         <View style={styles.team}><TeamBadge {...match.teamA} /><Text style={[styles.teamName, { color: colors.foreground }]}>{match.teamA.name}</Text></View>
