@@ -1,6 +1,5 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useColors } from "@/hooks/useColors";
-import { GameLogo } from "@/components/GameLogo";
 
 export type GameFilter = "Valorant" | "CS2" | "League of Legends";
 const items: { label: GameFilter; short: string; key: "valorant" | "cs2" | "lol" }[] = [
@@ -13,7 +12,7 @@ export function GameTabs({ selected, onChange }: { selected: GameFilter; onChang
   const colors = useColors();
   return <View style={[styles.container, { borderBottomColor: colors.border }]}>{items.map((item) => {
     const active = selected === item.label;
-    return <Pressable key={item.label} onPress={() => onChange(item.label)} style={styles.item}><View style={[styles.logo, { backgroundColor: active ? colors.accent : colors.card, borderColor: active ? colors.primary : colors.border }]}><GameLogo game={item.key} active={active} size={27} /></View><Text style={[styles.label, { color: active ? colors.foreground : colors.mutedForeground }]}>{item.short}</Text>{active && <View style={[styles.indicator, { backgroundColor: colors.primary }]} />}</Pressable>;
+    return <Pressable key={item.label} onPress={() => onChange(item.label)} accessibilityLabel={`${item.label} logo missing asset`} style={styles.item}><View style={[styles.logo, { backgroundColor: active ? colors.accent : colors.card, borderColor: active ? colors.primary : colors.border }]} /><Text style={[styles.label, { color: active ? colors.foreground : colors.mutedForeground }]}>{item.short}</Text>{active && <View style={[styles.indicator, { backgroundColor: colors.primary }]} />}</Pressable>;
   })}</View>;
 }
 
