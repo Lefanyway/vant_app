@@ -99,7 +99,7 @@ router.get("/teams/:id/overview", async (req, res, next) => {
       const opponent = home ? match.awayScore : match.homeScore;
       return own === undefined || opponent === undefined ? "D" : own > opponent ? "W" : own < opponent ? "L" : "D";
     });
-    const overview: TeamOverview = { team, nextMatch, recentMatches, competitions: competitions.slice(0, 5), rosterPreview: (team.roster ?? []).slice(0, 5), recentForm, capabilities: { overview: true, matches: Boolean(selected.getTeamMatches), roster: Boolean(team.roster?.length), stats: Boolean(selected.getTeamStats), news: false } };
+    const overview: TeamOverview = { team, nextMatch, recentMatches, competitions: competitions.slice(0, 5), rosterPreview: (team.roster ?? []).slice(0, 5), recentForm, capabilities: { overview: true, matches: Boolean(selected.getTeamMatches), roster: Boolean(team.roster?.length), stats: Boolean(selected.getTeamStats), news: Boolean(selected.getTeamNews) } };
     return res.json(overview);
   } catch (error) { return next(error); }
 });
@@ -122,6 +122,15 @@ router.get("/teams/:id/stats", async (req, res, next) => {
   const selected = providerRequired(res); if (!selected) return;
   if (!selected.getTeamStats) return res.json({ stats: null, available: false, error: "Team stats unavailable" });
   try { const stats = await cached(`team-stats:${req.params.id}:30d`, ESPORTS_CACHE_TTL.teamStats, () => selected.getTeamStats!(req.params.id, "30d")); return res.json({ stats, available: Boolean(stats) }); } catch (error) { return res.json({ stats: null, available: false, error: "Team stats unavailable" }); }
+});
+router.get("/teams/:id/news", async (req, res, next) => {
+  const selected = providerRequired(res); if (!selected) return;
+  if (!selected.getTeamNews) return res.json({ articles: [], available: false, error: "Team news unavailable" });
+  const limit = Math.min(20, Math.max(1, Number(req.query.limit) || 5));
+  try {
+    const articles = await cached(`team-news:${req.params.id}:${limit}`, ESPORTS_CACHE_TTL.teamNews, () => selected.getTeamNews!(req.params.id, limit));
+    return res.json({ articles, available: articles.length > 0 });
+  } catch (error) { return res.json({ articles: [], available: false, error: "Team news unavailable" }); }
 });
 router.get("/teams/:id", async (req, res, next) => { const selected = providerRequired(res); if (!selected) return; try { const item = await cached(`team:${req.params.id}`, ESPORTS_CACHE_TTL.teams, () => selected.getTeam(req.params.id)); if (!item) return res.status(404).json({ error: "Team not found" }); return res.json(item); } catch (error) { return next(error); } });
 router.get("/teams", async (req, res, next) => { const selected = providerRequired(res); if (!selected) return; try { return res.json(await cached(`teams:${req.query.game ?? "all"}`, ESPORTS_CACHE_TTL.teams, () => selected.getTeams(game(req.query.game)))); } catch (error) { return next(error); } });

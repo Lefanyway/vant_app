@@ -3,6 +3,8 @@ import type { Match, Team } from "@/lib/data";
 type ApiTeam = { id: string; name: string; acronym?: string; logoUrl?: string; country?: string; gameId: string };
 export type ApiPlayer = { id: string; name: string; fullName?: string; imageUrl?: string; country?: string; role?: string; status?: "player" | "coach" | "staff" };
 export type ApiTeamDetails = ApiTeam & { website?: string; socials?: { platform: string; url: string }[]; roster?: ApiPlayer[] };
+export type TeamNewsArticle = { id: string; title: string; url: string; publishedAt: string; source: string; imageUrl?: string; summary?: string };
+export type TeamNewsResult = { articles: TeamNewsArticle[]; available: boolean; error?: string };
 type ApiCompetition = { id: string; name: string; region?: string; serieName?: string; logoUrl?: string };
 type ApiMatch = { id: string; gameId: string; competition: ApiCompetition; homeTeam: ApiTeam; awayTeam: ApiTeam; startTime: string; status: "scheduled" | "live" | "finished" | "cancelled" | "postponed"; bestOf?: 1 | 3 | 5; homeScore?: number; awayScore?: number; streams?: { url: string; language?: string; official?: boolean }[] };
 type ApiMatchDetails = { match: ApiMatch; maps: { id: string; mapName?: string; mapNumber: number; homeScore?: number; awayScore?: number }[]; playerStats: unknown[]; economy: null; veto: null; headToHead: ApiMatch[]; recentMatches: { teamId: string; matches: ApiMatch[] }[]; capabilities: { maps: boolean; playerStats: boolean; economy: boolean; veto: boolean; headToHead: boolean; recentMatches: boolean } };
@@ -88,12 +90,13 @@ export type TeamOverview = {
   competitions: ApiCompetition[];
   rosterPreview: ApiPlayer[];
   recentForm: ("W" | "L" | "D")[];
-  capabilities: { overview: true; matches: boolean; roster: boolean; stats: boolean; news: false };
+  capabilities: { overview: true; matches: boolean; roster: boolean; stats: boolean; news: boolean };
 };
 export type TeamStatsResult = { stats: { period: "30d"; matches: number; wins: number; losses: number; mapsPlayed?: number; mapsWon?: number; mapWinRate?: number } | null; available: boolean; error?: string };
 export type TeamMatchesResult = { matches: ApiMatch[]; hasMore: boolean };
 
 export async function fetchTeamOverview(id: string) { return request<TeamOverview>(`/teams/${encodeURIComponent(id)}/overview`); }
+export async function fetchTeamNews(id: string, limit = 5) { return request<TeamNewsResult>(`/teams/${encodeURIComponent(id)}/news?limit=${limit}`); }
 export async function fetchTeamMatches(id: string, filter: "all" | "upcoming" | "finished", page = 1) {
   return request<TeamMatchesResult>(`/teams/${encodeURIComponent(id)}/matches?filter=${filter}&page=${page}&per_page=20`);
 }
