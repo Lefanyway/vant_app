@@ -8,6 +8,7 @@ import { fetchMatchDetails, type MatchDetails } from "@/lib/api";
 import type { Match } from "@/lib/data";
 import { TeamBadge } from "@/components/MatchCard";
 import { useColors } from "@/hooks/useColors";
+import { TeamLink } from "@/components/TeamLink";
 
 type Tab = "Overview" | "Performance" | "Economy" | "H2H";
 
@@ -97,7 +98,7 @@ function PastMatch({ match, colors, focusTeamId }: { match: Match; colors: Retur
   return <View style={[styles.pastMatch, { backgroundColor: colors.card, borderColor: colors.border }]}><Text style={[styles.resultMark, { color: won === undefined ? colors.mutedForeground : won ? colors.positive : colors.destructive }]}>{won === undefined ? "—" : won ? "W" : "L"}</Text><Text style={[styles.pastScore, { color: colors.foreground }]}>{match.scoreA ?? "—"} – {match.scoreB ?? "—"}</Text><Text style={[styles.pastTeams, { color: colors.foreground }]} numberOfLines={1}>{match.teamA.name} vs {match.teamB.name}</Text><Text style={[styles.pastDate, { color: colors.mutedForeground }]}>{match.startTime ? new Date(match.startTime).toLocaleDateString([], { month: "short", day: "numeric" }) : "—"}</Text></View>;
 }
 
-function TeamColumn({ team, colors }: { team: Match["teamA"]; colors: ReturnType<typeof useColors> }) { return <View style={styles.teamColumn}><TeamBadge {...team} /><Text style={[styles.teamName, { color: colors.foreground }]} numberOfLines={2}>{team.name}</Text></View>; }
+function TeamColumn({ team, colors }: { team: Match["teamA"]; colors: ReturnType<typeof useColors> }) { return <TeamLink team={team}><View style={styles.teamColumn}><TeamBadge {...team} /><Text style={[styles.teamName, { color: colors.foreground }]} numberOfLines={2}>{team.name}</Text></View></TeamLink>; }
 function SectionTitle({ title, colors }: { title: string; colors: ReturnType<typeof useColors> }) { return <Text style={[styles.sectionTitle, { color: colors.mutedForeground }]}>{title}</Text>; }
 function InfoRow({ label, value, colors }: { label: string; value: string; colors: ReturnType<typeof useColors> }) { return <View style={[styles.infoRow, { borderBottomColor: colors.border }]}><Text style={[styles.infoLabel, { color: colors.mutedForeground }]}>{label}</Text><Text style={[styles.infoValue, { color: colors.foreground }]}>{value}</Text></View>; }
 function Stat({ label, value, colors }: { label: string; value?: number | string; colors: ReturnType<typeof useColors> }) { return <View style={styles.stat}><Text style={[styles.statLabel, { color: colors.mutedForeground }]}>{label}</Text><Text style={[styles.statValue, { color: colors.foreground }]}>{value ?? "—"}</Text></View>; }

@@ -1,7 +1,7 @@
 import { Router, type Request, type Response } from "express";
 import { getConfiguredProvider, getConfiguredStatsProvider } from "../providers/esports";
 import { ESPORTS_CACHE_TTL, TtlCache } from "../providers/esports/cache";
-import type { GameId, Match } from "../providers/esports/types";
+import type { GameId, Match, TeamMatchFilter, TeamOverview } from "../providers/esports/types";
 
 const router = Router();
 const games = [{ id: "valorant", name: "VALORANT", shortName: "VALORANT" }, { id: "cs2", name: "Counter-Strike 2", shortName: "CS2" }, { id: "lol", name: "League of Legends", shortName: "LoL" }];
@@ -82,6 +82,47 @@ router.get("/matches", async (req, res, next) => {
 });
 router.get("/competitions/:id", async (req, res, next) => { const selected = providerRequired(res); if (!selected) return; try { const item = await cached(`competition:${req.params.id}`, ESPORTS_CACHE_TTL.competitions, () => selected.getCompetition(req.params.id)); if (!item) return res.status(404).json({ error: "Competition not found" }); return res.json(item); } catch (error) { return next(error); } });
 router.get("/competitions", async (req, res, next) => { const selected = providerRequired(res); if (!selected) return; try { return res.json(await cached(`competitions:${req.query.game ?? "all"}`, ESPORTS_CACHE_TTL.competitions, () => selected.getCompetitions(game(req.query.game)))); } catch (error) { return next(error); } });
+router.get("/teams/:id/overview", async (req, res, next) => {
+  const selected = providerRequired(res); if (!selected) return;
+  try {
+    const team = await cached(`team:${req.params.id}`, ESPORTS_CACHE_TTL.teams, () => selected.getTeamDetails?.(req.params.id) ?? selected.getTeam(req.params.id).then((value) => value ? { ...value, roster: [] } : null));
+    if (!team) return res.status(404).json({ error: "Team not found" });
+    const [matchPage, competitions] = await Promise.all([
+      selected.getTeamMatches ? cached(`team-matches:${req.params.id}:overview`, ESPORTS_CACHE_TTL.teamMatches, () => selected.getTeamMatches!(req.params.id, "all", 1, 20)) : Promise.resolve({ matches: [] as Match[], hasMore: false }),
+      cached(`competitions:${team.gameId}`, ESPORTS_CACHE_TTL.competitions, () => selected.getCompetitions(team.gameId)),
+    ]);
+    const recentMatches = matchPage.matches.filter((match) => match.status === "finished").slice(0, 5);
+    const nextMatch = matchPage.matches.find((match) => match.status === "scheduled" || match.status === "live") ?? null;
+    const recentForm = recentMatches.map((match) => {
+      const home = match.homeTeam.id === team.id;
+      const own = home ? match.homeScore : match.awayScore;
+      const opponent = home ? match.awayScore : match.homeScore;
+      return own === undefined || opponent === undefined ? "D" : own > opponent ? "W" : own < opponent ? "L" : "D";
+    });
+    const overview: TeamOverview = { team, nextMatch, recentMatches, competitions: competitions.slice(0, 5), rosterPreview: (team.roster ?? []).slice(0, 5), recentForm, capabilities: { overview: true, matches: Boolean(selected.getTeamMatches), roster: Boolean(team.roster?.length), stats: Boolean(selected.getTeamStats), news: false } };
+    return res.json(overview);
+  } catch (error) { return next(error); }
+});
+router.get("/teams/:id/matches", async (req, res, next) => {
+  const selected = providerRequired(res); if (!selected) return;
+  if (!selected.getTeamMatches) return res.status(503).json({ error: "Team matches unavailable" });
+  const filter = (["all", "upcoming", "finished"].includes(String(req.query.filter)) ? String(req.query.filter) : "all") as TeamMatchFilter;
+  const page = Math.max(1, Number(req.query.page) || 1); const perPage = Math.min(20, Math.max(1, Number(req.query.per_page) || 20));
+  try { return res.json(await cached(`team-matches:${req.params.id}:${filter}:${page}:${perPage}`, ESPORTS_CACHE_TTL.teamMatches, () => selected.getTeamMatches!(req.params.id, filter, page, perPage))); } catch (error) { return next(error); }
+});
+router.get("/teams/:id/roster", async (req, res, next) => {
+  const selected = providerRequired(res); if (!selected) return;
+  try {
+    const team = await cached(`team:${req.params.id}`, ESPORTS_CACHE_TTL.teams, () => selected.getTeamDetails?.(req.params.id) ?? selected.getTeam(req.params.id).then((value) => value ? { ...value, roster: [] } : null));
+    if (!team) return res.status(404).json({ error: "Team not found" });
+    return res.json(team.roster ?? []);
+  } catch (error) { return next(error); }
+});
+router.get("/teams/:id/stats", async (req, res, next) => {
+  const selected = providerRequired(res); if (!selected) return;
+  if (!selected.getTeamStats) return res.json({ stats: null, available: false, error: "Team stats unavailable" });
+  try { const stats = await cached(`team-stats:${req.params.id}:30d`, ESPORTS_CACHE_TTL.teamStats, () => selected.getTeamStats!(req.params.id, "30d")); return res.json({ stats, available: Boolean(stats) }); } catch (error) { return res.json({ stats: null, available: false, error: "Team stats unavailable" }); }
+});
 router.get("/teams/:id", async (req, res, next) => { const selected = providerRequired(res); if (!selected) return; try { const item = await cached(`team:${req.params.id}`, ESPORTS_CACHE_TTL.teams, () => selected.getTeam(req.params.id)); if (!item) return res.status(404).json({ error: "Team not found" }); return res.json(item); } catch (error) { return next(error); } });
 router.get("/teams", async (req, res, next) => { const selected = providerRequired(res); if (!selected) return; try { return res.json(await cached(`teams:${req.query.game ?? "all"}`, ESPORTS_CACHE_TTL.teams, () => selected.getTeams(game(req.query.game)))); } catch (error) { return next(error); } });
 router.get("/search", async (req, res, next) => { const selected = providerRequired(res); if (!selected) return; const q = typeof req.query.q === "string" ? req.query.q : ""; try { return res.json(await cached(`search:${q.toLowerCase()}`, ESPORTS_CACHE_TTL.search, () => selected.search(q))); } catch (error) { return next(error); } });

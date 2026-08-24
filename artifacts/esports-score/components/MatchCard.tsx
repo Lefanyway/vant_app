@@ -4,6 +4,7 @@ import { Match } from "@/lib/data";
 import { useColors } from "@/hooks/useColors";
 import { useApp } from "@/context/AppContext";
 import { ResolvedLogo } from "@/components/ResolvedLogo";
+import { TeamLink } from "@/components/TeamLink";
 
 export function TeamBadge({ name, short, color, logoUrl }: { name: string; short: string; color: string; logoUrl?: string }) {
   return <View style={styles.teamBadge}><ResolvedLogo type="team" name={name} size={38} logoUrl={logoUrl} /></View>;
@@ -20,13 +21,13 @@ export function MatchCard({ match, onPress }: { match: Match; onPress: () => voi
         <Pressable testID={`favorite-${match.id}`} onPress={() => toggleFavorite(match.teamA.id)} hitSlop={10}><Feather name={isFollowed ? "heart" : "heart"} size={17} color={isFollowed ? colors.primary : colors.mutedForeground} /></Pressable>
       </View>
       <View style={styles.cardMain}>
-        <View style={styles.team}><TeamBadge {...match.teamA} /><Text style={[styles.teamName, { color: colors.foreground }]}>{match.teamA.name}</Text></View>
+        <TeamLink team={match.teamA}><View style={styles.team}><TeamBadge {...match.teamA} /><Text style={[styles.teamName, { color: colors.foreground }]} numberOfLines={2}>{match.teamA.name}</Text></View></TeamLink>
         <View style={styles.scoreColumn}>
           {match.status === "Live" ? <Text style={[styles.liveText, { color: colors.primary }]}>LIVE</Text> : <Text style={[styles.time, { color: colors.foreground }]}>{match.time}</Text>}
           {match.status !== "Upcoming" && <Text style={[styles.score, { color: colors.foreground }]}>{match.scoreA} <Text style={{ color: colors.mutedForeground }}>—</Text> {match.scoreB}</Text>}
           <Text style={[styles.format, { color: colors.mutedForeground }]}>{match.format}</Text>
         </View>
-        <View style={[styles.team, styles.teamRight]}><TeamBadge {...match.teamB} /><Text style={[styles.teamName, { color: colors.foreground }]}>{match.teamB.name}</Text></View>
+        <TeamLink team={match.teamB}><View style={[styles.team, styles.teamRight]}><TeamBadge {...match.teamB} /><Text style={[styles.teamName, { color: colors.foreground }]} numberOfLines={2}>{match.teamB.name}</Text></View></TeamLink>
       </View>
       <View style={[styles.cardBottom, { borderTopColor: colors.border }]}><Text style={[styles.detail, { color: colors.mutedForeground }]}>{match.detail}</Text><Feather name="chevron-right" size={16} color={colors.mutedForeground} /></View>
     </Pressable>

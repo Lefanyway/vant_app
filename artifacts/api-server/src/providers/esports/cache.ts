@@ -8,6 +8,9 @@ export const ESPORTS_CACHE_TTL = {
   live: 20_000,
   matchDetail: 60_000,
   search: 5 * 60_000,
+  teamMatches: 60 * 60_000,
+  teamRoster: 3 * 60 * 60_000,
+  teamStats: 6 * 60 * 60_000,
 } as const;
 
 type Entry = { value: unknown; expiresAt: number };

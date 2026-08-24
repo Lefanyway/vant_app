@@ -6,6 +6,8 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { fetchSearch } from "@/lib/api";
 import { ResolvedLogo } from "@/components/ResolvedLogo";
 import { useColors } from "@/hooks/useColors";
+import { TeamLink } from "@/components/TeamLink";
+import { toApiTeam } from "@/lib/api";
 
 export default function Search() {
   const colors = useColors(); const insets = useSafeAreaInsets(); const [query, setQuery] = useState("");
@@ -22,7 +24,7 @@ export default function Search() {
       : searchQuery.isLoading ? <Text style={[styles.empty, { color: colors.mutedForeground }]}>Searching…</Text>
       : searchQuery.isError ? <View><Text style={[styles.empty, { color: colors.mutedForeground }]}>Couldn't load results.</Text><Pressable onPress={() => searchQuery.refetch()}><Text style={[styles.retry, { color: colors.primary }]}>Try again</Text></Pressable></View>
       : <>
-          {teams.length > 0 && <SearchGroup title="TEAMS">{teams.map((team) => <View key={team.id} style={[styles.result, { borderBottomColor: colors.border }]}><ResolvedLogo type="team" name={team.name} logoUrl={team.logoUrl} size={34} /><View><Text style={[styles.resultName, { color: colors.foreground }]}>{team.name}</Text><Text style={[styles.resultMeta, { color: colors.mutedForeground }]}>{gameLabel(team.gameId)}</Text></View></View>)}</SearchGroup>}
+          {teams.length > 0 && <SearchGroup title="TEAMS">{teams.map((team) => <TeamLink key={team.id} team={toApiTeam({ ...team, gameId: team.gameId ?? "valorant" })} compact><View style={[styles.result, { borderBottomColor: colors.border }]}><ResolvedLogo type="team" name={team.name} logoUrl={team.logoUrl} size={34} /><View><Text style={[styles.resultName, { color: colors.foreground }]}>{team.name}</Text><Text style={[styles.resultMeta, { color: colors.mutedForeground }]}>{gameLabel(team.gameId)}</Text></View></View></TeamLink>)}</SearchGroup>}
           {competitions.length > 0 && <SearchGroup title="COMPETITIONS">{competitions.map((competition) => <View key={competition.id} style={[styles.result, { borderBottomColor: colors.border }]}><ResolvedLogo type="competition" name={competition.name} logoUrl={competition.logoUrl} size={34} /><View><Text style={[styles.resultName, { color: colors.foreground }]}>{competition.name}</Text><Text style={[styles.resultMeta, { color: colors.mutedForeground }]}>{gameLabel(competition.gameId)}</Text></View></View>)}</SearchGroup>}
           {teams.length + competitions.length === 0 && <Text style={[styles.empty, { color: colors.mutedForeground }]}>No results for “{query}”.</Text>}
         </>}

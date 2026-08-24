@@ -1,8 +1,9 @@
 import { PandaScoreClient } from "./client";
-import type { Competition, EsportsDataProvider, Game, GameId, Match, MatchDetails, MatchQuery, MatchStatus, ProviderCapabilities, SearchResult, Team } from "../types";
+import type { Competition, EsportsDataProvider, Game, GameId, Match, MatchDetails, MatchQuery, MatchStatus, ProviderCapabilities, SearchResult, Team, TeamDetails, TeamMatchFilter, TeamPlayer, TeamStats } from "../types";
 import { localDayBounds } from "../date";
 
-type RawTeam = { id: number; name: string; acronym?: string; image_url?: string; location?: string };
+type RawPlayer = { id: number; name?: string; first_name?: string; last_name?: string; image_url?: string; nationality?: string; role?: string };
+type RawTeam = { id: number; name: string; acronym?: string; image_url?: string; location?: string; players?: RawPlayer[]; website?: string; social?: { url?: string } };
 type RawLeague = { id: number; name: string; slug?: string; image_url?: string };
 type RawMatch = {
   id: number; begin_at?: string; status?: string; number_of_games?: number;
@@ -22,6 +23,7 @@ const internalId = (provider: string, id: number) => `${provider}:${id}`;
 
 const logoProxy = (url?: string) => url ? `/api/esports/assets/logo?url=${encodeURIComponent(url)}` : undefined;
 const mapTeam = (raw: RawTeam, game: GameId): Team => ({ id: internalId("pandascore", raw.id), externalIds: [{ provider: "pandascore", id: String(raw.id) }], name: raw.name, acronym: raw.acronym, logoUrl: logoProxy(raw.image_url), country: raw.location, gameId: game });
+const mapPlayer = (raw: RawPlayer): TeamPlayer => ({ id: internalId("pandascore", raw.id), name: raw.name ?? ([raw.first_name, raw.last_name].filter(Boolean).join(" ") || `Player ${raw.id}`), fullName: [raw.first_name, raw.last_name].filter(Boolean).join(" ") || undefined, imageUrl: logoProxy(raw.image_url), country: raw.nationality, role: raw.role, status: raw.role?.toLowerCase().includes("coach") ? "coach" : "player" });
 const tbdTeam = (matchId: number, side: "home" | "away", game: GameId): Team => ({ id: `tbd:${matchId}:${side}`, externalIds: [], name: "TBD", gameId: game });
 const mapCompetition = (raw: RawLeague, game: GameId, serieName?: string): Competition => ({ id: internalId("pandascore", raw.id), externalIds: [{ provider: "pandascore", id: String(raw.id) }], name: raw.name, slug: raw.slug, logoUrl: logoProxy(raw.image_url), serieName, gameId: game });
 
@@ -175,11 +177,73 @@ export class PandaScoreAdapter implements EsportsDataProvider {
     const externalId = id.startsWith("pandascore:") ? id.slice("pandascore:".length) : id;
     for (const target of ["valorant", "cs2", "lol"] as GameId[]) {
       try {
-        const row = await this.client.request<RawTeam>(`/${providerSlug[target]}/teams/${encodeURIComponent(externalId)}`);
-        return mapTeam(row, target);
+        const row = await this.findRawTeam(externalId, target);
+        if (row) return mapTeam(row, target);
       } catch { /* try next game */ }
     }
     return null;
+  }
+
+  private async findRawTeam(externalId: string, target: GameId): Promise<RawTeam | null> {
+    try {
+      return await this.client.request<RawTeam>(`/${providerSlug[target]}/teams/${encodeURIComponent(externalId)}`);
+    } catch {
+      const { rows } = await this.client.fetchAllPages<RawTeam>(`/${providerSlug[target]}/teams`, { "filter[id]": externalId }, 2);
+      return rows.find((row) => String(row.id) === externalId) ?? null;
+    }
+  }
+
+  async getTeamDetails(id: string): Promise<TeamDetails | null> {
+    const externalId = id.startsWith("pandascore:") ? id.slice("pandascore:".length) : id;
+    for (const target of ["valorant", "cs2", "lol"] as GameId[]) {
+      try {
+        const row = await this.findRawTeam(externalId, target);
+        if (!row) continue;
+        const team = mapTeam(row, target);
+        return { ...team, website: row.website, socials: row.social?.url ? [{ platform: "social", url: row.social.url }] : [], roster: (row.players ?? []).map(mapPlayer) };
+      } catch { /* try next game */ }
+    }
+    return null;
+  }
+
+  private teamExternalId(id: string) {
+    return id.startsWith("pandascore:") ? id.slice("pandascore:".length) : id;
+  }
+
+  async getTeamMatches(id: string, filter: TeamMatchFilter, page = 1, perPage = 20): Promise<{ matches: Match[]; hasMore: boolean }> {
+    const externalId = this.teamExternalId(id);
+    const endpoints = filter === "upcoming" ? ["upcoming"] : filter === "finished" ? ["past"] : ["upcoming", "past"];
+    const results: Match[] = [];
+    let hasMore = false;
+    for (const target of ["valorant", "cs2", "lol"] as GameId[]) {
+      for (const endpoint of endpoints) {
+        try {
+          let rows = await this.client.request<RawMatch[]>(`/${providerSlug[target]}/teams/${encodeURIComponent(externalId)}/matches/${endpoint}`, { page, per_page: perPage, sort: endpoint === "past" ? "-begin_at" : "begin_at" });
+          if (!rows.length) {
+            rows = await this.client.request<RawMatch[]>(`/${providerSlug[target]}/matches/${endpoint}`, { page, per_page: perPage, sort: endpoint === "past" ? "-begin_at" : "begin_at", "filter[opponent_id]": externalId });
+          }
+          const mapped = rows.map((row) => this.mapMatch(row)).filter((match) => match.homeTeam.id === id || match.awayTeam.id === id);
+          results.push(...mapped);
+          hasMore = hasMore || rows.length === perPage;
+        } catch { /* the team belongs to another game */ }
+      }
+    }
+    const unique = Array.from(new Map(results.map((match) => [match.id, match])).values()).sort((a, b) => filter === "finished" ? Date.parse(b.startTime) - Date.parse(a.startTime) : Date.parse(a.startTime) - Date.parse(b.startTime));
+    return { matches: unique.slice(0, perPage), hasMore };
+  }
+
+  async getTeamStats(id: string, period: "30d" = "30d"): Promise<TeamStats | null> {
+    const cutoff = Date.now() - 30 * 24 * 60 * 60_000;
+    const page = await this.getTeamMatches(id, "finished", 1, 100);
+    const matches = page.matches.filter((match) => Date.parse(match.startTime) >= cutoff && match.homeScore !== undefined && match.awayScore !== undefined);
+    if (!matches.length) return null;
+    const team = await this.getTeam(id);
+    if (!team) return null;
+    const wins = matches.filter((match) => {
+      const focusedHome = match.homeTeam.id === team.id;
+      return focusedHome ? match.homeScore! > match.awayScore! : match.awayScore! > match.homeScore!;
+    }).length;
+    return { period, matches: matches.length, wins, losses: matches.length - wins };
   }
 
   async search(query: string): Promise<SearchResult[]> {

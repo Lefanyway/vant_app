@@ -7,6 +7,7 @@ import { useApp } from "@/context/AppContext";
 import { TeamBadge } from "@/components/MatchCard";
 import { fetchMatches, fetchTeams, localDateKey } from "@/lib/api";
 import { useColors } from "@/hooks/useColors";
+import { TeamLink } from "@/components/TeamLink";
 
 const options = [{ key: "before30", label: "30 minutes before" }, { key: "before5", label: "5 minutes before" }, { key: "start", label: "When match starts" }, { key: "result", label: "Final result" }] as const;
 
@@ -21,8 +22,8 @@ export default function Following() {
     <Text style={[styles.label, { color: colors.mutedForeground }]}>TEAMS</Text>
     {teamsQuery.isLoading ? <Text style={[styles.empty, { color: colors.mutedForeground }]}>Loading teams…</Text>
       : teamsQuery.isError ? <Text style={[styles.empty, { color: colors.mutedForeground }]}>Couldn't load teams.</Text>
-      : followed.length === 0 ? <Text style={[styles.empty, { color: colors.mutedForeground }]}>Follow a team from any match to see it here.</Text>
-      : followed.map((team) => <View key={team.id} style={[styles.row, { backgroundColor: colors.card, borderColor: colors.border }]}><TeamBadge {...team} /><View style={{ flex: 1 }}><Text style={[styles.team, { color: colors.foreground }]}>{team.name}</Text><Text style={[styles.game, { color: colors.mutedForeground }]}>{team.game}</Text></View><Pressable onPress={() => toggleFavorite(team.id)}><Feather name="heart" size={18} color={colors.primary} /></Pressable></View>)}
+       : followed.length === 0 ? <Text style={[styles.empty, { color: colors.mutedForeground }]}>Follow a team from any match to see it here.</Text>
+       : followed.map((team) => <View key={team.id} style={[styles.row, { backgroundColor: colors.card, borderColor: colors.border }]}><TeamLink team={team} compact><TeamBadge {...team} /><View style={{ flex: 1 }}><Text style={[styles.team, { color: colors.foreground }]}>{team.name}</Text><Text style={[styles.game, { color: colors.mutedForeground }]}>{team.game}</Text></View></TeamLink><Pressable onPress={() => toggleFavorite(team.id)}><Feather name="heart" size={18} color={colors.primary} /></Pressable></View>)}
     <Text style={[styles.label, { color: colors.mutedForeground }]}>NOTIFICATIONS</Text>
     <View style={[styles.panel, { backgroundColor: colors.card, borderColor: colors.border }]}>{options.map((item, index) => <View key={item.key} style={[styles.option, index < options.length - 1 && { borderBottomColor: colors.border, borderBottomWidth: 1 }]}><Text style={[styles.optionText, { color: colors.foreground }]}>{item.label}</Text><Switch value={notifications[item.key]} onValueChange={() => toggleNotification(item.key)} trackColor={{ false: colors.secondary, true: colors.accent }} thumbColor={notifications[item.key] ? colors.primary : colors.mutedForeground} /></View>)}</View>
     <View style={[styles.spoiler, { backgroundColor: colors.accent, borderColor: colors.primary }]}><View style={{ flex: 1 }}><Text style={[styles.optionText, { color: colors.foreground }]}>Spoiler-free mode</Text><Text style={[styles.game, { color: colors.mutedForeground }]}>Hide score and winner from alerts</Text></View><Switch value={notifications.spoilerFree} onValueChange={() => toggleNotification("spoilerFree")} trackColor={{ false: colors.secondary, true: colors.primary }} thumbColor={colors.primaryForeground} /></View>

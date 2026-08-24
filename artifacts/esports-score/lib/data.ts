@@ -15,6 +15,7 @@ export type Team = {
   color: string;
   game: Game;
   logoUrl?: string;
+  country?: string;
 };
 
 export type Match = {
