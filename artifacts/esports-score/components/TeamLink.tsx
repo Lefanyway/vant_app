@@ -7,6 +7,7 @@ import { ResolvedLogo } from "@/components/ResolvedLogo";
 export function TeamLink({ team, children, compact = false }: { team: Team; children?: ReactNode; compact?: boolean }) {
   return (
     <Pressable
+      testID={`team-link-${team.id}`}
       accessibilityRole="link"
       accessibilityLabel={`Open ${team.name}`}
       onPress={(event) => {
