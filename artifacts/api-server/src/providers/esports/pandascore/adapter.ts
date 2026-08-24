@@ -1,6 +1,7 @@
 import { PandaScoreClient } from "./client";
-import type { Competition, EsportsDataProvider, Game, GameId, Match, MatchDetails, MatchQuery, MatchStatus, ProviderCapabilities, SearchResult, Team, TeamDetails, TeamMatchFilter, TeamPlayer, TeamStats } from "../types";
+import type { Competition, EsportsDataProvider, Game, GameId, Match, MatchDetails, MatchQuery, MatchStatus, ProviderCapabilities, SearchResult, Team, TeamDetails, TeamMatchFilter, TeamNewsArticle, TeamPlayer, TeamStats } from "../types";
 import { localDayBounds } from "../date";
+import { fetchTeamNews } from "./news";
 
 type RawPlayer = { id: number; name?: string; first_name?: string; last_name?: string; image_url?: string; nationality?: string; role?: string };
 type RawTeam = { id: number; name: string; acronym?: string; image_url?: string; location?: string; players?: RawPlayer[]; website?: string; social?: { url?: string } };
@@ -244,6 +245,14 @@ export class PandaScoreAdapter implements EsportsDataProvider {
       return focusedHome ? match.homeScore! > match.awayScore! : match.awayScore! > match.homeScore!;
     }).length;
     return { period, matches: matches.length, wins, losses: matches.length - wins };
+  }
+
+  async getTeamNews(id: string, limit = 5): Promise<TeamNewsArticle[]> {
+    const team = await this.getTeam(id);
+    if (!team) return [];
+    const articles = await fetchTeamNews(team.name, limit);
+    console.log(`[VANT esports] provider=pandascore op=team-news team=${team.id} source=google-news articles=${articles.length}`);
+    return articles;
   }
 
   async search(query: string): Promise<SearchResult[]> {
