@@ -39,6 +39,9 @@ cd services/vlr-api && python main.py
 
 Health checks are available at `/health` and `/v2/health`.
 
+When deployed alongside VANT, the service is routed under `/vlr`; use the
+published VANT URL plus `/vlr` as `VLR_API_BASE_URL`.
+
 ## Highlights
 
 - **V2-first API** - consistent response envelopes, validation, and per-endpoint caching

@@ -30,3 +30,26 @@ NODE_ENV = "production"
 
 [services.production.health.startup]
 path = "/api/healthz"
+
+[[services]]
+localPort = 3001
+name = "VLR Stats API"
+paths = ["/vlr"]
+
+[services.development]
+run = "cd ../../services/vlr-api && python main.py"
+
+[services.production]
+
+[services.production.build]
+args = ["python", "-m", "pip", "install", "--user", "-r", "services/vlr-api/requirements.txt"]
+
+[services.production.run]
+args = ["python", "services/vlr-api/main.py"]
+
+[services.production.run.env]
+PORT = "3001"
+PYTHONPATH = "services/vlr-api"
+
+[services.production.health.startup]
+path = "/vlr/health"
