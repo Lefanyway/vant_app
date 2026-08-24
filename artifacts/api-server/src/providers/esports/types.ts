@@ -20,6 +20,22 @@ export type MatchDetails = {
   recentMatches: { teamId: string; matches: Match[] }[];
   capabilities: { maps: boolean; playerStats: boolean; economy: boolean; veto: boolean; headToHead: boolean; recentMatches: boolean };
 };
+export type ValorantMatchLookup = { homeTeam: Team; awayTeam: Team; startTime: string; competition?: Competition; bestOf?: 1 | 3 | 5 };
+export type ValorantProviderMatch = { providerMatchId: string; homeTeamName: string; awayTeamName: string; startTime: string; competitionName?: string; bestOf?: 1 | 3 | 5 };
+export type ValorantMapStats = { id: string; mapName: string; mapNumber: number; homeScore?: number; awayScore?: number; status?: "scheduled" | "live" | "finished" };
+export type ValorantPlayerStats = { playerId: string; playerName: string; teamId?: string; agent?: string; rating?: number; acs?: number; kills?: number; deaths?: number; assists?: number; kast?: number; adr?: number; headshotPercentage?: number; firstKills?: number; firstDeaths?: number };
+export type ValorantEconomy = { homeRoundsWon?: number; awayRoundsWon?: number; homePistolRoundsWon?: number; awayPistolRoundsWon?: number; homeAttackRoundsWon?: number; awayAttackRoundsWon?: number; homeDefenseRoundsWon?: number; awayDefenseRoundsWon?: number };
+export type ValorantVetoAction = { teamName: string; action: "ban" | "pick" | "remain"; mapName: string };
+export type VantValorantMatchStats = { providerMatchId: string; maps: ValorantMapStats[]; playerStats: ValorantPlayerStats[]; economy?: ValorantEconomy; veto: ValorantVetoAction[]; headToHead: Match[]; recentMatches: { teamId: string; matches: Match[] }[] };
+export type ValorantStatsCapabilities = { deepStats: boolean; maps: boolean; playerStats: boolean; economy: boolean; veto: boolean; headToHead: boolean; recentMatches: boolean };
+export type ValorantStatsResult = { stats: VantValorantMatchStats | null; capabilities: ValorantStatsCapabilities; error?: "VLR enrichment unavailable" | "VLR match not found" };
+export type ValorantStatsProvider = {
+  name: string;
+  findMatch(input: ValorantMatchLookup): Promise<ValorantProviderMatch | null>;
+  getMatchStats(providerMatchId: string): Promise<VantValorantMatchStats | null>;
+  getHeadToHead(input: { homeTeam: Team; awayTeam: Team }): Promise<Match[]>;
+  getRecentMatches(team: Team, limit?: number): Promise<Match[]>;
+};
 export type MatchQuery = { game?: GameId; date?: string; from?: string; to?: string; timezone?: string };
 export type SearchResult = { type: "team" | "competition" | "game"; id: string; name: string; gameId?: GameId; logoUrl?: string };
 export type ProviderCapabilities = { schedules: boolean; results: boolean; runningMatches: boolean; historicalStats: boolean; liveTelemetry: boolean };

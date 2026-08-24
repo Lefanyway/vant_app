@@ -1,5 +1,5 @@
 import { Router, type Request, type Response } from "express";
-import { getConfiguredProvider } from "../providers/esports";
+import { getConfiguredProvider, getConfiguredStatsProvider } from "../providers/esports";
 import { ESPORTS_CACHE_TTL, TtlCache } from "../providers/esports/cache";
 import type { GameId, Match } from "../providers/esports/types";
 
@@ -49,6 +49,26 @@ router.get("/games", async (_req, res, next) => { const selected = getConfigured
 router.get("/matches/live", async (req, res, next) => { const selected = providerRequired(res); if (!selected) return; try { return res.json(await cached(`live:${req.query.game ?? "all"}`, ESPORTS_CACHE_TTL.live, () => selected.getLiveMatches(game(req.query.game)))); } catch (error) { return next(error); } });
 router.get("/matches/upcoming", async (req, res, next) => { const selected = providerRequired(res); if (!selected) return; try { return res.json(await cached(`upcoming:${req.query.game ?? "all"}`, ESPORTS_CACHE_TTL.matchesFuture, () => selected.getUpcomingMatches(game(req.query.game)))); } catch (error) { return next(error); } });
 router.get("/matches/:id/details", async (req, res, next) => { const selected = providerRequired(res); if (!selected) return; try { if (!selected.getMatchDetails) return res.status(404).json({ error: "Match details unavailable" }); const details = await cached(`match-details:${req.params.id}`, ESPORTS_CACHE_TTL.matchDetail, () => selected.getMatchDetails!(req.params.id)); if (!details) return res.status(404).json({ error: "Match not found" }); return res.json(details); } catch (error) { return next(error); } });
+router.get("/matches/:id/stats", async (req, res, next) => {
+  const selected = providerRequired(res); if (!selected) return;
+  const unavailable = { stats: null, capabilities: { deepStats: false, maps: false, playerStats: false, economy: false, veto: false, headToHead: false, recentMatches: false }, error: "VLR enrichment unavailable" as const };
+  try {
+    const statsProvider = getConfiguredStatsProvider();
+    if (!statsProvider) return res.json(unavailable);
+    const result = await cached(`match-stats:${req.params.id}`, ESPORTS_CACHE_TTL.matchDetail, async () => {
+      const match = await selected.getMatch(req.params.id);
+      if (!match || match.gameId !== "valorant") return unavailable;
+      try {
+        const resolved = await statsProvider.findMatch({ homeTeam: match.homeTeam, awayTeam: match.awayTeam, startTime: match.startTime, competition: match.competition, bestOf: match.bestOf });
+        if (!resolved) return { ...unavailable, error: "VLR match not found" as const };
+        const stats = await statsProvider.getMatchStats(resolved.providerMatchId);
+        if (!stats) return unavailable;
+        return { stats, capabilities: { deepStats: true, maps: stats.maps.length > 0, playerStats: stats.playerStats.length > 0, economy: Boolean(stats.economy), veto: stats.veto.length > 0, headToHead: stats.headToHead.length > 0, recentMatches: stats.recentMatches.some((group) => group.matches.length > 0) } };
+      } catch { return unavailable; }
+    });
+    return res.json(result);
+  } catch (error) { return next(error); }
+});
 router.get("/matches/:id", async (req, res, next) => { const selected = providerRequired(res); if (!selected) return; try { const match = await cached<Match | null>(`match:${req.params.id}`, ESPORTS_CACHE_TTL.matchDetail, () => selected.getMatch(req.params.id)); if (!match) return res.status(404).json({ error: "Match not found" }); return res.json(match); } catch (error) { return next(error); } });
 router.get("/matches", async (req, res, next) => {
   const selected = providerRequired(res); if (!selected) return;
@@ -68,4 +88,13 @@ router.get("/search", async (req, res, next) => { const selected = providerRequi
 
 router.get("/debug/provider", async (_req, res) => { if (process.env.NODE_ENV !== "development") return res.status(404).end(); const selected = getConfiguredProvider(); let reachable = false; if (selected.provider) { try { await selected.provider.getGames(); reachable = true; } catch { reachable = false; } } return res.json({ provider: selected.name, configured: selected.configured, reachable }); });
 router.get("/debug/esports", async (_req, res) => { if (process.env.NODE_ENV !== "development") return res.status(404).end(); const selected = getConfiguredProvider(); let reachable = false; if (selected.provider) { try { await selected.provider.getGames(); reachable = true; } catch { reachable = false; } } return res.json({ provider: selected.name, configured: selected.configured, reachable, capabilities: selected.provider?.capabilities ?? null, cacheEntries: cache.size }); });
+router.get("/debug/providers", async (_req, res) => {
+  if (process.env.NODE_ENV !== "development") return res.status(404).end();
+  const fixtures = getConfiguredProvider();
+  const stats = getConfiguredStatsProvider();
+  let pandaReachable = false; let vlrReachable = false;
+  if (fixtures.provider) { try { await fixtures.provider.getGames(); pandaReachable = true; } catch { /* sanitized health result */ } }
+  if (stats) { try { await stats.health(); vlrReachable = true; } catch { /* sanitized health result */ } }
+  return res.json({ pandascore: { configured: fixtures.configured, reachable: pandaReachable }, vlr: { configured: Boolean(stats), reachable: vlrReachable } });
+});
 export default router;

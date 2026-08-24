@@ -4,7 +4,9 @@ type ApiTeam = { id: string; name: string; acronym?: string; logoUrl?: string; c
 type ApiCompetition = { id: string; name: string; region?: string; serieName?: string; logoUrl?: string };
 type ApiMatch = { id: string; gameId: string; competition: ApiCompetition; homeTeam: ApiTeam; awayTeam: ApiTeam; startTime: string; status: "scheduled" | "live" | "finished" | "cancelled" | "postponed"; bestOf?: 1 | 3 | 5; homeScore?: number; awayScore?: number; streams?: { url: string; language?: string; official?: boolean }[] };
 type ApiMatchDetails = { match: ApiMatch; maps: { id: string; mapName?: string; mapNumber: number; homeScore?: number; awayScore?: number }[]; playerStats: unknown[]; economy: null; veto: null; headToHead: ApiMatch[]; recentMatches: { teamId: string; matches: ApiMatch[] }[]; capabilities: { maps: boolean; playerStats: boolean; economy: boolean; veto: boolean; headToHead: boolean; recentMatches: boolean } };
-export type MatchDetails = { match: Match; maps: { id: string; mapName?: string; mapNumber: number; homeScore?: number; awayScore?: number }[]; playerStats: unknown[]; economy: null; veto: null; headToHead: Match[]; recentMatches: { teamId: string; matches: Match[] }[]; capabilities: { maps: boolean; playerStats: boolean; economy: boolean; veto: boolean; headToHead: boolean; recentMatches: boolean } };
+type ApiStats = { providerMatchId: string; maps: { id: string; mapName: string; mapNumber: number; homeScore?: number; awayScore?: number; status?: string }[]; playerStats: { playerId: string; playerName: string; teamId?: string; agent?: string; rating?: number; acs?: number; kills?: number; deaths?: number; assists?: number; kast?: number; adr?: number; headshotPercentage?: number; firstKills?: number; firstDeaths?: number }[]; economy?: { homeRoundsWon?: number; awayRoundsWon?: number; homePistolRoundsWon?: number; awayPistolRoundsWon?: number; homeAttackRoundsWon?: number; awayAttackRoundsWon?: number; homeDefenseRoundsWon?: number; awayDefenseRoundsWon?: number }; veto: { teamName: string; action: string; mapName: string }[]; headToHead: ApiMatch[]; recentMatches: { teamId: string; matches: ApiMatch[] }[] };
+type ApiStatsResult = { stats: ApiStats | null; capabilities: { deepStats: boolean; maps: boolean; playerStats: boolean; economy: boolean; veto: boolean; headToHead: boolean; recentMatches: boolean }; error?: string };
+export type MatchDetails = { match: Match; maps: { id: string; mapName?: string; mapNumber: number; homeScore?: number; awayScore?: number }[]; playerStats: unknown[]; economy: null; veto: { teamName: string; action: string; mapName: string }[] | null; headToHead: Match[]; recentMatches: { teamId: string; matches: Match[] }[]; capabilities: { maps: boolean; playerStats: boolean; economy: boolean; veto: boolean; headToHead: boolean; recentMatches: boolean }; stats?: ApiStats };
 export type ApiSearchResult = { type: "team" | "competition" | "game"; id: string; name: string; gameId?: string; logoUrl?: string };
 
 const baseUrl = process.env.EXPO_PUBLIC_API_BASE_URL ?? "";
@@ -43,8 +45,19 @@ export async function fetchMatches(game?: string, date = localDateKey(new Date()
 
 export async function fetchMatch(id: string) { return toMatch(await request<ApiMatch>(`/matches/${encodeURIComponent(id)}`)); }
 export async function fetchMatchDetails(id: string) {
-  const details = await request<ApiMatchDetails>(`/matches/${encodeURIComponent(id)}/details`);
-  return { ...details, match: toMatch(details.match), headToHead: details.headToHead.map(toMatch), recentMatches: details.recentMatches.map((group) => ({ ...group, matches: group.matches.map(toMatch) })) };
+  const [details, statsResult] = await Promise.all([request<ApiMatchDetails>(`/matches/${encodeURIComponent(id)}/details`), request<ApiStatsResult>(`/matches/${encodeURIComponent(id)}/stats`)]);
+  const stats = statsResult.stats ?? undefined;
+  return {
+    ...details, match: toMatch(details.match),
+    maps: stats?.maps ?? details.maps,
+    playerStats: stats?.playerStats ?? details.playerStats,
+    economy: stats?.economy ? null : details.economy,
+    veto: stats?.veto ?? details.veto,
+    headToHead: (stats?.headToHead?.length ? stats.headToHead : details.headToHead).map(toMatch),
+    recentMatches: (stats?.recentMatches?.length ? stats.recentMatches : details.recentMatches).map((group) => ({ ...group, matches: group.matches.map(toMatch) })),
+    capabilities: statsResult.capabilities.deepStats ? { maps: statsResult.capabilities.maps, playerStats: statsResult.capabilities.playerStats, economy: statsResult.capabilities.economy, veto: statsResult.capabilities.veto, headToHead: statsResult.capabilities.headToHead, recentMatches: statsResult.capabilities.recentMatches } : details.capabilities,
+    stats,
+  };
 }
 
 export async function fetchLiveMatches(game?: string) {
