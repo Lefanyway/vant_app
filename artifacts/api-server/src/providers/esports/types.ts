@@ -3,6 +3,29 @@ export type MatchStatus = "scheduled" | "live" | "finished" | "cancelled" | "pos
 export type ExternalId = { provider: string; id: string };
 export type Game = { id: GameId; name: string; shortName: string; logoUrl?: string };
 export type Team = { id: string; externalIds: ExternalId[]; name: string; acronym?: string; logoUrl?: string; country?: string; gameId: GameId };
+export type TeamPlayer = { id: string; name: string; fullName?: string; imageUrl?: string; country?: string; role?: string; status?: "player" | "coach" | "staff" };
+export type TeamDetails = Team & { website?: string; socials?: { platform: string; url: string }[]; roster?: TeamPlayer[] };
+export type TeamMatchFilter = "all" | "upcoming" | "finished";
+export type TeamStats = {
+  period: "30d";
+  matches: number;
+  wins: number;
+  losses: number;
+  mapsPlayed?: number;
+  mapsWon?: number;
+  averageRoundsWon?: number;
+  mapWinRate?: number;
+};
+export type TeamPageCapabilities = { overview: true; matches: boolean; roster: boolean; stats: boolean; news: false };
+export type TeamOverview = {
+  team: TeamDetails;
+  nextMatch: Match | null;
+  recentMatches: Match[];
+  competitions: Competition[];
+  rosterPreview: TeamPlayer[];
+  recentForm: ("W" | "L" | "D")[];
+  capabilities: TeamPageCapabilities;
+};
 export type Competition = { id: string; externalIds: ExternalId[]; name: string; slug?: string; logoUrl?: string; region?: string; serieName?: string; gameId: GameId };
 export type Stream = { url: string; language?: string; official?: boolean };
 export type Match = {
@@ -54,5 +77,8 @@ export type EsportsDataProvider = {
   getCompetition(id: string): Promise<Competition | null>;
   getTeams(game?: GameId): Promise<Team[]>;
   getTeam(id: string): Promise<Team | null>;
+  getTeamDetails?(id: string): Promise<TeamDetails | null>;
+  getTeamMatches?(id: string, filter: TeamMatchFilter, page?: number, perPage?: number): Promise<{ matches: Match[]; hasMore: boolean }>;
+  getTeamStats?(id: string, period?: "30d"): Promise<TeamStats | null>;
   search(query: string): Promise<SearchResult[]>;
 };
