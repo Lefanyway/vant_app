@@ -56,9 +56,9 @@ router.get("/matches/:id/stats", async (req, res, next) => {
     const statsProvider = getConfiguredStatsProvider();
     if (!statsProvider) return res.json(unavailable);
     const result = await cached(`match-stats:${req.params.id}`, ESPORTS_CACHE_TTL.matchDetail, async () => {
-      const match = await selected.getMatch(req.params.id);
-      if (!match || match.gameId !== "valorant") return unavailable;
       try {
+        const match = await selected.getMatch(req.params.id);
+        if (!match || match.gameId !== "valorant") return unavailable;
         const resolved = await statsProvider.findMatch({ homeTeam: match.homeTeam, awayTeam: match.awayTeam, startTime: match.startTime, competition: match.competition, bestOf: match.bestOf });
         if (!resolved) return { ...unavailable, error: "VLR match not found" as const };
         const stats = await statsProvider.getMatchStats(resolved.providerMatchId);

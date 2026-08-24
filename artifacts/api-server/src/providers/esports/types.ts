@@ -26,7 +26,8 @@ export type ValorantMapStats = { id: string; mapName: string; mapNumber: number;
 export type ValorantPlayerStats = { playerId: string; playerName: string; teamId?: string; agent?: string; rating?: number; acs?: number; kills?: number; deaths?: number; assists?: number; kast?: number; adr?: number; headshotPercentage?: number; firstKills?: number; firstDeaths?: number };
 export type ValorantEconomy = { homeRoundsWon?: number; awayRoundsWon?: number; homePistolRoundsWon?: number; awayPistolRoundsWon?: number; homeAttackRoundsWon?: number; awayAttackRoundsWon?: number; homeDefenseRoundsWon?: number; awayDefenseRoundsWon?: number };
 export type ValorantVetoAction = { teamName: string; action: "ban" | "pick" | "remain"; mapName: string };
-export type VantValorantMatchStats = { providerMatchId: string; maps: ValorantMapStats[]; playerStats: ValorantPlayerStats[]; economy?: ValorantEconomy; veto: ValorantVetoAction[]; headToHead: Match[]; recentMatches: { teamId: string; matches: Match[] }[] };
+/** Public stats model. Provider lookup identifiers must stay inside the adapter/route. */
+export type VantValorantMatchStats = { maps: ValorantMapStats[]; playerStats: ValorantPlayerStats[]; economy?: ValorantEconomy; veto: ValorantVetoAction[]; headToHead: Match[]; recentMatches: { teamId: string; matches: Match[] }[] };
 export type ValorantStatsCapabilities = { deepStats: boolean; maps: boolean; playerStats: boolean; economy: boolean; veto: boolean; headToHead: boolean; recentMatches: boolean };
 export type ValorantStatsResult = { stats: VantValorantMatchStats | null; capabilities: ValorantStatsCapabilities; error?: "VLR enrichment unavailable" | "VLR match not found" };
 export type ValorantStatsProvider = {
