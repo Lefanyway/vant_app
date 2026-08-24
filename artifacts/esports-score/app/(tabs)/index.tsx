@@ -2,7 +2,7 @@ import { Feather } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Pressable, RefreshControl, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { Platform, Pressable, RefreshControl, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { CompetitionCard } from "@/components/CompetitionCard";
 import { CompetitionListItem } from "@/components/CompetitionListItem";
@@ -25,7 +25,7 @@ export default function Home() {
   const competitionsQuery = useQuery({ queryKey: ["competitions", gameId], queryFn: () => fetchCompetitions(gameId), enabled: mode === "Competitions" });
   const filtered = useMemo(() => (matchesQuery.data ?? []).filter((m) => !query || `${m.teamA.name} ${m.teamB.name} ${m.tournament}`.toLowerCase().includes(query.toLowerCase())), [matchesQuery.data, query]);
   const grouped = filtered.reduce<Record<string, typeof filtered>>((groups, match) => { (groups[match.tournament] ??= []).push(match); return groups; }, {});
-  return <ScrollView style={[styles.screen, { backgroundColor: colors.background }]} contentContainerStyle={{ paddingTop: Math.max(insets.top, 16), paddingBottom: 108 }} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); setTimeout(() => setRefreshing(false), 500); }} tintColor={colors.primary} />}>
+  return <ScrollView style={[styles.screen, { backgroundColor: colors.background }]} contentContainerStyle={{ paddingTop: Platform.OS === "web" ? 67 : insets.top, paddingBottom: 108 }} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); setTimeout(() => setRefreshing(false), 500); }} tintColor={colors.primary} />}>
     <View style={[styles.header, { backgroundColor: colors.card, borderColor: colors.border }]}><Text style={[styles.brand, { color: colors.foreground }]}>VANT</Text><View style={[styles.search, { backgroundColor: colors.background, borderColor: colors.border }]}><Feather name="search" size={15} color={colors.mutedForeground} /><TextInput value={query} onChangeText={setQuery} placeholder="Search teams, players, tournaments" placeholderTextColor={colors.mutedForeground} style={[styles.searchInput, { color: colors.foreground }]} /></View><Pressable onPress={() => router.push("/following")} hitSlop={10}><Feather name="bell" size={18} color={colors.foreground} /></Pressable></View>
     <Text style={[styles.date, { color: colors.mutedForeground }]}>{new Date(`${selectedDate}T12:00:00`).toLocaleDateString([], { weekday: "long", month: "short", day: "numeric" }).toUpperCase()}</Text>
     <GameTabs selected={game} onChange={setGame} />
