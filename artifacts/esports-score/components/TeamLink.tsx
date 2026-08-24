@@ -22,6 +22,6 @@ export function TeamLink({ team, children, compact = false }: { team: Team; chil
 
 const styles = StyleSheet.create({
   link: { alignItems: "center", justifyContent: "center" },
-  compact: { flexDirection: "row" },
+  compact: { flexDirection: "row", width: "100%", alignItems: "stretch" },
   default: { alignItems: "center", justifyContent: "center" },
 });
