@@ -89,3 +89,39 @@ test("uses a bounded default for missing and invalid limits", async () => {
   assert.deepEqual(limits, [5, 5]);
   assert(limits.every((limit) => typeof limit === "number" && Number.isFinite(limit)));
 });
+
+test("caps a news limit above the public maximum before calling the provider", async () => {
+  const limits: unknown[] = [];
+  providerSelection({
+    getTeamNews: async (_id, limit) => {
+      limits.push(limit);
+      return [];
+    },
+  });
+
+  const result = await requestNews("team-with-large-limit", "?limit=999");
+
+  assert.equal(result.status, 200);
+  assert.deepEqual(limits, [20]);
+  assert.deepEqual(result.body, {
+    articles: [],
+    available: false,
+  });
+});
+
+test("sanitizes provider failures into an unavailable news response", async () => {
+  providerSelection({
+    getTeamNews: async () => {
+      throw new Error("provider credentials or internal details");
+    },
+  });
+
+  const result = await requestNews("team-with-provider-failure");
+
+  assert.equal(result.status, 200);
+  assert.deepEqual(result.body, {
+    articles: [],
+    available: false,
+    error: "Team news unavailable",
+  });
+});
