@@ -1,6 +1,6 @@
 # Abrir o VANT no Expo Go
 
-Use o checkout `wt-grok`: era o checkout da API ativa ao fazer este diagnostico.
+Execute os comandos a partir da raiz do repositorio VANT.
 
 ## Login no Expo antes da primeira abertura
 
@@ -8,7 +8,7 @@ Entre no Expo Go do celular e na CLI do computador com a mesma conta Expo.
 No PowerShell, execute:
 
 ```powershell
-cd C:\caminho\do\projeto\wt-grok\artifacts\esports-score
+cd .\artifacts\esports-score
 node .\node_modules\expo\bin\cli login
 node .\node_modules\expo\bin\cli whoami
 ```
@@ -27,10 +27,9 @@ causar essa mensagem. Um servidor que ja estava aberto precisa ser reiniciado.
 ## Todo dia
 
 1. Ligue o computador e conecte computador e celular ao mesmo Wi-Fi.
-2. Abra `ABRIR-VANT.cmd` na pasta acima de `wt-grok`, ou use PowerShell:
+2. Abra `ABRIR-VANT.cmd` na raiz do repositorio, ou use PowerShell:
 
 ```powershell
-cd C:\caminho\do\projeto\wt-grok
 npm run dev:phone
 ```
 
