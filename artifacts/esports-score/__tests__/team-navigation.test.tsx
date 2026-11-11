@@ -51,26 +51,34 @@ jest.mock("@/lib/api", () => ({
   fetchTeamOverview: () => Promise.resolve(null), fetchTeamMatches: () => Promise.resolve({ matches: [], hasMore: false }),
   fetchTeamRoster: () => Promise.resolve([]), fetchTeamStats: () => Promise.resolve({ stats: null, available: false }),
   fetchSearch: () => Promise.resolve([]), fetchTeams: () => Promise.resolve([]), fetchMatches: () => Promise.resolve([]),
-  fetchMatchDetails: () => Promise.resolve(null), localDateKey: () => "2026-08-24",
+  fetchMatchDetails: () => Promise.resolve(null), fetchMatch: () => Promise.resolve(null), fetchMatchStats: () => Promise.resolve(null), applyMatchStats: (details: unknown) => details, errorMessage: (_error: unknown, fallback: string) => fallback, localDateKey: () => "2026-08-24",
   toApiTeam: (value: any) => ({ id: value.id, name: value.name, short: value.acronym ?? value.name.slice(0, 3).toUpperCase(), color: "#4C8DFF", game: "Valorant", gameId: value.gameId }),
   toMatch: (value: any) => ({ id: value.id, startTime: value.startTime, game: "Valorant", tournament: "Test Cup", time: "12:00", status: "Upcoming", teamA: value.homeTeam, teamB: value.awayTeam, format: "BO3", detail: "Match" }),
 }));
-jest.mock("@tanstack/react-query", () => ({
-  useQuery: ({ queryKey }: { queryKey: unknown[] }) => {
-    mockQueryKeys.push(queryKey);
-    const key = String(queryKey[0]);
-    return { data: mockQueryState[key], isLoading: mockLoading.has(key), isError: false, refetch: jest.fn() };
-  },
-  useInfiniteQuery: ({ queryKey }: { queryKey: unknown[] }) => {
-    mockQueryKeys.push(queryKey);
-    const key = String(queryKey[0]);
-    const pages = (mockQueryState[key] as unknown[] | undefined) ?? [];
-    return { data: { pages }, isLoading: mockLoading.has(key), isError: false, hasNextPage: false, isFetchingNextPage: false, fetchNextPage: jest.fn() };
-  },
-}));
+jest.mock("@tanstack/react-query", () => {
+  class QueryClient {
+    setQueryData() {}
+    prefetchQuery() { return Promise.resolve(); }
+  }
+  return {
+    QueryClient,
+    useQuery: ({ queryKey }: { queryKey: unknown[] }) => {
+      mockQueryKeys.push(queryKey);
+      const key = String(queryKey[0]);
+      return { data: mockQueryState[key], isLoading: mockLoading.has(key), isError: false, error: null, refetch: jest.fn() };
+    },
+    useInfiniteQuery: ({ queryKey }: { queryKey: unknown[] }) => {
+      mockQueryKeys.push(queryKey);
+      const key = String(queryKey[0]);
+      const pages = (mockQueryState[key] as unknown[] | undefined) ?? [];
+      return { data: { pages }, isLoading: mockLoading.has(key), isError: false, hasNextPage: false, isFetchingNextPage: false, fetchNextPage: jest.fn() };
+    },
+  };
+});
 jest.mock("expo-router", () => ({
   router: { push: jest.fn(), back: jest.fn() },
   useLocalSearchParams: () => mockRouteParams,
+  useIsFocused: () => true,
 }));
 jest.mock("@/hooks/useColors", () => ({
   useColors: () => ({
@@ -126,12 +134,12 @@ describe("universal team profile", () => {
     mockQueryState["team-overview"] = null;
     mockRouteParams = { id: "missing-team" };
     renderWithQuery(<TeamDetail />);
-    expect(await screen.findByText("Team not found.")).toBeTruthy();
+    expect(await screen.findByText("Equipe não encontrada.")).toBeTruthy();
   });
 
   it("toggles following from the team profile", async () => {
     renderWithQuery(<TeamDetail />);
-    const follow = await screen.findByText("Follow");
+    const follow = await screen.findByText("Seguir");
     fireEvent.press(follow);
     expect(mockToggleFavorite).toHaveBeenCalledWith("loud");
   });
@@ -139,24 +147,24 @@ describe("universal team profile", () => {
   it("renders loading, unavailable stats, and an empty matches state", async () => {
     mockLoading.add("team-overview");
     renderWithQuery(<TeamDetail />);
-    expect(screen.queryByText("Team not found.")).toBeNull();
+    expect(screen.queryByText("Equipe não encontrada.")).toBeNull();
     mockLoading.delete("team-overview");
     mockQueryState["team-overview"] = overview;
     renderWithQuery(<TeamDetail />);
-    expect(screen.getByText("Stats")).toBeTruthy();
-    fireEvent.press(screen.getByText("Stats"));
-    expect(await screen.findByText("Team stats unavailable.")).toBeTruthy();
-    fireEvent.press(screen.getByText("Matches"));
-    expect(await screen.findByText("No matches found.")).toBeTruthy();
+    expect(screen.getByText("Estatísticas")).toBeTruthy();
+    fireEvent.press(screen.getByText("Estatísticas"));
+    expect(await screen.findByText("Estatísticas indisponíveis.")).toBeTruthy();
+    fireEvent.press(screen.getByText("Partidas"));
+    expect(await screen.findByText("Nenhuma partida encontrada.")).toBeTruthy();
   });
 });
 
 describe("team profile entry points", () => {
   it("links a search result to the team profile", async () => {
-    mockQueryState.search = [{ type: "team", id: "loud", name: "LOUD", gameId: "valorant" }];
+    mockQueryState.catalog = [{ items: [{ type: "team", id: "loud", name: "LOUD", gameId: "valorant" }], hasMore: false }];
     jest.useFakeTimers();
     renderWithQuery(<Search />);
-    fireEvent.changeText(screen.getByPlaceholderText("Teams and competitions"), "LOUD");
+    fireEvent.changeText(screen.getByPlaceholderText("Equipe, sigla ou competição"), "LOUD");
     await act(async () => {
       jest.advanceTimersByTime(400);
     });

@@ -1,34 +1,55 @@
+import { Ionicons } from "@expo/vector-icons";
 import { Feather } from "@expo/vector-icons";
-import { router } from "expo-router";
 import { useQuery } from "@tanstack/react-query";
-import { Pressable, ScrollView, StyleSheet, Switch, Text, View } from "react-native";
+import { useState } from "react";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useApp } from "@/context/AppContext";
-import { TeamBadge } from "@/components/MatchCard";
-import { fetchMatches, fetchTeams, localDateKey } from "@/lib/api";
-import { useColors } from "@/hooks/useColors";
+import { MobileHeader, ScreenTabs, EmptyState, ListSkeleton } from "@/components/MobileChrome";
+import { CompetitionListItem } from "@/components/CompetitionListItem";
+import { MatchCard, TeamBadge } from "@/components/MatchCard";
 import { TeamLink } from "@/components/TeamLink";
-
-const options = [{ key: "before30", label: "30 minutes before" }, { key: "before5", label: "5 minutes before" }, { key: "start", label: "When match starts" }, { key: "result", label: "Final result" }] as const;
-
+import { useApp } from "@/context/AppContext";
+import { useColors } from "@/hooks/useColors";
+import { fetchCompetitions, fetchFollowedMatches, fetchMatch, fetchTeam, toApiTeam, type ApiTeamDetails } from "@/lib/api";
+import type { Team } from "@/lib/data";
+import { openCompetition, openMatch } from "@/lib/navigation";
+function asTeam(value: Team | ApiTeamDetails): Team { return "short" in value && "game" in value ? value : toApiTeam(value); }
 export default function Following() {
-  const colors = useColors(); const insets = useSafeAreaInsets(); const { favoriteTeams, toggleFavorite, notifications, toggleNotification } = useApp();
-  const teamsQuery = useQuery({ queryKey: ["teams"], queryFn: () => fetchTeams() });
-  const upcomingQuery = useQuery({ queryKey: ["matches", "all", localDateKey(new Date())], queryFn: () => fetchMatches() });
-  const followed = (teamsQuery.data ?? []).filter((team) => favoriteTeams.includes(team.id));
-  const upNext = (upcomingQuery.data ?? []).filter((match) => match.status !== "Finished" && followed.some((team) => team.id === match.teamA.id || team.id === match.teamB.id)).slice(0, 5);
-  return <ScrollView style={[styles.screen, { backgroundColor: colors.background }]} contentContainerStyle={{ paddingTop: Math.max(insets.top, 18), paddingBottom: 100 }}>
-    <View style={styles.header}><View><Text style={[styles.title, { color: colors.foreground }]}>Following</Text><Text style={[styles.subtitle, { color: colors.mutedForeground }]}>Teams and alerts you care about.</Text></View><Feather name="settings" size={19} color={colors.mutedForeground} /></View>
-    <Text style={[styles.label, { color: colors.mutedForeground }]}>TEAMS</Text>
-    {teamsQuery.isLoading ? <Text style={[styles.empty, { color: colors.mutedForeground }]}>Loading teams…</Text>
-      : teamsQuery.isError ? <Text style={[styles.empty, { color: colors.mutedForeground }]}>Couldn't load teams.</Text>
-       : followed.length === 0 ? <Text style={[styles.empty, { color: colors.mutedForeground }]}>Follow a team from any match to see it here.</Text>
-       : followed.map((team) => <View key={team.id} style={[styles.row, { backgroundColor: colors.card, borderColor: colors.border }]}><TeamLink team={team} compact><TeamBadge {...team} /><View style={{ flex: 1 }}><Text style={[styles.team, { color: colors.foreground }]}>{team.name}</Text><Text style={[styles.game, { color: colors.mutedForeground }]}>{team.game}</Text></View></TeamLink><Pressable onPress={() => toggleFavorite(team.id)}><Feather name="heart" size={18} color={colors.primary} /></Pressable></View>)}
-    <Text style={[styles.label, { color: colors.mutedForeground }]}>NOTIFICATIONS</Text>
-    <View style={[styles.panel, { backgroundColor: colors.card, borderColor: colors.border }]}>{options.map((item, index) => <View key={item.key} style={[styles.option, index < options.length - 1 && { borderBottomColor: colors.border, borderBottomWidth: 1 }]}><Text style={[styles.optionText, { color: colors.foreground }]}>{item.label}</Text><Switch value={notifications[item.key]} onValueChange={() => toggleNotification(item.key)} trackColor={{ false: colors.secondary, true: colors.accent }} thumbColor={notifications[item.key] ? colors.primary : colors.mutedForeground} /></View>)}</View>
-    <View style={[styles.spoiler, { backgroundColor: colors.accent, borderColor: colors.primary }]}><View style={{ flex: 1 }}><Text style={[styles.optionText, { color: colors.foreground }]}>Spoiler-free mode</Text><Text style={[styles.game, { color: colors.mutedForeground }]}>Hide score and winner from alerts</Text></View><Switch value={notifications.spoilerFree} onValueChange={() => toggleNotification("spoilerFree")} trackColor={{ false: colors.secondary, true: colors.primary }} thumbColor={colors.primaryForeground} /></View>
-    <Text style={[styles.label, { color: colors.mutedForeground }]}>UP NEXT FOR YOU</Text>
-    {upNext.length === 0 ? <Text style={[styles.empty, { color: colors.mutedForeground }]}>No upcoming matches for your teams today.</Text> : upNext.map((match) => <Pressable key={match.id} onPress={() => router.push(`/match/${match.id}`)} style={[styles.next, { backgroundColor: colors.card, borderColor: colors.border }]}><Text style={[styles.game, { color: colors.mutedForeground }]}>{match.time} · {match.tournament}</Text><Text style={[styles.nextTeams, { color: colors.foreground }]}>{match.teamA.name}  <Text style={{ color: colors.mutedForeground }}>vs</Text>  {match.teamB.name}</Text></Pressable>)}
-  </ScrollView>;
+  const colors = useColors();
+  const insets = useSafeAreaInsets();
+  const [tab, setTab] = useState<"matches" | "teams" | "competitions">("teams");
+  const { favoriteTeams, favoriteCompetitions = [], favoriteMatches = [], favoritesReady = true, toggleFavorite, migrateFavorite } = useApp();
+  const teamsQuery = useQuery({ queryKey: ["teams", favoriteTeams], enabled: favoritesReady && favoriteTeams.length > 0, queryFn: async () => {
+    const results: PromiseSettledResult<Team>[] = [];
+    for (let offset = 0; offset < favoriteTeams.length; offset += 3) {
+      results.push(...await Promise.allSettled(favoriteTeams.slice(offset, offset + 3).map(async id => { const team = await fetchTeam(id); migrateFavorite?.(id, team.id); return team; })));
+    }
+    const teams = results.flatMap(row => row.status === "fulfilled" ? [row.value] : []);
+    if (!teams.length) throw new Error("Não foi possível carregar as equipes.");
+    return teams;
+  }, staleTime: 10 * 60_000 });
+  const followedMatches = useQuery({ queryKey: ["followed-matches", favoriteTeams], enabled: tab === "matches" && favoritesReady && favoriteTeams.length > 0, queryFn: () => fetchFollowedMatches(favoriteTeams) });
+  const savedMatches = useQuery({ queryKey: ["saved-matches", favoriteMatches], enabled: tab === "matches" && favoritesReady && favoriteMatches.length > 0, queryFn: async () => {
+    const results = await Promise.allSettled(favoriteMatches.map(id => fetchMatch(id)));
+    const rows = results.flatMap(row => row.status === "fulfilled" ? [row.value] : []);
+    if (!rows.length && favoriteMatches.length) throw new Error("Não foi possível carregar as partidas salvas.");
+    return rows;
+  } });
+  const competitionsQuery = useQuery({ queryKey: ["competitions", "valorant"], queryFn: () => fetchCompetitions("valorant"), enabled: tab === "competitions" && favoriteCompetitions.length > 0, staleTime: 10 * 60_000 });
+  const teams = ((teamsQuery.data ?? []) as Array<Team | ApiTeamDetails>).map(asTeam);
+  const matches = [...new Map([...(savedMatches.data ?? []), ...(followedMatches.data?.matches ?? [])].map(match => [match.id, match])).values()];
+  const competitions = (competitionsQuery.data ?? []).filter(row => favoriteCompetitions.includes(row.id));
+  return <View style={{ flex: 1, backgroundColor: colors.background }}>
+    <MobileHeader><ScreenTabs items={[{ key: "matches", label: "Partidas" }, { key: "teams", label: "Equipes" }, { key: "competitions", label: "Competições" }]} selected={tab} onChange={setTab} /></MobileHeader>
+    <ScrollView contentContainerStyle={{ paddingHorizontal: 8, paddingTop: 12, paddingBottom: 110 + insets.bottom }}>
+      {tab === "teams" ? !favoritesReady || favoriteTeams.length > 0 && teamsQuery.isLoading ? <ListSkeleton /> : teamsQuery.isError ? <EmptyState title="Não foi possível carregar" onRetry={() => void teamsQuery.refetch()} /> : teams.length === 0 ? <EmptyState title="Suas equipes favoritas" description="Busque uma equipe e toque na estrela para acompanhá-la aqui." /> : teams.map(team => <View key={team.id} style={[styles.row, { backgroundColor: colors.card }]}>
+        <View style={styles.link}><TeamLink team={team} compact><TeamBadge {...team} size={38} /><View style={styles.copy}><Text style={[styles.name, { color: colors.foreground }]}>{team.name}</Text><Text style={[styles.meta, { color: colors.mutedForeground }]}>Valorant</Text></View></TeamLink></View>
+        <Pressable accessibilityRole="button" accessibilityLabel={`Deixar de seguir ${team.name}`} onPress={() => toggleFavorite(team.id)} style={styles.star}><Ionicons name="star" size={23} color={colors.primary} /></Pressable>
+      </View>) : tab === "matches" ? savedMatches.isLoading || followedMatches.isLoading ? <ListSkeleton /> : matches.length ? matches.map(match => <MatchCard key={match.id} match={match} onPress={() => openMatch(match.id, match)} />) : savedMatches.isError || followedMatches.isError ? <EmptyState title="Não foi possível carregar" onRetry={() => { void savedMatches.refetch(); void followedMatches.refetch(); }} /> : <EmptyState title="Suas partidas favoritas" description="Salve partidas ou siga equipes para acompanhar os próximos confrontos." /> : competitionsQuery.isLoading ? <ListSkeleton /> : competitionsQuery.isError ? <EmptyState title="Não foi possível carregar" onRetry={() => void competitionsQuery.refetch()} /> : competitions.length ? competitions.map(row => <CompetitionListItem key={row.id} id={row.id} name={row.name} region={row.region || "Valorant"} logoUrl={row.logoUrl} onPress={() => openCompetition(row.id)} />) : <EmptyState title="Suas competições favoritas" description="Toque na estrela de um campeonato para fixá-lo aqui." />}
+      {tab === "teams" && teams.length > 0 && teams.length < favoriteTeams.length ? <Pressable onPress={() => void teamsQuery.refetch()} style={{ padding: 12 }}><Text style={[styles.meta, { color: colors.mutedForeground }]}>Algumas equipes não puderam ser atualizadas. Seus favoritos continuam salvos. Toque para tentar novamente.</Text></Pressable> : null}
+      {tab === "matches" && matches.length > 0 && (savedMatches.isError || followedMatches.isError || followedMatches.data?.partial) ? <Text style={[styles.meta, { color: colors.mutedForeground, padding: 12 }]}>Algumas partidas não puderam ser atualizadas.</Text> : null}
+    </ScrollView>
+  </View>;
 }
-const styles = StyleSheet.create({ screen: { flex: 1, paddingHorizontal: 16 }, header: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" }, title: { fontSize: 24, fontWeight: "700", letterSpacing: -0.5 }, subtitle: { fontSize: 14, marginTop: 6 }, label: { fontSize: 10, fontWeight: "700", letterSpacing: 1.1, marginTop: 28, marginBottom: 10 }, row: { borderWidth: 1, borderRadius: 10, padding: 12, flexDirection: "row", alignItems: "center", gap: 12, marginBottom: 8 }, team: { fontSize: 14, fontWeight: "600" }, game: { fontSize: 12, marginTop: 3 }, empty: { fontSize: 14, paddingVertical: 18 }, panel: { borderWidth: 1, borderRadius: 10, paddingHorizontal: 14 }, option: { minHeight: 52, flexDirection: "row", alignItems: "center", justifyContent: "space-between" }, optionText: { fontSize: 14, fontWeight: "500" }, spoiler: { marginTop: 12, borderWidth: 1, borderRadius: 10, padding: 14, flexDirection: "row", alignItems: "center" }, next: { borderWidth: 1, borderRadius: 10, padding: 14, marginBottom: 8 }, nextTeams: { fontSize: 15, fontWeight: "600", marginTop: 8 } });
+const styles = StyleSheet.create({ row: { borderRadius: 10, paddingHorizontal: 14, paddingVertical: 8, flexDirection: "row", alignItems: "center", gap: 10, marginBottom: 5, minHeight: 65 }, link: { flex: 1, minWidth: 0 }, copy: { flex: 1, minWidth: 0, marginLeft: 12, justifyContent: "center" }, name: { fontSize: 16, lineHeight: 22 }, meta: { fontSize: 12, marginTop: 3 }, star: { width: 44, height: 44, alignItems: "center", justifyContent: "center" } });
+

@@ -1,92 +1,35 @@
-import React from 'react';
-import { Platform, StyleSheet, useColorScheme, View } from 'react-native';
-import { useColors } from '@/hooks/useColors';
-import { Feather } from '@expo/vector-icons';
-import { BlurView } from 'expo-blur';
-import { isLiquidGlassAvailable } from 'expo-glass-effect';
-import { Tabs } from 'expo-router';
-import { Icon, Label, NativeTabs } from 'expo-router/unstable-native-tabs';
-import { SymbolView } from 'expo-symbols';
+import { Feather } from "@expo/vector-icons";
+import { Tabs } from "expo-router";
+import { BlurView } from "expo-blur";
+import { Image, Platform, Pressable, StyleSheet, Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { font } from "@/constants/type";
+import { useColors } from "@/hooks/useColors";
 
-// IMPORTANT: iOS 26 uses NativeTabs for native tabs with liquid glass support.
-// NativeTabs intentionally does NOT use custom design tokens — liquid glass
-// is a system-level appearance provided by iOS and cannot be overridden.
-// Custom brand colors are applied only on the ClassicTabLayout path (older iOS / Android / web).
-function NativeTabLayout() {
-  return (
-    <NativeTabs>
-      <NativeTabs.Trigger name="index">
-        <Icon sf={{ default: 'house', selected: 'house.fill' }} />
-        <Label>Home</Label>
-      </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="matches"><Icon sf={{ default: 'calendar', selected: 'calendar' }} /><Label>Matches</Label></NativeTabs.Trigger>
-      <NativeTabs.Trigger name="following"><Icon sf={{ default: 'star', selected: 'star.fill' }} /><Label>Following</Label></NativeTabs.Trigger>
-      <NativeTabs.Trigger name="search"><Icon sf={{ default: 'magnifyingglass', selected: 'magnifyingglass' }} /><Label>Search</Label></NativeTabs.Trigger>
-    </NativeTabs>
-  );
-}
-
-function ClassicTabLayout() {
-  const colors = useColors();
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === 'dark';
-  const isIOS = Platform.OS === 'ios';
-  const isWeb = Platform.OS === 'web';
-
-  return (
-    <Tabs
-      screenOptions={{
-        tabBarActiveTintColor: colors.primary,
-        tabBarInactiveTintColor: colors.mutedForeground,
-        headerShown: false,
-        tabBarStyle: {
-          position: 'absolute',
-          backgroundColor: isIOS ? 'transparent' : colors.background,
-          borderTopWidth: isWeb ? 1 : 0,
-          borderTopColor: colors.border,
-          elevation: 0,
-          ...(isWeb ? { height: 84 } : {}),
-        },
-        tabBarBackground: () =>
-          isIOS ? (
-            <BlurView
-              intensity={100}
-              tint={isDark ? 'dark' : 'light'}
-              style={StyleSheet.absoluteFill}
-            />
-          ) : isWeb ? (
-            <View
-              style={[
-                StyleSheet.absoluteFill,
-                { backgroundColor: colors.background },
-              ]}
-            />
-          ) : null,
-      }}
-    >
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) =>
-            isIOS ? (
-              <SymbolView name="house" tintColor={color} size={24} />
-            ) : (
-              <Feather name="home" size={22} color={color} />
-            ),
-        }}
-      />
-      <Tabs.Screen name="matches" options={{ title: 'Matches', tabBarIcon: ({ color }) => <Feather name="calendar" size={22} color={color} /> }} />
-      <Tabs.Screen name="following" options={{ title: 'Following', tabBarIcon: ({ color }) => <Feather name="star" size={22} color={color} /> }} />
-      <Tabs.Screen name="search" options={{ title: 'Search', tabBarIcon: ({ color }) => <Feather name="search" size={22} color={color} /> }} />
-      <Tabs.Screen name="profile" options={{ href: null }} />
-    </Tabs>
-  );
-}
-
+const valorantMark = require("../../assets/generated/games/valorant-mark.png");
+const labels: Record<string, string> = { index: "Valorant", following: "Favoritos", matches: "Calendário", search: "Buscar" };
+const icons = { following: "star", matches: "calendar", search: "search" } as const;
 export default function TabLayout() {
-  if (isLiquidGlassAvailable()) {
-    return <NativeTabLayout />;
-  }
-  return <ClassicTabLayout />;
+  const colors = useColors();
+  const insets = useSafeAreaInsets();
+  return <Tabs screenOptions={{ headerShown: false, sceneStyle: { backgroundColor: colors.background } }} tabBar={({ state, emitter, navigateToTab }) => <View style={[styles.container, { bottom: Math.max(insets.bottom, 12) }]}>
+    <View style={[styles.bar, { borderColor: colors.border, backgroundColor: colors.card }]}>
+      {Platform.OS === "ios" ? <BlurView intensity={40} tint={colors.background === "#090B0D" ? "dark" : "light"} style={StyleSheet.absoluteFill} /> : null}
+      {state.routes.filter(route => labels[route.name]).map(route => {
+        const active = state.routes[state.index].key === route.key;
+        return <Pressable key={route.key} accessibilityRole="tab" accessibilityState={{ selected: active }} accessibilityLabel={labels[route.name]} onPress={() => { const event = emitter.emit({ type: "tabPress", target: route.key, canPreventDefault: true }); if (!active && !event.defaultPrevented) navigateToTab(route.key); }} style={[styles.item, { backgroundColor: active ? colors.secondary : "transparent" }]}>
+          {route.name === "index" ? <Image source={valorantMark} resizeMode="contain" accessibilityLabel="Valorant" style={styles.mark} /> : <Feather name={icons[route.name as keyof typeof icons]} size={22} color={active ? colors.primary : colors.mutedForeground} />}
+          <Text style={[styles.label, { color: active ? colors.primary : colors.mutedForeground, fontFamily: font.semibold }]}>{labels[route.name]}</Text>
+        </Pressable>;
+      })}
+    </View>
+  </View>}>
+    <Tabs.Screen name="index" options={{ title: "Valorant" }} />
+    <Tabs.Screen name="following" options={{ title: "Favoritos" }} />
+    <Tabs.Screen name="matches" options={{ title: "Calendário" }} />
+    <Tabs.Screen name="search" options={{ title: "Buscar" }} />
+    <Tabs.Screen name="profile" options={{ href: null }} />
+  </Tabs>;
 }
+const styles = StyleSheet.create({ container: { position: "absolute", left: 12, right: 12 }, bar: { flexDirection: "row", borderWidth: 1, borderRadius: 40, padding: 5, overflow: "hidden" }, item: { flex: 1, minWidth: 0, height: 58, borderRadius: 32, alignItems: "center", justifyContent: "center", gap: 2 }, mark: { width: 22, height: 22 }, label: { fontSize: 10 } });
+

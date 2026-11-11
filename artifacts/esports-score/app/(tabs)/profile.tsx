@@ -1,8 +1,28 @@
-import { Feather } from "@expo/vector-icons";
-import { Pressable, ScrollView, StyleSheet, Switch, Text, View } from "react-native";
+import { router } from "expo-router";
+import { Pressable, ScrollView, StyleSheet, Text } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useApp } from "@/context/AppContext";
+import { ComingSoonGames } from "@/components/GameTabs";
 import { useColors } from "@/hooks/useColors";
-const options = [{ key: "before30", label: "30 minutes before" }, { key: "before5", label: "5 minutes before" }, { key: "start", label: "When match starts" }, { key: "result", label: "Final result" }] as const;
-export default function Profile() { const colors = useColors(); const insets = useSafeAreaInsets(); const { notifications, toggleNotification } = useApp(); return <ScrollView style={[styles.screen, { backgroundColor: colors.background }]} contentContainerStyle={{ paddingTop: Math.max(insets.top, 18), paddingBottom: 100 }}><Text style={[styles.title, { color: colors.foreground }]}>Settings</Text><View style={[styles.profile, { backgroundColor: colors.card, borderColor: colors.border }]}><View style={[styles.avatar, { backgroundColor: colors.primary }]}><Text style={[styles.avatarText, { color: colors.primaryForeground }]}>ES</Text></View><View><Text style={[styles.name, { color: colors.foreground }]}>Esports fan</Text><Text style={[styles.email, { color: colors.mutedForeground }]}>Your personal scoreboard</Text></View></View><Text style={[styles.label, { color: colors.mutedForeground }]}>MATCH ALERTS</Text><View style={[styles.panel, { backgroundColor: colors.card, borderColor: colors.border }]}>{options.map((item, index) => <View key={item.key} style={[styles.option, index < options.length - 1 && { borderBottomColor: colors.border, borderBottomWidth: 1 }]}><Text style={[styles.optionText, { color: colors.foreground }]}>{item.label}</Text><Switch value={notifications[item.key]} onValueChange={() => toggleNotification(item.key)} trackColor={{ false: colors.secondary, true: colors.accent }} thumbColor={notifications[item.key] ? colors.primary : colors.mutedForeground} /></View>)}</View><View style={[styles.spoiler, { backgroundColor: colors.accent, borderColor: colors.primary }]}><View style={{ flex: 1 }}><Text style={[styles.optionText, { color: colors.foreground }]}>Spoiler-free notifications</Text><Text style={[styles.email, { color: colors.mutedForeground }]}>Hide scores and winners in alerts</Text></View><Switch value={notifications.spoilerFree} onValueChange={() => toggleNotification("spoilerFree")} trackColor={{ false: colors.secondary, true: colors.primary }} thumbColor={colors.primaryForeground} /></View><Text style={[styles.footer, { color: colors.mutedForeground }]}>EsportsScore <Text style={{ color: colors.primary }}>•</Text> reliable scores, one place.</Text></ScrollView> }
-const styles = StyleSheet.create({ screen: { flex: 1, paddingHorizontal: 16 }, title: { fontSize: 27, fontWeight: "800", letterSpacing: -0.8 }, profile: { marginTop: 20, borderWidth: 1, borderRadius: 16, padding: 16, flexDirection: "row", alignItems: "center", gap: 12 }, avatar: { width: 46, height: 46, borderRadius: 14, alignItems: "center", justifyContent: "center" }, avatarText: { fontSize: 14, fontWeight: "800" }, name: { fontSize: 15, fontWeight: "700" }, email: { fontSize: 11, marginTop: 4 }, label: { fontSize: 10, fontWeight: "800", letterSpacing: 1.2, marginTop: 28, marginBottom: 10 }, panel: { borderWidth: 1, borderRadius: 15, paddingHorizontal: 14 }, option: { minHeight: 54, flexDirection: "row", alignItems: "center", justifyContent: "space-between" }, optionText: { fontSize: 14, fontWeight: "600" }, spoiler: { marginTop: 12, borderWidth: 1, borderRadius: 15, padding: 14, flexDirection: "row", alignItems: "center" }, footer: { textAlign: "center", fontSize: 11, marginTop: 36 } });
+
+export default function Profile() {
+  const colors = useColors();
+  const insets = useSafeAreaInsets();
+  return (
+    <ScrollView style={[styles.screen, { backgroundColor: colors.background }]} contentContainerStyle={{ paddingTop: Math.max(insets.top, 18), paddingBottom: 100 }}>
+      <Text style={[styles.title, { color: colors.foreground }]}>VANT</Text>
+      <Text style={[styles.body, { color: colors.mutedForeground }]}>Suas equipes e partidas favoritas ficam salvas neste dispositivo.</Text>
+      <Pressable accessibilityRole="button" onPress={() => router.push("/following")} style={[styles.button, { borderColor: colors.border, backgroundColor: colors.card }]}>
+        <Text style={[styles.buttonText, { color: colors.foreground }]}>Abrir favoritos</Text>
+      </Pressable>
+      <ComingSoonGames />
+    </ScrollView>
+  );
+}
+
+const styles = StyleSheet.create({
+  screen: { flex: 1, paddingHorizontal: 16 },
+  title: { fontSize: 27, fontWeight: "800", letterSpacing: -0.8 },
+  body: { fontSize: 15, lineHeight: 22, marginTop: 16 },
+  button: { minHeight: 48, borderWidth: 1, borderRadius: 12, alignItems: "center", justifyContent: "center", marginTop: 24, paddingHorizontal: 16 },
+  buttonText: { fontSize: 14, fontWeight: "700" },
+});

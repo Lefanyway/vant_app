@@ -1,14 +1,21 @@
+import { Ionicons } from "@expo/vector-icons";
+import { ResolvedLogo } from "@/components/ResolvedLogo";
+import { useApp } from "@/context/AppContext";
 import { Feather } from "@expo/vector-icons";
-import { router, useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Linking, Pressable, ScrollView, Share, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { fetchMatchDetails, type MatchDetails } from "@/lib/api";
+import { BackButton } from "@/components/BackButton";
+import { applyMatchStats, errorMessage, fetchMatch, fetchMatchDetails, fetchMatchStats, type MatchDetails } from "@/lib/api";
 import type { Match } from "@/lib/data";
+import { hasScore } from "@/lib/matches";
+import { openCompetition, openMatch } from "@/lib/navigation";
 import { TeamBadge } from "@/components/MatchCard";
 import { useColors } from "@/hooks/useColors";
 import { TeamLink } from "@/components/TeamLink";
+import { useActiveScreen } from "@/hooks/useActiveScreen";
 
 type Tab = "Overview" | "Performance" | "Economy" | "H2H";
 
@@ -16,96 +23,104 @@ export default function MatchDetail() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const colors = useColors();
   const insets = useSafeAreaInsets();
+  const active = useActiveScreen();
   const [tab, setTab] = useState<Tab>("Overview");
-  const detailsQuery = useQuery({ queryKey: ["match-details", id], queryFn: () => fetchMatchDetails(String(id)), enabled: Boolean(id), refetchInterval: (query) => query.state.data?.match.status === "Live" ? 30_000 : false });
-  const details = detailsQuery.data;
-  return <ScrollView style={[styles.screen, { backgroundColor: colors.background }]} contentContainerStyle={{ paddingTop: Math.max(insets.top, 14), paddingBottom: 50 }}>
-    <View style={styles.nav}><Pressable onPress={() => router.back()} hitSlop={10}><Feather name="arrow-left" size={21} color={colors.foreground} /></Pressable><Text style={[styles.navTitle, { color: colors.foreground }]}>Match center</Text><View style={{ width: 21 }} /></View>
-    {detailsQuery.isLoading ? <DetailSkeleton colors={colors} /> : detailsQuery.isError || !details ? <View style={styles.errorBox}><Text style={[styles.message, { color: colors.mutedForeground }]}>Couldn't load match details.</Text><Pressable onPress={() => detailsQuery.refetch()}><Text style={[styles.retry, { color: colors.primary }]}>Try again</Text></Pressable></View> : <DetailContent details={details} tab={tab} setTab={setTab} colors={colors} />}
+  const previewQuery = useQuery({ queryKey: ["match-preview", id], queryFn: () => fetchMatch(String(id)), enabled: Boolean(id), staleTime: 60_000 });
+  const detailsQuery = useQuery({ queryKey: ["match-details", id], queryFn: ({ signal }) => fetchMatchDetails(String(id), signal), enabled: Boolean(id), staleTime: 60_000, refetchInterval: (query) => active && query.state.data?.match.status === "Live" ? 45_000 : false });
+  const statsQuery = useQuery({ queryKey: ["match-stats", id], queryFn: ({ signal }) => fetchMatchStats(String(id), signal), enabled: Boolean(id), staleTime: 60_000 });
+  const knownMatch = detailsQuery.data?.match ?? previewQuery.data;
+  const details = detailsQuery.data ? applyMatchStats(detailsQuery.data, statsQuery.data) : null;
+  return <ScrollView style={[styles.screen, { backgroundColor: colors.background }]} contentContainerStyle={{ paddingTop: Math.max(insets.top, 8), paddingBottom: 50 }}>
+    <View style={styles.nav}><BackButton /></View>
+    {knownMatch ? <DetailContent match={knownMatch} details={details} detailsLoading={detailsQuery.isLoading} detailsError={detailsQuery.isError ? errorMessage(detailsQuery.error, "Não foi possível carregar o restante da partida.") : null} onRetry={() => { void detailsQuery.refetch(); void statsQuery.refetch(); }} tab={tab} setTab={setTab} colors={colors} /> : previewQuery.isLoading || detailsQuery.isLoading ? <DetailSkeleton colors={colors} /> : <View style={styles.errorBox}><Text style={[styles.message, { color: colors.mutedForeground }]}>{detailsQuery.isError || previewQuery.isError ? errorMessage(detailsQuery.error ?? previewQuery.error, "Não foi possível carregar a partida.") : "Partida não encontrada."}</Text><Pressable onPress={() => { void previewQuery.refetch(); void detailsQuery.refetch(); }}><Text style={[styles.retry, { color: colors.primary }]}>Tentar de novo</Text></Pressable></View>}
   </ScrollView>;
 }
 
-function DetailContent({ details, tab, setTab, colors }: { details: Awaited<ReturnType<typeof fetchMatchDetails>>; tab: Tab; setTab: (tab: Tab) => void; colors: ReturnType<typeof useColors> }) {
-  const match = details.match;
-  const tabs: Tab[] = ["Overview", "Performance", "Economy", ...(details.capabilities.headToHead ? ["H2H" as const] : [])];
+function DetailContent({ match, details, detailsLoading, detailsError, onRetry, tab, setTab, colors }: { match: Match; details: MatchDetails | null; detailsLoading: boolean; detailsError: string | null; onRetry: () => void; tab: Tab; setTab: (tab: Tab) => void; colors: ReturnType<typeof useColors> }) {
+  const { favoriteMatches = [], toggleMatch } = useApp();
+  const saved = favoriteMatches.includes(match.id);
+  const tabs: { key: Tab; label: string }[] = [
+    { key: "Overview", label: "Detalhes" },
+    ...((details?.stats?.playerStats.length ?? 0) > 0 ? [{ key: "Performance" as const, label: "Jogadores" }] : []),
+    ...(details?.stats?.economy ? [{ key: "Economy" as const, label: "Economia" }] : []),
+    ...((details?.headToHead.length ?? 0) > 0 ? [{ key: "H2H" as const, label: "Confrontos" }] : []),
+  ];
   return <>
-    <Text style={[styles.competition, { color: colors.foreground }]}>{match.tournament}</Text>
-    <Text style={[styles.series, { color: colors.mutedForeground }]}>{match.game} · {match.format}</Text>
-    <View style={styles.teams}>
-      <TeamColumn team={match.teamA} colors={colors} />
-      <View style={styles.scoreBlock}><Text style={[styles.status, { color: match.status === "Live" ? colors.primary : colors.mutedForeground }]}>{match.status === "Live" ? "LIVE" : match.status === "Finished" ? "FINAL" : match.time}</Text><Text style={[styles.score, { color: colors.foreground }]}>{match.scoreA ?? "—"} <Text style={{ color: colors.mutedForeground }}>–</Text> {match.scoreB ?? "—"}</Text><Text style={[styles.format, { color: colors.mutedForeground }]}>{match.format}</Text></View>
-      <TeamColumn team={match.teamB} colors={colors} />
+    <View style={[styles.hero, { backgroundColor: colors.card }]}>
+      <View style={styles.heroActions}><Pressable accessibilityRole="button" accessibilityLabel="Compartilhar partida" onPress={() => void Share.share({ message: `${match.teamA.name} vs ${match.teamB.name} · ${match.tournament} · ${match.time}` })} style={styles.heroIcon}><Feather name="share" size={21} color={colors.foreground} /></Pressable><Pressable accessibilityRole="button" accessibilityLabel={saved ? "Remover partida dos favoritos" : "Salvar partida"} accessibilityState={{ selected: saved }} onPress={() => toggleMatch?.(match.id)} style={styles.heroIcon}><Ionicons name={saved ? "star" : "star-outline"} size={24} color={saved ? colors.primary : colors.foreground} /></Pressable></View>
+      <View style={styles.teams}>
+        <TeamColumn team={match.teamA} colors={colors} />
+        <View style={styles.scoreBlock}>
+          {hasScore(match) ? <Text style={[styles.score, { color: colors.foreground }]}>{match.scoreA} – {match.scoreB}</Text> : <Text style={[styles.score, { color: colors.foreground }]}>{match.time}</Text>}
+          <Text style={[styles.status, { color: match.status === "Live" ? colors.destructive : colors.mutedForeground }]}>{match.status === "Live" ? "● Ao vivo" : match.status === "Finished" ? "Finalizada" : match.status === "Cancelled" ? "Cancelada" : match.status === "Postponed" ? "Adiada" : match.startTime ? new Date(match.startTime).toLocaleDateString("pt-BR", { day: "numeric", month: "short" }) : "A definir"}</Text>
+          {match.format ? <Text style={[styles.format, { color: colors.mutedForeground }]}>{match.format}</Text> : null}
+        </View>
+        <TeamColumn team={match.teamB} colors={colors} />
+      </View>
     </View>
-    <Text style={[styles.date, { color: colors.mutedForeground }]}>{match.startTime ? new Date(match.startTime).toLocaleDateString([], { weekday: "long", month: "short", day: "numeric" }) : "Date unavailable"}</Text>
-    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tabs} style={{ borderBottomColor: colors.border, borderBottomWidth: 1 }}>{tabs.map((item) => <Pressable key={item} onPress={() => setTab(item)} style={[styles.tab, tab === item && { borderBottomColor: colors.primary }]}><Text style={[styles.tabText, { color: tab === item ? colors.primary : colors.mutedForeground }]}>{item}</Text></Pressable>)}</ScrollView>
-    <MapSelector details={details} colors={colors} />
-    {tab === "Overview" ? <Overview details={details} colors={colors} /> : tab === "Performance" ? <Performance details={details} colors={colors} /> : tab === "Economy" ? <Economy details={details} colors={colors} /> : <H2H details={details} colors={colors} />}
+    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tabs}>{tabs.map(item => <Pressable key={item.key} accessibilityRole="tab" accessibilityState={{ selected: tab === item.key }} onPress={() => setTab(item.key)} style={[styles.tab, { borderBottomColor: tab === item.key ? colors.foreground : "transparent" }]}><Text style={[styles.tabText, { color: tab === item.key ? colors.foreground : colors.mutedForeground }]}>{item.label}</Text></Pressable>)}</ScrollView>
+    <Pressable disabled={!match.competitionId || match.competitionId.startsWith("unknown:")} onPress={() => match.competitionId && openCompetition(match.competitionId)} style={[styles.competitionRow, { backgroundColor: colors.card }]}>
+      <ResolvedLogo type="competition" name={match.tournament} entityId={match.competitionId} logoUrl={match.competitionLogoUrl} size={34} />
+      <Text style={[styles.competitionCopy, { color: colors.foreground }]}>{match.tournament}<Text style={{ color: colors.mutedForeground }}>{"\n"}Valorant{match.format ? ` · ${match.format}` : ""}</Text></Text>
+      <Feather name="chevron-right" size={22} color={colors.primary} />
+    </Pressable>
+    {details ? <>{tab === "Overview" ? <Overview details={details} colors={colors} /> : tab === "Performance" ? <Performance details={details} colors={colors} /> : tab === "Economy" ? <Economy details={details} colors={colors} /> : <H2H details={details} colors={colors} />}</> : detailsLoading ? <DetailSkeleton colors={colors} /> : <View style={styles.errorBox}><Text style={[styles.message, { color: colors.mutedForeground }]}>{detailsError ?? "Não foi possível carregar os detalhes."}</Text><Pressable onPress={onRetry}><Text style={[styles.retry, { color: colors.primary }]}>Tentar novamente</Text></Pressable></View>}
   </>;
 }
-
-function MapSelector({ details, colors }: { details: MatchDetails; colors: ReturnType<typeof useColors> }) {
-  return <View style={styles.mapArea}>
-    <Text style={[styles.mapLabel, { color: colors.mutedForeground }]}>MAPS</Text>
-    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.mapTabs}>
-      <View style={[styles.mapTab, styles.mapTabSelected, { backgroundColor: colors.secondary, borderColor: colors.primary }]}><Text style={[styles.mapTabText, { color: colors.foreground }]}>All Maps</Text></View>
-      {details.maps.map((map) => <View key={map.id} style={[styles.mapTab, { backgroundColor: colors.card, borderColor: colors.border }]}><Text style={[styles.mapTabText, { color: colors.mutedForeground }]}>{map.mapNumber} {map.mapName ?? "Map"}</Text></View>)}
-      {!details.capabilities.maps && <View style={[styles.mapUnavailable, { borderColor: colors.border }]}><Text style={[styles.mapUnavailableText, { color: colors.mutedForeground }]}>Map data unavailable</Text></View>}
-    </ScrollView>
-  </View>;
-}
-
 function Overview({ details, colors }: { details: MatchDetails; colors: ReturnType<typeof useColors> }) {
   const match = details.match;
   return <View>
-    <SectionTitle title="SERIES SUMMARY" colors={colors} />
+    <SectionTitle title="Resumo da série" colors={colors} />
     <View style={[styles.panel, { backgroundColor: colors.card, borderColor: colors.border }]}>
-      <InfoRow label="Competition" value={match.tournament} colors={colors} />
-      <InfoRow label="Format" value={match.format} colors={colors} />
-      <InfoRow label="Streams" value={match.streams?.length ? `${match.streams.length} available` : "Data unavailable"} colors={colors} />
-      <InfoRow label="Maps" value={details.capabilities.maps ? `${details.maps.length} available` : "Data unavailable"} colors={colors} />
+      <InfoRow label="Competição" value={match.tournament} colors={colors} />
+      {match.format ? <InfoRow label="Formato" value={match.format} colors={colors} /> : null}
+      <InfoRow label="Início" value={match.startTime ? `${new Date(match.startTime).toLocaleString("pt-BR", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}` : "A definir"} colors={colors} last />
     </View>
-    <SectionTitle title="MAPS" colors={colors} />
-    <Unavailable text="Map names and map scores are not available from the current PandaScore match feed." colors={colors} />
-    <SectionTitle title="PLAYER PERFORMANCE" colors={colors} />
-    <Unavailable text="Player K/D/A, ACS, ADR, KAST, HS%, first kills and agents are not available from the current feed." colors={colors} />
-    <SectionTitle title="ECONOMY" colors={colors} />
-    <Unavailable text="Economy and attack/defense splits are not available from the current feed." colors={colors} />
+    {match.streams?.length ? <SectionTitle title="Transmissões" colors={colors} /> : null}
+    {match.streams?.length ? match.streams.map((stream) => <Pressable key={stream.url} accessibilityRole="link" onPress={() => void Linking.openURL(stream.url)} style={[styles.stream, { backgroundColor: colors.card, borderColor: colors.border }]}><Text style={[styles.streamText, { color: colors.foreground }]} numberOfLines={1}>{stream.language ? `${languageName(stream.language)}${stream.official ? " · oficial" : ""}` : "Assistir"}</Text><Feather name="external-link" size={14} color={colors.mutedForeground} /></Pressable>) : null}
+    {details.maps.some(map => map.mapName) ? <SectionTitle title="Mapas" colors={colors} /> : null}
+    {!details.maps.some(map => map.mapName) ? null : <View style={[styles.panel, { backgroundColor: colors.card, borderColor: colors.border }]}>{details.maps.filter((map) => map.mapName).map((map, index, named) => <InfoRow key={map.id} last={index === named.length - 1} label={map.mapName ?? `Mapa ${map.mapNumber}`} value={typeof map.homeScore === "number" && typeof map.awayScore === "number" ? `${map.homeScore}–${map.awayScore}` : "A definir"} colors={colors} />)}</View>}
     <RecentMatches details={details} colors={colors} />
   </View>;
 }
 
 function Performance({ details, colors }: { details: MatchDetails; colors: ReturnType<typeof useColors> }) {
   const players = details.stats?.playerStats ?? [];
-  return <View><SectionTitle title="PERFORMANCE" colors={colors} />{players.length === 0 ? <Unavailable text="Player performance is not available from the configured stats provider." colors={colors} /> : <View style={[styles.panel, { backgroundColor: colors.card, borderColor: colors.border }]}>{players.map((player) => <View key={player.playerId} style={[styles.playerRow, { borderBottomColor: colors.border }]}><View style={styles.playerIdentity}><Text style={[styles.playerName, { color: colors.foreground }]}>{player.playerName}</Text>{player.agent ? <Text style={[styles.playerAgent, { color: colors.mutedForeground }]}>{player.agent}</Text> : null}</View><Stat label="RATING" value={player.rating} colors={colors} /><Stat label="KDA" value={player.kills !== undefined || player.deaths !== undefined || player.assists !== undefined ? `${player.kills ?? "—"}/${player.deaths ?? "—"}/${player.assists ?? "—"}` : undefined} colors={colors} /><Stat label="ACS" value={player.acs} colors={colors} /></View>)}</View>}</View>;
+  return <View><SectionTitle title="Jogadores" colors={colors} />{players.length === 0 ? <Unavailable text="As estatísticas dos jogadores ainda não estão disponíveis para esta partida." colors={colors} /> : <View style={[styles.panel, { backgroundColor: colors.card, borderColor: colors.border }]}>{players.map((player) => <View key={player.playerId} style={[styles.playerRow, { borderBottomColor: colors.border }]}><View style={styles.playerIdentity}><Text style={[styles.playerName, { color: colors.foreground }]}>{player.playerName}</Text>{player.agent ? <Text style={[styles.playerAgent, { color: colors.mutedForeground }]}>{player.agent}</Text> : null}</View><Stat label="RATING" value={player.rating} colors={colors} /><Stat label="KDA" value={player.kills !== undefined || player.deaths !== undefined || player.assists !== undefined ? `${player.kills ?? "—"}/${player.deaths ?? "—"}/${player.assists ?? "—"}` : undefined} colors={colors} /><Stat label="ACS" value={player.acs} colors={colors} /></View>)}</View>}</View>;
 }
 
 function Economy({ details, colors }: { details: MatchDetails; colors: ReturnType<typeof useColors> }) {
   const economy = details.stats?.economy;
-  return <View><SectionTitle title="ECONOMY" colors={colors} />{!economy ? <Unavailable text="Economy, pistol rounds and attack/defense splits are not available from the configured stats provider." colors={colors} /> : <View style={[styles.panel, { backgroundColor: colors.card, borderColor: colors.border }]}><InfoRow label="Rounds won" value={`${economy.homeRoundsWon ?? "—"} – ${economy.awayRoundsWon ?? "—"}`} colors={colors} /><InfoRow label="Pistol rounds" value={`${economy.homePistolRoundsWon ?? "—"} – ${economy.awayPistolRoundsWon ?? "—"}`} colors={colors} /><InfoRow label="Attack rounds" value={`${economy.homeAttackRoundsWon ?? "—"} – ${economy.awayAttackRoundsWon ?? "—"}`} colors={colors} /><InfoRow label="Defense rounds" value={`${economy.homeDefenseRoundsWon ?? "—"} – ${economy.awayDefenseRoundsWon ?? "—"}`} colors={colors} /></View>}</View>;
+  return <View><SectionTitle title="Economia" colors={colors} />{!economy ? <Unavailable text="Os dados de economia ainda não estão disponíveis para esta partida." colors={colors} /> : <View style={[styles.panel, { backgroundColor: colors.card, borderColor: colors.border }]}><InfoRow label="Rounds vencidos" value={`${economy.homeRoundsWon ?? "—"} – ${economy.awayRoundsWon ?? "—"}`} colors={colors} /><InfoRow label="Rounds de pistol" value={`${economy.homePistolRoundsWon ?? "—"} – ${economy.awayPistolRoundsWon ?? "—"}`} colors={colors} /><InfoRow label="Rounds no ataque" value={`${economy.homeAttackRoundsWon ?? "—"} – ${economy.awayAttackRoundsWon ?? "—"}`} colors={colors} /><InfoRow label="Rounds na defesa" value={`${economy.homeDefenseRoundsWon ?? "—"} – ${economy.awayDefenseRoundsWon ?? "—"}`} colors={colors} last /></View>}</View>;
 }
 
 function H2H({ details, colors }: { details: MatchDetails; colors: ReturnType<typeof useColors> }) {
-  return <View><SectionTitle title="HEAD-TO-HEAD" colors={colors} />{details.headToHead.length === 0 ? <Unavailable text="No previous head-to-head matches found." colors={colors} /> : details.headToHead.slice(0, 5).map((match) => <PastMatch key={match.id} match={match} colors={colors} />)}</View>;
+  return <View><SectionTitle title="Confrontos anteriores" colors={colors} />{details.headToHead.length === 0 ? <Unavailable text="Ainda não há confrontos anteriores disponíveis." colors={colors} /> : details.headToHead.slice(0, 5).map((match) => <PastMatch key={match.id} match={match} colors={colors} />)}</View>;
 }
 
 function RecentMatches({ details, colors }: { details: MatchDetails; colors: ReturnType<typeof useColors> }) {
-  return <>{details.recentMatches.map((group) => <View key={group.teamId}><SectionTitle title={`RECENT MATCHES · ${group.matches[0]?.teamA.id === group.teamId ? group.matches[0].teamA.name : group.matches[0]?.teamB.name ?? "TEAM"}`} colors={colors} />{group.matches.length === 0 ? <Unavailable text="No recent matches found." colors={colors} /> : group.matches.map((match) => <PastMatch key={match.id} match={match} colors={colors} focusTeamId={group.teamId} />)}</View>)}</>;
+  return <>{details.recentMatches.filter(group => group.matches.length > 0).map((group) => <View key={group.teamId}><SectionTitle title={`Últimas partidas · ${group.matches[0]?.teamA.id === group.teamId ? group.matches[0].teamA.name : group.matches[0]?.teamB.name ?? "Equipe"}`} colors={colors} />{group.matches.length === 0 ? <Unavailable text="Nenhuma partida recente disponível." colors={colors} /> : group.matches.map((match) => <PastMatch key={match.id} match={match} colors={colors} focusTeamId={group.teamId} />)}</View>)}</>;
 }
 
 function PastMatch({ match, colors, focusTeamId }: { match: Match; colors: ReturnType<typeof useColors>; focusTeamId?: string }) {
-  const focusedHome = focusTeamId ? match.teamA.id === focusTeamId : false;
-  const won = focusTeamId ? (focusedHome ? (match.scoreA ?? -1) > (match.scoreB ?? -1) : (match.scoreB ?? -1) > (match.scoreA ?? -1)) : undefined;
-  return <View style={[styles.pastMatch, { backgroundColor: colors.card, borderColor: colors.border }]}><Text style={[styles.resultMark, { color: won === undefined ? colors.mutedForeground : won ? colors.positive : colors.destructive }]}>{won === undefined ? "—" : won ? "W" : "L"}</Text><Text style={[styles.pastScore, { color: colors.foreground }]}>{match.scoreA ?? "—"} – {match.scoreB ?? "—"}</Text><Text style={[styles.pastTeams, { color: colors.foreground }]} numberOfLines={1}>{match.teamA.name} vs {match.teamB.name}</Text><Text style={[styles.pastDate, { color: colors.mutedForeground }]}>{match.startTime ? new Date(match.startTime).toLocaleDateString([], { month: "short", day: "numeric" }) : "—"}</Text></View>;
+  const scored = typeof match.scoreA === "number" && typeof match.scoreB === "number";
+  const own = focusTeamId === match.teamA.id ? match.scoreA : match.scoreB;
+  const opponent = focusTeamId === match.teamA.id ? match.scoreB : match.scoreA;
+  const result = !focusTeamId || !scored || own === undefined || opponent === undefined ? "—" : own > opponent ? "W" : own < opponent ? "L" : "D";
+  return <Pressable onPress={() => openMatch(match.id, match)} style={[styles.pastMatch, { backgroundColor: colors.card, borderColor: colors.border }]}><Text style={[styles.resultMark, { color: result === "W" ? colors.positive : result === "L" ? colors.destructive : colors.mutedForeground }]}>{result === "W" ? "V" : result === "L" ? "D" : result === "D" ? "E" : "—"}</Text><Text style={[styles.pastScore, { color: colors.foreground }]}>{hasScore(match) ? `${match.scoreA}–${match.scoreB}` : "—"}</Text><Text style={[styles.pastTeams, { color: colors.foreground }]} numberOfLines={1}>{match.teamA.name} vs {match.teamB.name}</Text><Text style={[styles.pastDate, { color: colors.mutedForeground }]}>{match.startTime ? new Date(match.startTime).toLocaleDateString("pt-BR", { month: "short", day: "numeric" }) : "A definir"}</Text></Pressable>;
 }
 
-function TeamColumn({ team, colors }: { team: Match["teamA"]; colors: ReturnType<typeof useColors> }) { return <TeamLink team={team}><View style={styles.teamColumn}><TeamBadge {...team} /><Text style={[styles.teamName, { color: colors.foreground }]} numberOfLines={2}>{team.name}</Text></View></TeamLink>; }
+function TeamColumn({ team, colors }: { team: Match["teamA"]; colors: ReturnType<typeof useColors> }) { return <TeamLink team={team} fill><View style={styles.teamColumn}><TeamBadge {...team} size={62} /><Text numberOfLines={2} style={[styles.teamName, { color: colors.foreground }]}>{team.name}</Text></View></TeamLink>; }
+const languages: Record<string, string> = { pt: "Português", en: "Inglês", es: "Espanhol", fr: "Francês", de: "Alemão", it: "Italiano", ru: "Russo", tr: "Turco", ar: "Árabe", ja: "Japonês", ko: "Coreano", zh: "Chinês", th: "Tailandês", vi: "Vietnamita", id: "Indonésio", pl: "Polonês" };
+const languageName = (code: string) => languages[code.toLowerCase().slice(0, 2)] ?? code.toUpperCase();
 function SectionTitle({ title, colors }: { title: string; colors: ReturnType<typeof useColors> }) { return <Text style={[styles.sectionTitle, { color: colors.mutedForeground }]}>{title}</Text>; }
-function InfoRow({ label, value, colors }: { label: string; value: string; colors: ReturnType<typeof useColors> }) { return <View style={[styles.infoRow, { borderBottomColor: colors.border }]}><Text style={[styles.infoLabel, { color: colors.mutedForeground }]}>{label}</Text><Text style={[styles.infoValue, { color: colors.foreground }]}>{value}</Text></View>; }
+function InfoRow({ label, value, colors, last = false }: { label: string; value: string; colors: ReturnType<typeof useColors>; last?: boolean }) { return <View style={[styles.infoRow, last && styles.infoRowLast, { borderBottomColor: colors.border }]}><Text style={[styles.infoLabel, { color: colors.mutedForeground }]}>{label}</Text><Text style={[styles.infoValue, { color: colors.foreground }]}>{value}</Text></View>; }
 function Stat({ label, value, colors }: { label: string; value?: number | string; colors: ReturnType<typeof useColors> }) { return <View style={styles.stat}><Text style={[styles.statLabel, { color: colors.mutedForeground }]}>{label}</Text><Text style={[styles.statValue, { color: colors.foreground }]}>{value ?? "—"}</Text></View>; }
-function Unavailable({ text, colors }: { text: string; colors: ReturnType<typeof useColors> }) { return <View style={[styles.unavailable, { backgroundColor: colors.card, borderColor: colors.border }]}><Text style={[styles.unavailableTitle, { color: colors.mutedForeground }]}>Data unavailable</Text><Text style={[styles.unavailableText, { color: colors.mutedForeground }]}>{text}</Text></View>; }
+function Unavailable({ text, colors }: { text: string; colors: ReturnType<typeof useColors> }) { return <View style={[styles.unavailable, { backgroundColor: colors.card, borderColor: colors.border }]}><Text style={[styles.unavailableTitle, { color: colors.mutedForeground }]}>Dados indisponíveis</Text><Text style={[styles.unavailableText, { color: colors.mutedForeground }]}>{text}</Text></View>; }
 function DetailSkeleton({ colors }: { colors: ReturnType<typeof useColors> }) { return <View><View style={[styles.skeleton, { backgroundColor: colors.card }]} /><View style={[styles.skeletonWide, { backgroundColor: colors.card }]} /><View style={[styles.skeleton, { backgroundColor: colors.card }]} /></View>; }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, paddingHorizontal: 16 }, nav: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }, navTitle: { fontSize: 14, fontWeight: "600" },
-  competition: { fontSize: 18, fontWeight: "800", textAlign: "center", letterSpacing: -0.3 }, series: { fontSize: 12, textAlign: "center", marginTop: 5 }, teams: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 24 }, teamColumn: { alignItems: "center", width: "29%", gap: 9 }, teamName: { fontSize: 14, fontWeight: "700", textAlign: "center" }, scoreBlock: { alignItems: "center" }, status: { fontSize: 11, fontWeight: "800", letterSpacing: 1 }, score: { fontSize: 27, fontWeight: "800", fontVariant: ["tabular-nums"], marginTop: 4 }, format: { fontSize: 11, fontWeight: "700", marginTop: 4 }, date: { fontSize: 12, textAlign: "center", marginTop: 18 }, tabs: { flexDirection: "row", marginTop: 25 }, tab: { paddingVertical: 12, paddingHorizontal: 18, borderBottomWidth: 2, borderBottomColor: "transparent" }, tabText: { fontSize: 11, fontWeight: "800", letterSpacing: 0.6 }, mapArea: { marginTop: 14 }, mapLabel: { fontSize: 10, fontWeight: "800", letterSpacing: 1.1, marginBottom: 8 }, mapTabs: { gap: 8, paddingBottom: 2 }, mapTab: { minWidth: 94, minHeight: 42, borderWidth: 1, borderRadius: 8, paddingHorizontal: 14, justifyContent: "center", alignItems: "center" }, mapTabSelected: { borderWidth: 1.5 }, mapTabText: { fontSize: 11, fontWeight: "700" }, mapUnavailable: { minHeight: 42, borderWidth: 1, borderRadius: 8, paddingHorizontal: 12, justifyContent: "center" }, mapUnavailableText: { fontSize: 11 }, sectionTitle: { fontSize: 10, fontWeight: "800", letterSpacing: 1.2, marginTop: 24, marginBottom: 10 }, panel: { borderWidth: 1, borderRadius: 12, paddingHorizontal: 14 }, infoRow: { minHeight: 44, borderBottomWidth: 1, flexDirection: "row", alignItems: "center", justifyContent: "space-between" }, infoRowLast: { borderBottomWidth: 0 }, infoLabel: { fontSize: 12 }, infoValue: { fontSize: 12, fontWeight: "700", maxWidth: "60%", textAlign: "right" }, playerRow: { minHeight: 62, borderBottomWidth: 1, flexDirection: "row", alignItems: "center", gap: 10 }, playerIdentity: { flex: 1 }, playerName: { fontSize: 12, fontWeight: "700" }, playerAgent: { fontSize: 10, marginTop: 3 }, stat: { width: 42, alignItems: "flex-end" }, statLabel: { fontSize: 8, fontWeight: "800" }, statValue: { fontSize: 11, fontWeight: "800", marginTop: 3 }, unavailable: { borderWidth: 1, borderRadius: 12, padding: 15 }, unavailableTitle: { fontSize: 12, fontWeight: "800" }, unavailableText: { fontSize: 12, lineHeight: 18, marginTop: 5 }, pastMatch: { minHeight: 52, borderWidth: 1, borderRadius: 10, paddingHorizontal: 10, marginBottom: 7, flexDirection: "row", alignItems: "center", gap: 8 }, resultMark: { width: 18, fontSize: 11, fontWeight: "900" }, pastScore: { width: 38, fontSize: 12, fontWeight: "800", fontVariant: ["tabular-nums"] }, pastTeams: { flex: 1, fontSize: 12, fontWeight: "600" }, pastDate: { fontSize: 10 }, message: { fontSize: 14, textAlign: "center", marginTop: 40 }, errorBox: { alignItems: "center" }, retry: { fontSize: 13, fontWeight: "600", marginTop: 10 }, skeleton: { height: 145, borderRadius: 12, marginBottom: 14 }, skeletonWide: { height: 52, borderRadius: 12, marginBottom: 14 },
+ hero: { marginHorizontal: -8, paddingHorizontal: 20, paddingBottom: 22 }, heroActions: { flexDirection: "row", justifyContent: "flex-end", gap: 6 }, heroIcon: { width: 44, height: 44, justifyContent: "center", alignItems: "center" }, competitionRow: { borderRadius: 16, flexDirection: "row", alignItems: "center", gap: 12, padding: 16, marginTop: 10 }, competitionCopy: { flex: 1, fontSize: 13, lineHeight: 20 },
+  screen: { flex: 1, paddingHorizontal: 8 }, nav: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 4 }, navTitle: { fontSize: 14, fontWeight: "600" },
+  competition: { fontSize: 18, fontWeight: "800", textAlign: "center", letterSpacing: -0.3 }, series: { fontSize: 12, textAlign: "center", marginTop: 5 }, teams: { flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start", marginTop: 10, gap: 8 }, teamColumn: { alignItems: "center", flex: 1, minWidth: 0, gap: 9 }, teamName: { fontSize: 14, fontWeight: "700", textAlign: "center" }, scoreBlock: { alignItems: "center", minWidth: 88, flexShrink: 0 }, status: { fontSize: 11, fontWeight: "800", letterSpacing: 1 }, score: { fontSize: 26, fontWeight: "700", fontVariant: ["tabular-nums"], marginTop: 4 }, format: { fontSize: 11, fontWeight: "700", marginTop: 4 }, stream: { minHeight: 48, borderWidth: 1, borderRadius: 10, paddingHorizontal: 12, marginBottom: 8, flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 8 }, streamText: { flex: 1, fontSize: 13, fontWeight: "700" }, date: { fontSize: 12, textAlign: "center", marginTop: 18 }, tabs: { flexDirection: "row", marginTop: 0 }, tab: { paddingVertical: 12, paddingHorizontal: 18, borderBottomWidth: 2, borderBottomColor: "transparent" }, tabText: { fontSize: 14, fontWeight: "600" }, compactNote: { fontSize: 13, lineHeight: 18, marginBottom: 8 }, sectionTitle: { fontSize: 15, fontWeight: "600", marginTop: 24, marginBottom: 9 }, panel: { borderWidth: 0, borderRadius: 22, paddingHorizontal: 18, paddingVertical: 6 }, infoRow: { minHeight: 44, borderBottomWidth: 1, flexDirection: "row", alignItems: "center", justifyContent: "space-between" }, infoRowLast: { borderBottomWidth: 0 }, infoLabel: { fontSize: 12 }, infoValue: { fontSize: 12, fontWeight: "700", maxWidth: "60%", textAlign: "right" }, playerRow: { minHeight: 62, borderBottomWidth: 1, flexDirection: "row", alignItems: "center", gap: 10 }, playerIdentity: { flex: 1 }, playerName: { fontSize: 12, fontWeight: "700" }, playerAgent: { fontSize: 10, marginTop: 3 }, stat: { width: 42, alignItems: "flex-end" }, statLabel: { fontSize: 8, fontWeight: "800" }, statValue: { fontSize: 11, fontWeight: "800", marginTop: 3 }, unavailable: { borderWidth: 0, borderRadius: 22, padding: 15 }, unavailableTitle: { fontSize: 12, fontWeight: "800" }, unavailableText: { fontSize: 12, lineHeight: 18, marginTop: 5 }, pastMatch: { minHeight: 52, borderWidth: 1, borderRadius: 10, paddingHorizontal: 10, marginBottom: 7, flexDirection: "row", alignItems: "center", gap: 8 }, resultMark: { width: 18, fontSize: 11, fontWeight: "900" }, pastScore: { width: 38, fontSize: 12, fontWeight: "800", fontVariant: ["tabular-nums"] }, pastTeams: { flex: 1, fontSize: 12, fontWeight: "600" }, pastDate: { fontSize: 10 }, message: { fontSize: 14, textAlign: "center", marginTop: 40 }, errorBox: { alignItems: "center" }, retry: { fontSize: 13, fontWeight: "600", marginTop: 10 }, skeleton: { height: 145, borderRadius: 12, marginBottom: 14 }, skeletonWide: { height: 52, borderRadius: 12, marginBottom: 14 },
 });

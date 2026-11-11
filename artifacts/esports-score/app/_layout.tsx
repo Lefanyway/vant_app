@@ -1,5 +1,7 @@
+import { AppLoading } from "@/components/AppLoading";
 import React, { useEffect } from 'react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClientProvider } from '@tanstack/react-query';
+import { queryClient } from '@/lib/queryClient';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -12,20 +14,24 @@ import {
   useFonts,
 } from '@expo-google-fonts/inter';
 import { Stack } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
+import { View } from 'react-native';
 import * as SplashScreen from 'expo-splash-screen';
-import { AppProvider } from '@/context/AppContext';
+import { AppProvider, useApp } from '@/context/AppContext';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
-const queryClient = new QueryClient();
-
 function RootLayoutNav() {
   return (
-    <Stack screenOptions={{ headerBackTitle: 'Back' }}>
-      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-      <Stack.Screen name="match/[id]" options={{ headerShown: false }} />
-    </Stack>
+    <View style={{ flex: 1, width: "100%", maxWidth: 480, alignSelf: "center", overflow: "hidden" }}>
+      <Stack screenOptions={{ headerShown: false, title: "VANT" }}>
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="match/[id]" options={{ headerShown: false }} />
+        <Stack.Screen name="teams/[id]" options={{ headerShown: false }} />
+        <Stack.Screen name="competitions/[id]" options={{ headerShown: false }} />
+      </Stack>
+    </View>
   );
 }
 
@@ -43,7 +49,7 @@ export default function RootLayout() {
     }
   }, [fontsLoaded, fontError]);
 
-  if (!fontsLoaded && !fontError) return null;
+  if (!fontsLoaded && !fontError) return <AppLoading message="Carregando o VANT…" />;
 
   return (
     <SafeAreaProvider>
@@ -51,7 +57,7 @@ export default function RootLayout() {
         <QueryClientProvider client={queryClient}>
           <GestureHandlerRootView>
             <KeyboardProvider>
-              <AppProvider><RootLayoutNav /></AppProvider>
+              <AppProvider><StatusBar style="light" /><RootLayoutNav /></AppProvider>
             </KeyboardProvider>
           </GestureHandlerRootView>
         </QueryClientProvider>
