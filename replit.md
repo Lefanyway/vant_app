@@ -43,3 +43,13 @@ _Populate as you build — sharp edges, "always run X before Y" rules._
 ## Pointers
 
 - See the `pnpm-workspace` skill for workspace structure, TypeScript setup, and package details
+
+## Valorant phase
+
+This phase shows only Valorant on the main scores screen. CS2 and League of Legends stay on the profile as a static “Em breve” note and do not call PandaScore.
+
+- Required env: `PANDASCORE_API_TOKEN` — token stays on the API server. The app reads Valorant through `/api`.
+- PandaScore Free returns Valorant matches, teams, current rosters, leagues, scores, and stream links.
+- The free plan does not return map names, per-map scores, confirmed match lineups, or player stats such as ACS, ADR, KAST, agents, and economy. Those stay hidden. A higher PandaScore plan, or the optional VLR stats provider, is required before they can be shown.
+- A finished or scheduled 0–0 score is treated as unconfirmed. A live 0–0 stays visible.
+- Current roster on a team page is the current squad, not the lineup of an old match.

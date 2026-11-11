@@ -1,0 +1,149 @@
+[
+  {
+    "width": 360,
+    "errors": [],
+    "overflowing": false,
+    "logos": [
+      {
+        "alt": "Valorant",
+        "complete": true,
+        "width": 192,
+        "src": "http://localhost:8083/assets/?unstable_path=.%2Fassets%2Fgenerated%2Fgames/valorant-mark.png"
+      },
+      {
+        "alt": "Logo de VCT",
+        "complete": true,
+        "width": 192,
+        "src": "http://localhost:8083/assets/?unstable_path=.%2Fassets%2Fgenerated%2Fcompetitions/vct.png"
+      },
+      {
+        "alt": "Logo de G2 Esports",
+        "complete": true,
+        "width": 167,
+        "src": "http://localhost:8083/assets/?unstable_path=.%2Fassets%2Fgenerated%2Fteams/g2-esports.png"
+      },
+      {
+        "alt": "Logo de Team Vitality",
+        "complete": true,
+        "width": 159,
+        "src": "http://localhost:8083/assets/?unstable_path=.%2Fassets%2Fgenerated%2Fteams/team-vitality.png"
+      },
+      {
+        "alt": "Logo de NRG",
+        "complete": true,
+        "width": 192,
+        "src": "http://localhost:8083/assets/?unstable_path=.%2Fassets%2Fgenerated%2Fteams/nrg.png"
+      },
+      {
+        "alt": "Logo de LOUD",
+        "complete": true,
+        "width": 192,
+        "src": "http://localhost:8083/assets/?unstable_path=.%2Fassets%2Fgenerated%2Fteams/loud.png"
+      },
+      {
+        "alt": "Valorant",
+        "complete": true,
+        "width": 192,
+        "src": "http://localhost:8083/assets/?unstable_path=.%2Fassets%2Fgenerated%2Fgames/valorant-mark.png"
+      }
+    ]
+  },
+  {
+    "width": 390,
+    "errors": [],
+    "overflowing": false,
+    "logos": [
+      {
+        "alt": "Valorant",
+        "complete": true,
+        "width": 192,
+        "src": "http://localhost:8083/assets/?unstable_path=.%2Fassets%2Fgenerated%2Fgames/valorant-mark.png"
+      },
+      {
+        "alt": "Logo de VCT",
+        "complete": true,
+        "width": 192,
+        "src": "http://localhost:8083/assets/?unstable_path=.%2Fassets%2Fgenerated%2Fcompetitions/vct.png"
+      },
+      {
+        "alt": "Logo de G2 Esports",
+        "complete": true,
+        "width": 167,
+        "src": "http://localhost:8083/assets/?unstable_path=.%2Fassets%2Fgenerated%2Fteams/g2-esports.png"
+      },
+      {
+        "alt": "Logo de Team Vitality",
+        "complete": true,
+        "width": 159,
+        "src": "http://localhost:8083/assets/?unstable_path=.%2Fassets%2Fgenerated%2Fteams/team-vitality.png"
+      },
+      {
+        "alt": "Logo de NRG",
+        "complete": true,
+        "width": 192,
+        "src": "http://localhost:8083/assets/?unstable_path=.%2Fassets%2Fgenerated%2Fteams/nrg.png"
+      },
+      {
+        "alt": "Logo de LOUD",
+        "complete": true,
+        "width": 192,
+        "src": "http://localhost:8083/assets/?unstable_path=.%2Fassets%2Fgenerated%2Fteams/loud.png"
+      },
+      {
+        "alt": "Valorant",
+        "complete": true,
+        "width": 192,
+        "src": "http://localhost:8083/assets/?unstable_path=.%2Fassets%2Fgenerated%2Fgames/valorant-mark.png"
+      }
+    ]
+  },
+  {
+    "width": 430,
+    "errors": [],
+    "overflowing": false,
+    "logos": [
+      {
+        "alt": "Valorant",
+        "complete": true,
+        "width": 192,
+        "src": "http://localhost:8083/assets/?unstable_path=.%2Fassets%2Fgenerated%2Fgames/valorant-mark.png"
+      },
+      {
+        "alt": "Logo de VCT",
+        "complete": true,
+        "width": 192,
+        "src": "http://localhost:8083/assets/?unstable_path=.%2Fassets%2Fgenerated%2Fcompetitions/vct.png"
+      },
+      {
+        "alt": "Logo de G2 Esports",
+        "complete": true,
+        "width": 167,
+        "src": "http://localhost:8083/assets/?unstable_path=.%2Fassets%2Fgenerated%2Fteams/g2-esports.png"
+      },
+      {
+        "alt": "Logo de Team Vitality",
+        "complete": true,
+        "width": 159,
+        "src": "http://localhost:8083/assets/?unstable_path=.%2Fassets%2Fgenerated%2Fteams/team-vitality.png"
+      },
+      {
+        "alt": "Logo de NRG",
+        "complete": true,
+        "width": 192,
+        "src": "http://localhost:8083/assets/?unstable_path=.%2Fassets%2Fgenerated%2Fteams/nrg.png"
+      },
+      {
+        "alt": "Logo de LOUD",
+        "complete": true,
+        "width": 192,
+        "src": "http://localhost:8083/assets/?unstable_path=.%2Fassets%2Fgenerated%2Fteams/loud.png"
+      },
+      {
+        "alt": "Valorant",
+        "complete": true,
+        "width": 192,
+        "src": "http://localhost:8083/assets/?unstable_path=.%2Fassets%2Fgenerated%2Fgames/valorant-mark.png"
+      }
+    ]
+  }
+]
