@@ -1,5 +1,5 @@
 export type Game = "Valorant" | "CS2" | "League of Legends";
-export type MatchStatus = "Live" | "Upcoming" | "Finished";
+export type MatchStatus = "Live" | "Upcoming" | "Finished" | "Cancelled" | "Postponed";
 export type Player = { id: string; name: string; role?: string };
 export type Tournament = { id: string; name: string; game: Game };
 export type Series = { id: string; format: "BO1" | "BO3" | "BO5"; matchId: string };
@@ -21,19 +21,27 @@ export type Team = {
 export type Match = {
   id: string;
   startTime?: string;
+  scheduledTime?: string;
   game: Game;
   tournament: string;
+  competitionId?: string;
+  competitionName?: string;
+  stage?: string;
   time: string;
   status: MatchStatus;
   teamA: Team;
   teamB: Team;
   scoreA?: number;
   scoreB?: number;
-  format: "BO1" | "BO3" | "BO5";
+  format?: "BO1" | "BO3" | "BO5";
   detail: string;
   competitionLogoUrl?: string;
   streams?: { url: string; language?: string; official?: boolean }[];
 };
+
+export function formatLabel(format?: Match["format"]) {
+  return format;
+}
 
 export const teams: Team[] = [
   { id: "loud", name: "LOUD", short: "L", color: "#B7F34B", game: "Valorant" },

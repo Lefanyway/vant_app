@@ -5,5 +5,5 @@ const missingLogo = (color: string) => `<svg width="32" height="32" viewBox="0 0
 
 export function MissingLogo({ size = 32 }: { size?: number }) {
   const colors = useColors();
-  return <SvgXml xml={missingLogo(colors.mutedForeground)} width={size} height={size} accessibilityLabel="Missing esports asset" />;
+  return <SvgXml xml={missingLogo(colors.mutedForeground)} width={size} height={size} accessibilityLabel="Logo indisponível" />;
 }

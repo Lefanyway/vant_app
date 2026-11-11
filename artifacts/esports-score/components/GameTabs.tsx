@@ -1,22 +1,42 @@
-import { Feather } from "@expo/vector-icons";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Image, StyleSheet, Text, View } from "react-native";
+import { font } from "@/constants/type";
 import { useColors } from "@/hooks/useColors";
-import { ResolvedLogo } from "@/components/ResolvedLogo";
 
-export type GameFilter = "All" | "Valorant" | "CS2" | "League of Legends";
-const items: { label: GameFilter; short: string; key?: "valorant" | "cs2" | "lol" }[] = [
-  { label: "All", short: "Todos" },
-  { label: "Valorant", short: "V", key: "valorant" },
-  { label: "CS2", short: "CS", key: "cs2" },
-  { label: "League of Legends", short: "LoL", key: "lol" },
-];
+const mark = require("../assets/generated/games/valorant-mark.png");
 
-export function GameTabs({ selected, onChange }: { selected: GameFilter; onChange: (value: GameFilter) => void }) {
+export function GameIdentity() {
   const colors = useColors();
-  return <View style={[styles.container, { borderBottomColor: colors.border }]}>{items.map((item) => {
-    const active = selected === item.label;
-    return <Pressable key={item.label} onPress={() => onChange(item.label)} accessibilityLabel={item.label === "All" ? "All followed games" : `${item.label} logo`} style={styles.item}><View style={styles.logo}>{item.key ? <ResolvedLogo type="game" name={item.label} size={30} /> : <Feather name="layers" size={20} color={active ? colors.primary : colors.mutedForeground} />}</View><Text style={[styles.label, { color: active ? colors.foreground : colors.mutedForeground }]}>{item.short}</Text>{active && <View style={[styles.indicator, { backgroundColor: colors.primary }]} />}</Pressable>;
-  })}</View>;
+  return (
+    <View style={styles.row} accessibilityRole="header">
+      <Image source={mark} resizeMode="contain" accessibilityLabel="Símbolo do Valorant" style={styles.mark} />
+      <Text maxFontSizeMultiplier={1.3} style={[styles.name, { color: colors.foreground, fontFamily: font.bold }]}>Valorant</Text>
+    </View>
+  );
 }
 
-const styles = StyleSheet.create({ container: { flexDirection: "row", alignItems: "stretch", borderBottomWidth: 1, marginBottom: 16 }, item: { minWidth: 72, alignItems: "center", paddingVertical: 8, marginRight: 8, position: "relative" }, logo: { width: 32, height: 32, alignItems: "center", justifyContent: "center" }, label: { fontSize: 12, fontWeight: "600", marginTop: 6 }, indicator: { position: "absolute", bottom: -1, height: 2, width: 30, borderRadius: 1 } });
+export function ComingSoonGames() {
+  const colors = useColors();
+  const games = ["CS2", "League of Legends"];
+  return (
+    <View style={[styles.soonCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
+      <Text style={[styles.soonTitle, { color: colors.foreground, fontFamily: font.bold }]}>Outros jogos</Text>
+      {games.map((game) => (
+        <View key={game} style={styles.soonRow}>
+          <Text style={[styles.soonName, { color: colors.foreground, fontFamily: font.semibold }]}>{game}</Text>
+          <Text style={[styles.soonLabel, { color: colors.mutedForeground, fontFamily: font.medium }]}>Em breve</Text>
+        </View>
+      ))}
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  row: { minHeight: 44, flexDirection: "row", alignItems: "center", gap: 8 },
+  mark: { width: 28, height: 28 },
+  name: { fontSize: 16 },
+  soonCard: { borderWidth: 1, borderRadius: 12, padding: 14, marginTop: 28 },
+  soonTitle: { fontSize: 13, marginBottom: 8 },
+  soonRow: { minHeight: 44, flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
+  soonName: { fontSize: 15 },
+  soonLabel: { fontSize: 13 },
+});

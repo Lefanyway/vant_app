@@ -1,20 +1,20 @@
-import { router } from "expo-router";
 import { Pressable, StyleSheet, View } from "react-native";
 import type { ReactNode } from "react";
-import type { Team } from "@/lib/data";
 import { ResolvedLogo } from "@/components/ResolvedLogo";
+import type { Team } from "@/lib/data";
+import { openTeam } from "@/lib/navigation";
 
-export function TeamLink({ team, children, compact = false }: { team: Team; children?: ReactNode; compact?: boolean }) {
+export function TeamLink({ team, children, compact = false, fill = false }: { team: Team; children?: ReactNode; compact?: boolean; fill?: boolean }) {
   return (
     <Pressable
       testID={`team-link-${team.id}`}
       accessibilityRole="link"
-      accessibilityLabel={`Open ${team.name}`}
+      accessibilityLabel={`Abrir ${team.name}`}
       onPress={(event) => {
         event.stopPropagation();
-        router.push(`/teams/${encodeURIComponent(team.id)}`);
+        openTeam(team);
       }}
-      style={({ pressed }) => [styles.link, compact && styles.compact, { opacity: pressed ? 0.7 : 1 }]}
+      style={({ pressed }) => [styles.link, compact && styles.compact, fill && styles.fill, { opacity: pressed ? 0.7 : 1 }]}
     >
       {children ?? <View style={styles.default}><ResolvedLogo type="team" name={team.name} game={team.game} logoUrl={team.logoUrl} size={32} /></View>}
     </Pressable>
@@ -24,5 +24,6 @@ export function TeamLink({ team, children, compact = false }: { team: Team; chil
 const styles = StyleSheet.create({
   link: { alignItems: "center", justifyContent: "center" },
   compact: { flexDirection: "row", width: "100%", alignItems: "stretch" },
+  fill: { flex: 1, minWidth: 0, alignItems: "stretch" },
   default: { alignItems: "center", justifyContent: "center" },
 });
