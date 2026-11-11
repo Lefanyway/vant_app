@@ -1,41 +1,24 @@
-modules = ["nodejs-24", "python-base-3.13"]
+modules = ["nodejs-24"]
 
-[deployment]
-router = "application"
-deploymentTarget = "autoscale"
+[nix]
+channel = "stable-25_05"
 
-[deployment.postBuild]
-args = ["pnpm", "store", "prune"]
-env = { "CI" = "true" }
+[[ports]]
+localPort = 5000
+externalPort = 80
 
 [workflows]
 runButton = "Project"
 
 [[workflows.workflow]]
 name = "Project"
-mode = "parallel"
-author = "agent"
-
-[[workflows.workflow.tasks]]
-task = "workflow.run"
-args = "VANT Project"
-
-[[workflows.workflow]]
-name = "VANT Project"
-author = "agent"
+mode = "sequential"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "bash scripts/project.sh"
-waitForPort = 5000
 
-[workflows.workflow.metadata]
-outputType = "webview"
-
-[agent]
-stack = "PNPM_WORKSPACE"
-expertMode = true
-
-[postMerge]
-path = "scripts/post-merge.sh"
-timeoutMs = 20000
+[deployment]
+deploymentTarget = "vm"
+build = ["bash", "-lc", "pnpm install --frozen-lockfile && node scripts/build-production.mjs"]
+run = ["node", "scripts/start-production.mjs"]

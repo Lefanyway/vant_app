@@ -4,8 +4,10 @@ jest.mock("react-native-safe-area-context", () => ({
 
 jest.mock("@expo/vector-icons", () => ({
   Feather: () => null,
+  Ionicons: () => null,
 }));
 
 jest.mock("@/components/ResolvedLogo", () => ({
   ResolvedLogo: () => null,
+  logoSlot: { list: { size: 22, maxWidth: 64 }, header: { size: 28, maxWidth: 84 }, profile: { size: 72, maxWidth: 180 } },
 }));

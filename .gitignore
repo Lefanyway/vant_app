@@ -48,3 +48,8 @@ Thumbs.db
 .cache/
 .local/
 .replit-vlr-upstream/
+
+# Local secrets
+.env
+.env.*
+!.env.example
