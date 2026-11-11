@@ -39,7 +39,7 @@ export type Competition = { id: string; externalIds: ExternalId[]; name: string;
 export type Stream = { url: string; language?: string; official?: boolean };
 export type Match = {
   id: string; externalIds: ExternalId[]; gameId: GameId; competition: Competition;
-  homeTeam: Team; awayTeam: Team; startTime: string; status: MatchStatus; bestOf?: 1 | 3 | 5;
+  homeTeam: Team; awayTeam: Team; startTime: string | null; scheduledTime?: string | null; status: MatchStatus; bestOf?: 1 | 3 | 5;
   homeScore?: number; awayScore?: number; streams?: Stream[];
 };
 export type MatchDetails = {
@@ -70,11 +70,15 @@ export type ValorantStatsProvider = {
   getRecentMatches(team: Team, limit?: number): Promise<Match[]>;
 };
 export type MatchQuery = { game?: GameId; date?: string; from?: string; to?: string; timezone?: string };
-export type SearchResult = { type: "team" | "competition" | "game"; id: string; name: string; gameId?: GameId; logoUrl?: string };
+// acronym/country/countryName describe a team, season the latest season of a competition: context to tell similar names apart.
+export type SearchResult = { type: "team" | "competition" | "game"; id: string; name: string; gameId?: GameId; logoUrl?: string; acronym?: string; country?: string; countryName?: string; season?: string };
+export type CatalogType = "team" | "competition" | "all";
 export type ProviderCapabilities = { schedules: boolean; results: boolean; runningMatches: boolean; historicalStats: boolean; liveTelemetry: boolean };
 export type EsportsDataProvider = {
   name: string;
   capabilities: Record<GameId, ProviderCapabilities>;
+  health?(): Promise<void>;
+  getCatalogPage?(type: CatalogType, page: number, query: string): Promise<{ items: SearchResult[]; hasMore: boolean }>;
   getGames(): Promise<Game[]>;
   getMatches(query?: MatchQuery): Promise<Match[]>;
   getLiveMatches(game?: GameId): Promise<Match[]>;
@@ -84,6 +88,7 @@ export type EsportsDataProvider = {
   getMatchDetails?(id: string): Promise<MatchDetails | null>;
   getCompetitions(game?: GameId): Promise<Competition[]>;
   getCompetition(id: string): Promise<Competition | null>;
+  getCompetitionMatches?(id: string, filter: TeamMatchFilter, page?: number, perPage?: number): Promise<{ matches: Match[]; hasMore: boolean }>;
   getTeams(game?: GameId): Promise<Team[]>;
   getTeam(id: string): Promise<Team | null>;
   getTeamDetails?(id: string): Promise<TeamDetails | null>;

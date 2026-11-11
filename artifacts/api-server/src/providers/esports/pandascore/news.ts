@@ -41,8 +41,19 @@ function parseItems(xml: string): RssItem[] {
 
 function cleanDescription(description?: string): string | undefined {
   if (!description) return undefined;
-  const text = description.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+  // The RSS description is escaped HTML, so its text still holds HTML entities such as &nbsp; after the tags go.
+  const text = decodeXml(description.replace(/<[^>]*>/g, " ").replace(/&nbsp;|&#160;/gi, " ")).replace(/\s+/g, " ").trim();
   return text || undefined;
+}
+
+// Google News often sends a description that is only the headline plus the source name.
+function repeatsTitle(summary: string, title: string, source?: string): boolean {
+  const normalize = (value: string) => {
+    const text = value.replace(/\s+/g, " ").trim().toLowerCase();
+    const name = source?.replace(/\s+/g, " ").trim().toLowerCase();
+    return (name && text.endsWith(name) ? text.slice(0, -name.length) : text).replace(/[\s\-–—·|]+$/, "");
+  };
+  return normalize(summary) === normalize(title);
 }
 
 export async function fetchTeamNews(teamName: string, limit: number): Promise<TeamNewsArticle[]> {
@@ -72,13 +83,15 @@ export async function fetchTeamNews(teamName: string, limit: number): Promise<Te
       continue;
     }
 
+    const source = item.source ?? articleUrl.hostname.replace(/^www\./, "");
+    const summary = cleanDescription(item.description);
     articles.push({
       id: `google-news:${Buffer.from(articleUrl.href).toString("base64url")}`,
       title: item.title,
       url: articleUrl.href,
       publishedAt: publishedAt.toISOString(),
-      source: item.source ?? articleUrl.hostname.replace(/^www\./, ""),
-      summary: cleanDescription(item.description),
+      source,
+      summary: summary && !repeatsTitle(summary, item.title, source) ? summary : undefined,
     });
     if (articles.length >= limit) break;
   }
