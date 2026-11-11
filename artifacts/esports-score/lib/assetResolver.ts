@@ -1,11 +1,11 @@
 import manifest from "@/lib/esports-assets.json";
 import generatedAssetRegistry from "@/lib/generatedAssetRegistry";
 
-export type AssetEntityType = "game" | "team" | "competition";
+export type AssetEntityType = "game" | "team" | "competition" | "player";
 export type AssetStatus = "resolved" | "missing" | "error";
-export type AssetResult = { logoUrl?: string; logoSource?: number; source?: string; status: AssetStatus };
+export type AssetResult = { logoUrl?: string; logoSource?: number; source?: string; background?: string; status: AssetStatus };
 
-type ManifestEntry = { logo?: string; source?: string; status: AssetStatus };
+type ManifestEntry = { logo?: string; source?: string; background?: string; ids?: string[]; status: AssetStatus };
 type AssetManifest = { games: Record<string, ManifestEntry>; teams: Record<string, ManifestEntry>; competitions: Record<string, ManifestEntry> };
 
 const typedManifest = manifest as AssetManifest;
@@ -22,13 +22,23 @@ const aliases: Record<string, string> = {
   valorant: "valorant",
   "100t": "100-thieves",
   kru: "kru-esports",
+  "g2": "g2-esports",
+  "nrg-esports": "nrg",
+  "natus-vincere": "navi",
+  "drx": "kiwoom-drx",
+  "geng": "gen-g",
+  "vitality": "team-vitality",
 };
 
-export function resolveEsportsAsset({ type, name }: { type: AssetEntityType; name: string; game?: string }): AssetResult {
-  const key = aliases[normalizeAssetName(name)] ?? normalizeAssetName(name);
-  const entry = typedManifest[`${type}s` as keyof AssetManifest]?.[key];
+export function resolveEsportsAsset({ type, name, entityId }: { type: AssetEntityType; name: string; game?: string; entityId?: string }): AssetResult {
+  if (type === "player") return { status: "missing" };
+  const normalized = normalizeAssetName(name);
+  const entries = typedManifest[`${type}s` as keyof AssetManifest];
+  const idKey = entityId ? Object.keys(entries ?? {}).find(key => entries[key].ids?.includes(entityId)) : undefined;
+  const prefixKey = type === "competition" ? Object.keys(entries ?? {}).filter(key => normalized.startsWith(key + "-") && entries[key].status === "resolved").sort((a, b) => b.length - a.length)[0] : undefined;
+  const key = idKey ?? aliases[normalized] ?? (entries?.[normalized]?.status === "resolved" ? normalized : prefixKey) ?? normalized;
+  const entry = entries?.[key];
   if (!entry) {
-    if (__DEV__) console.warn(`Missing esports asset: ${name}`);
     return { status: "missing" };
   }
   if (entry.status === "error") return { logoUrl: entry.logo, source: entry.source, status: "error" };
@@ -37,5 +47,5 @@ export function resolveEsportsAsset({ type, name }: { type: AssetEntityType; nam
     if (__DEV__) console.warn(`Missing local esports asset: ${name}`);
     return { status: "missing", source: entry.source };
   }
-  return { logoUrl: entry.logo, logoSource, source: entry.source, status: entry.status ?? "missing" };
+  return { logoUrl: entry.logo, logoSource, source: entry.source, background: entry.background, status: entry.status ?? "missing" };
 }

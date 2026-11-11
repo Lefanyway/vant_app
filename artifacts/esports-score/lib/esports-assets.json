@@ -2,65 +2,670 @@
   "games": {
     "valorant": {
       "logo": "assets/generated/games/valorant.png",
-      "source": "Wikimedia Commons",
-      "status": "resolved"
+      "source": "https://playvalorant.com/en-us/news/game-updates/valorant-asset-kit/",
+      "sourceUrl": "https://cmsassets.rgpub.io/sanity/files/dsfx7636/news_live/b17ccca742efd7261229bd030ca5b67df217516a.zip",
+      "official": true,
+      "status": "resolved",
+      "background": "none"
     },
     "lol": {
-      "logo": "assets/generated/games/lol.png",
+      "logo": "assets/generated/games/lol-on-dark.png",
       "source": "Wikimedia Commons",
       "status": "resolved"
     }
   },
   "teams": {
     "loud": {
-      "source": "Wikimedia Commons",
-      "status": "error"
+      "logo": "assets/generated/teams/loud.png",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook",
+      "sourceUrl": "https://am-a.akamaihd.net/image?resize=256%3A&f=http%3A%2F%2Fstatic.lolesports.com%2Fteams%2F1644060140569_LOUDGreen.png",
+      "official": true,
+      "status": "resolved",
+      "background": "none",
+      "ids": [],
+      "name": "LOUD"
     },
     "sentinels": {
-      "source": "Wikimedia Commons",
-      "status": "error"
+      "logo": "assets/generated/teams/sentinels.png",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook",
+      "sourceUrl": "https://am-a.akamaihd.net/image?resize=256%3A&f=http%3A%2F%2Fstatic.lolesports.com%2Fteams%2F1739254422982_sent.png",
+      "official": true,
+      "status": "resolved",
+      "background": "light",
+      "ids": [],
+      "name": "Sentinels"
     },
     "g2-esports": {
-      "source": "Wikimedia Commons",
-      "status": "error"
+      "logo": "assets/generated/teams/g2-esports.png",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook",
+      "sourceUrl": "https://am-a.akamaihd.net/image?resize=256%3A&f=http%3A%2F%2Fstatic.lolesports.com%2Fteams%2F1675329807714_G2-Esports-Logo1.png",
+      "official": true,
+      "status": "resolved",
+      "background": "none",
+      "ids": [],
+      "name": "G2 Esports"
     },
     "mibr": {
-      "source": "Wikimedia Commons",
-      "status": "error"
+      "logo": "assets/generated/teams/mibr.png",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook",
+      "sourceUrl": "https://am-a.akamaihd.net/image?resize=256%3A&f=http%3A%2F%2Fstatic.lolesports.com%2Fteams%2F1648844013086_mibr_white-logo.png",
+      "official": true,
+      "status": "resolved",
+      "background": "none",
+      "ids": [],
+      "name": "MIBR"
     },
     "nrg": {
-      "source": "Wikimedia Commons",
-      "status": "error"
+      "logo": "assets/generated/teams/nrg.png",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook",
+      "sourceUrl": "https://am-a.akamaihd.net/image?resize=256%3A&f=http%3A%2F%2Fstatic.lolesports.com%2Fteams%2F1731490666442_NRGWHT.png",
+      "official": true,
+      "status": "resolved",
+      "background": "none",
+      "ids": [],
+      "name": "NRG"
     },
     "100-thieves": {
-      "source": "Wikimedia Commons",
-      "status": "error"
+      "logo": "assets/generated/teams/100-thieves.png",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook",
+      "sourceUrl": "https://am-a.akamaihd.net/image?resize=256%3A&f=http%3A%2F%2Fstatic.lolesports.com%2Fteams%2F1644966311613_100TVAL.png",
+      "official": true,
+      "status": "resolved",
+      "background": "none",
+      "ids": [],
+      "name": "100 Thieves"
     },
     "leviatan": {
-      "source": "Wikimedia Commons",
-      "status": "error"
+      "logo": "assets/generated/teams/leviatan-esports.png",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook",
+      "sourceUrl": "https://am-a.akamaihd.net/image?resize=256%3A&f=http%3A%2F%2Fstatic.lolesports.com%2Fteams%2F1644148043034_Leviatncolor.png",
+      "official": true,
+      "status": "resolved",
+      "background": "none",
+      "ids": [],
+      "name": "Leviatán Esports"
     },
     "kru-esports": {
-      "source": "Wikimedia Commons",
-      "status": "error"
+      "logo": "assets/generated/teams/kru-visa.png",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook",
+      "sourceUrl": "https://am-a.akamaihd.net/image?resize=256%3A&f=http%3A%2F%2Fstatic.lolesports.com%2Fteams%2F1630017626481_kru.png",
+      "official": true,
+      "status": "resolved",
+      "background": "none",
+      "ids": [],
+      "name": "KRÜ Visa"
+    },
+    "envy": {
+      "logo": "assets/generated/teams/envy.png",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook",
+      "sourceUrl": "https://am-a.akamaihd.net/image?resize=256%3A&f=http%3A%2F%2Fstatic.lolesports.com%2Fteams%2F1764151573361_ENVY_Standard_Light.png",
+      "official": true,
+      "status": "resolved",
+      "background": "none",
+      "ids": [],
+      "name": "ENVY"
+    },
+    "evil-geniuses": {
+      "logo": "assets/generated/teams/evil-geniuses.png",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook",
+      "sourceUrl": "https://am-a.akamaihd.net/image?resize=256%3A&f=http%3A%2F%2Fstatic.lolesports.com%2Fteams%2F1731490673901_VintageEG.png",
+      "official": true,
+      "status": "resolved",
+      "background": "none",
+      "ids": [],
+      "name": "Evil Geniuses"
+    },
+    "cloud9": {
+      "logo": "assets/generated/teams/cloud9.png",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook",
+      "sourceUrl": "https://am-a.akamaihd.net/image?resize=256%3A&f=http%3A%2F%2Fstatic.lolesports.com%2Fteams%2F1725635348011_C9-Logo.png",
+      "official": true,
+      "status": "resolved",
+      "background": "none",
+      "ids": [],
+      "name": "Cloud9"
+    },
+    "kru-visa": {
+      "logo": "assets/generated/teams/kru-visa.png",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook",
+      "sourceUrl": "https://am-a.akamaihd.net/image?resize=256%3A&f=http%3A%2F%2Fstatic.lolesports.com%2Fteams%2F1630017626481_kru.png",
+      "official": true,
+      "status": "resolved",
+      "background": "none",
+      "ids": [],
+      "name": "KRÜ Visa"
+    },
+    "kru": {
+      "logo": "assets/generated/teams/kru-visa.png",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook",
+      "sourceUrl": "https://am-a.akamaihd.net/image?resize=256%3A&f=http%3A%2F%2Fstatic.lolesports.com%2Fteams%2F1630017626481_kru.png",
+      "official": true,
+      "status": "resolved",
+      "background": "none",
+      "ids": [],
+      "name": "KRÜ Visa"
+    },
+    "furia": {
+      "logo": "assets/generated/teams/furia.png",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook",
+      "sourceUrl": "https://am-a.akamaihd.net/image?resize=256%3A&f=http%3A%2F%2Fstatic.lolesports.com%2Fteams%2F1644059765262_FURIA-LOGO.png",
+      "official": true,
+      "status": "resolved",
+      "background": "light",
+      "ids": [],
+      "name": "FURIA"
+    },
+    "leviatan-esports": {
+      "logo": "assets/generated/teams/leviatan-esports.png",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook",
+      "sourceUrl": "https://am-a.akamaihd.net/image?resize=256%3A&f=http%3A%2F%2Fstatic.lolesports.com%2Fteams%2F1644148043034_Leviatncolor.png",
+      "official": true,
+      "status": "resolved",
+      "background": "none",
+      "ids": [],
+      "name": "Leviatán Esports"
+    },
+    "g2": {
+      "logo": "assets/generated/teams/g2-esports.png",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook",
+      "sourceUrl": "https://am-a.akamaihd.net/image?resize=256%3A&f=http%3A%2F%2Fstatic.lolesports.com%2Fteams%2F1675329807714_G2-Esports-Logo1.png",
+      "official": true,
+      "status": "resolved",
+      "background": "none",
+      "ids": [],
+      "name": "G2 Esports"
+    },
+    "navi": {
+      "logo": "assets/generated/teams/navi.png",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook",
+      "sourceUrl": "https://am-a.akamaihd.net/image?resize=256%3A&f=http%3A%2F%2Fstatic.lolesports.com%2Fteams%2F1627386036528_Natus_Vincere_2021_lightmode.png",
+      "official": true,
+      "status": "resolved",
+      "background": "none",
+      "ids": [],
+      "name": "NAVI"
+    },
+    "natus-vincere": {
+      "logo": "assets/generated/teams/navi.png",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook",
+      "sourceUrl": "https://am-a.akamaihd.net/image?resize=256%3A&f=http%3A%2F%2Fstatic.lolesports.com%2Fteams%2F1627386036528_Natus_Vincere_2021_lightmode.png",
+      "official": true,
+      "status": "resolved",
+      "background": "none",
+      "ids": [],
+      "name": "NAVI"
+    },
+    "karmine-corp": {
+      "logo": "assets/generated/teams/karmine-corp.png",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook",
+      "sourceUrl": "https://am-a.akamaihd.net/image?resize=256%3A&f=http%3A%2F%2Fstatic.lolesports.com%2Fteams%2F1651626649157_download1.png",
+      "official": true,
+      "status": "resolved",
+      "background": "none",
+      "ids": [],
+      "name": "Karmine Corp"
+    },
+    "fut-esports": {
+      "logo": "assets/generated/teams/fut-esports.png",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook",
+      "sourceUrl": "https://am-a.akamaihd.net/image?resize=256%3A&f=http%3A%2F%2Fstatic.lolesports.com%2Fteams%2F1644342678681_FUT_VRL_DARK.png",
+      "official": true,
+      "status": "resolved",
+      "background": "none",
+      "ids": [],
+      "name": "FUT Esports"
+    },
+    "gentle-mates": {
+      "logo": "assets/generated/teams/gentle-mates.png",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook",
+      "sourceUrl": "https://am-a.akamaihd.net/image?resize=256%3A&f=http%3A%2F%2Fstatic.lolesports.com%2Fteams%2F1772419824776_M8-Logo.png",
+      "official": true,
+      "status": "resolved",
+      "background": "none",
+      "ids": [],
+      "name": "Gentle Mates"
+    },
+    "pcific-esports": {
+      "logo": "assets/generated/teams/pcific-esports.png",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook",
+      "sourceUrl": "https://am-a.akamaihd.net/image?resize=256%3A&f=http%3A%2F%2Fstatic.lolesports.com%2Fteams%2F1766141618825_PCIFIC_Esports_allmode.png",
+      "official": true,
+      "status": "resolved",
+      "background": "none",
+      "ids": [],
+      "name": "PCIFIC Esports"
+    },
+    "bbl-esports": {
+      "logo": "assets/generated/teams/bbl-esports.png",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook",
+      "sourceUrl": "https://am-a.akamaihd.net/image?resize=256%3A&f=http%3A%2F%2Fstatic.lolesports.com%2Fteams%2F1674060310685_BBL-GOLD-EMBLEM1.png",
+      "official": true,
+      "status": "resolved",
+      "background": "none",
+      "ids": [],
+      "name": "BBL Esports"
+    },
+    "ulf-esports": {
+      "logo": "assets/generated/teams/ulf-esports.png",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook",
+      "sourceUrl": "https://am-a.akamaihd.net/image?resize=256%3A&f=http%3A%2F%2Fstatic.lolesports.com%2Fteams%2F1766141700090_ULFLOGO.png",
+      "official": true,
+      "status": "resolved",
+      "background": "none",
+      "ids": [],
+      "name": "ULF Esports"
+    },
+    "team-vitality": {
+      "logo": "assets/generated/teams/team-vitality.png",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook",
+      "sourceUrl": "https://am-a.akamaihd.net/image?resize=256%3A&f=http%3A%2F%2Fstatic.lolesports.com%2Fteams%2F1722030793680_VITALITY_YELLOW.png",
+      "official": true,
+      "status": "resolved",
+      "background": "none",
+      "ids": [],
+      "name": "Team Vitality"
+    },
+    "vitality": {
+      "logo": "assets/generated/teams/team-vitality.png",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook",
+      "sourceUrl": "https://am-a.akamaihd.net/image?resize=256%3A&f=http%3A%2F%2Fstatic.lolesports.com%2Fteams%2F1722030793680_VITALITY_YELLOW.png",
+      "official": true,
+      "status": "resolved",
+      "background": "none",
+      "ids": [],
+      "name": "Team Vitality"
+    },
+    "team-heretics": {
+      "logo": "assets/generated/teams/team-heretics.png",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook",
+      "sourceUrl": "https://am-a.akamaihd.net/image?resize=256%3A&f=http%3A%2F%2Fstatic.lolesports.com%2Fteams%2F1674060672534_600px-Team_Heretics_2022_allmode1.png",
+      "official": true,
+      "status": "resolved",
+      "background": "none",
+      "ids": [],
+      "name": "Team Heretics"
+    },
+    "giantx": {
+      "logo": "assets/generated/teams/giantx.png",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook",
+      "sourceUrl": "https://am-a.akamaihd.net/image?resize=256%3A&f=http%3A%2F%2Fstatic.lolesports.com%2Fteams%2F1706547566185_GX.png",
+      "official": true,
+      "status": "resolved",
+      "background": "none",
+      "ids": [],
+      "name": "GIANTX"
+    },
+    "fnatic": {
+      "logo": "assets/generated/teams/fnatic.png",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook",
+      "sourceUrl": "https://am-a.akamaihd.net/image?resize=256%3A&f=http%3A%2F%2Fstatic.lolesports.com%2Fteams%2F1644542427486_download37.png",
+      "official": true,
+      "status": "resolved",
+      "background": "none",
+      "ids": [],
+      "name": "FNATIC"
+    },
+    "team-liquid": {
+      "logo": "assets/generated/teams/team-liquid.png",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook",
+      "sourceUrl": "https://am-a.akamaihd.net/image?resize=256%3A&f=http%3A%2F%2Fstatic.lolesports.com%2Fteams%2F1637252586938_teamliquid.png",
+      "official": true,
+      "status": "resolved",
+      "background": "none",
+      "ids": [],
+      "name": "Team Liquid"
+    },
+    "detonation-focusme": {
+      "logo": "assets/generated/teams/detonation-focusme.png",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook",
+      "sourceUrl": "https://am-a.akamaihd.net/image?resize=256%3A&f=http%3A%2F%2Fstatic.lolesports.com%2Fteams%2F1675669923678_190px-DetonatioN_FocusMe_2022_darkmode1.png",
+      "official": true,
+      "status": "resolved",
+      "background": "none",
+      "ids": [],
+      "name": "DetonatioN FocusMe"
+    },
+    "kiwoom-drx": {
+      "logo": "assets/generated/teams/kiwoom-drx.png",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook",
+      "sourceUrl": "https://am-a.akamaihd.net/image?resize=256%3A&f=http%3A%2F%2Fstatic.lolesports.com%2Fteams%2F1774420104898_.png",
+      "official": true,
+      "status": "resolved",
+      "background": "none",
+      "ids": [],
+      "name": "Kiwoom DRX"
+    },
+    "drx": {
+      "logo": "assets/generated/teams/kiwoom-drx.png",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook",
+      "sourceUrl": "https://am-a.akamaihd.net/image?resize=256%3A&f=http%3A%2F%2Fstatic.lolesports.com%2Fteams%2F1774420104898_.png",
+      "official": true,
+      "status": "resolved",
+      "background": "none",
+      "ids": [],
+      "name": "Kiwoom DRX"
+    },
+    "full-sense": {
+      "logo": "assets/generated/teams/full-sense.png",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook",
+      "sourceUrl": "https://am-a.akamaihd.net/image?resize=256%3A&f=http%3A%2F%2Fstatic.lolesports.com%2Fteams%2F1705915075330_FULLSENSE.png",
+      "official": true,
+      "status": "resolved",
+      "background": "none",
+      "ids": [],
+      "name": "FULL SENSE"
+    },
+    "gen-g": {
+      "logo": "assets/generated/teams/gen-g.png",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook",
+      "sourceUrl": "https://am-a.akamaihd.net/image?resize=256%3A&f=http%3A%2F%2Fstatic.lolesports.com%2Fteams%2F1775114509356_GENGLOGO_GOLD.png",
+      "official": true,
+      "status": "resolved",
+      "background": "none",
+      "ids": [],
+      "name": "Gen.G"
+    },
+    "geng": {
+      "logo": "assets/generated/teams/gen-g.png",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook",
+      "sourceUrl": "https://am-a.akamaihd.net/image?resize=256%3A&f=http%3A%2F%2Fstatic.lolesports.com%2Fteams%2F1775114509356_GENGLOGO_GOLD.png",
+      "official": true,
+      "status": "resolved",
+      "background": "none",
+      "ids": [],
+      "name": "Gen.G"
+    },
+    "gen-g-esports": {
+      "logo": "assets/generated/teams/gen-g.png",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook",
+      "sourceUrl": "https://am-a.akamaihd.net/image?resize=256%3A&f=http%3A%2F%2Fstatic.lolesports.com%2Fteams%2F1775114509356_GENGLOGO_GOLD.png",
+      "official": true,
+      "status": "resolved",
+      "background": "none",
+      "ids": [],
+      "name": "Gen.G"
+    },
+    "global-esports": {
+      "logo": "assets/generated/teams/global-esports.png",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook",
+      "sourceUrl": "https://am-a.akamaihd.net/image?resize=256%3A&f=http%3A%2F%2Fstatic.lolesports.com%2Fteams%2F1677137854820_GERedandBlue-WhiteBG.png",
+      "official": true,
+      "status": "resolved",
+      "background": "none",
+      "ids": [],
+      "name": "GLOBAL ESPORTS"
+    },
+    "nongshim-redforce": {
+      "logo": "assets/generated/teams/nongshim-redforce.png",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook",
+      "sourceUrl": "https://am-a.akamaihd.net/image?resize=256%3A&f=http%3A%2F%2Fstatic.lolesports.com%2Fteams%2F1674219422693_NS_.png",
+      "official": true,
+      "status": "resolved",
+      "background": "light",
+      "ids": [],
+      "name": "NONGSHIM REDFORCE"
+    },
+    "nongshim-red-force": {
+      "logo": "assets/generated/teams/nongshim-redforce.png",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook",
+      "sourceUrl": "https://am-a.akamaihd.net/image?resize=256%3A&f=http%3A%2F%2Fstatic.lolesports.com%2Fteams%2F1674219422693_NS_.png",
+      "official": true,
+      "status": "resolved",
+      "background": "light",
+      "ids": [],
+      "name": "NONGSHIM REDFORCE"
+    },
+    "paper-rex": {
+      "logo": "assets/generated/teams/paper-rex.png",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook",
+      "sourceUrl": "https://am-a.akamaihd.net/image?resize=256%3A&f=http%3A%2F%2Fstatic.lolesports.com%2Fteams%2F1630018120582_paper-rex-2021.png",
+      "official": true,
+      "status": "resolved",
+      "background": "none",
+      "ids": [],
+      "name": "Paper Rex"
+    },
+    "rex-regum-qeon": {
+      "logo": "assets/generated/teams/rex-regum-qeon.png",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook",
+      "sourceUrl": "https://am-a.akamaihd.net/image?resize=256%3A&f=http%3A%2F%2Fstatic.lolesports.com%2Fteams%2F1707306458590_LOGO_RRQ_orange.png",
+      "official": true,
+      "status": "resolved",
+      "background": "none",
+      "ids": [],
+      "name": "Rex Regum Qeon"
+    },
+    "t1": {
+      "logo": "assets/generated/teams/t1.png",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook",
+      "sourceUrl": "https://am-a.akamaihd.net/image?resize=256%3A&f=http%3A%2F%2Fstatic.lolesports.com%2Fteams%2F1677137430839_T1_infoboximage1.png",
+      "official": true,
+      "status": "resolved",
+      "background": "light",
+      "ids": [],
+      "name": "T1"
+    },
+    "team-secret": {
+      "logo": "assets/generated/teams/team-secret.png",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook",
+      "sourceUrl": "https://am-a.akamaihd.net/image?resize=256%3A&f=http%3A%2F%2Fstatic.lolesports.com%2Fteams%2F1636575342048_team-secret-on-dark.png",
+      "official": true,
+      "status": "resolved",
+      "background": "none",
+      "ids": [],
+      "name": "Team Secret"
+    },
+    "zeta-division": {
+      "logo": "assets/generated/teams/zeta-division.png",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook",
+      "sourceUrl": "https://am-a.akamaihd.net/image?resize=256%3A&f=http%3A%2F%2Fstatic.lolesports.com%2Fteams%2F1630017899610_zeta.png",
+      "official": true,
+      "status": "resolved",
+      "background": "none",
+      "ids": [],
+      "name": "ZETA DIVISION"
+    },
+    "varrel": {
+      "logo": "assets/generated/teams/varrel.png",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook",
+      "sourceUrl": "https://am-a.akamaihd.net/image?resize=256%3A&f=http%3A%2F%2Fstatic.lolesports.com%2Fteams%2F1706170514062_VARREL_darkmode.png",
+      "official": true,
+      "status": "resolved",
+      "background": "none",
+      "ids": [],
+      "name": "VARREL"
+    },
+    "trace-esports": {
+      "logo": "assets/generated/teams/trace-esports.png",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook",
+      "sourceUrl": "https://am-a.akamaihd.net/image?resize=256%3A&f=http%3A%2F%2Fstatic.lolesports.com%2Fteams%2F1736345448590_TE.png",
+      "official": true,
+      "status": "resolved",
+      "background": "none",
+      "ids": [],
+      "name": "Trace Esports"
+    },
+    "wolves-esports": {
+      "logo": "assets/generated/teams/wolves-esports.png",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook",
+      "sourceUrl": "https://am-a.akamaihd.net/image?resize=256%3A&f=http%3A%2F%2Fstatic.lolesports.com%2Fteams%2F1707126969882_WOL.png",
+      "official": true,
+      "status": "resolved",
+      "background": "none",
+      "ids": [],
+      "name": "WOLVES ESPORTS"
+    },
+    "funplus-phoenix": {
+      "logo": "assets/generated/teams/funplus-phoenix.png",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook",
+      "sourceUrl": "https://am-a.akamaihd.net/image?resize=256%3A&f=http%3A%2F%2Fstatic.lolesports.com%2Fteams%2F1644542485597_download38.png",
+      "official": true,
+      "status": "resolved",
+      "background": "light",
+      "ids": [],
+      "name": "FunPlus Phoenix"
+    },
+    "tyloo-gaming": {
+      "logo": "assets/generated/teams/tyloo-gaming.png",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook",
+      "sourceUrl": "https://am-a.akamaihd.net/image?resize=256%3A&f=http%3A%2F%2Fstatic.lolesports.com%2Fteams%2F1776403069581_TYLLOGO.png",
+      "official": true,
+      "status": "resolved",
+      "background": "none",
+      "ids": [],
+      "name": "TYLOO GAMING"
+    },
+    "tyloo": {
+      "logo": "assets/generated/teams/tyloo-gaming.png",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook",
+      "sourceUrl": "https://am-a.akamaihd.net/image?resize=256%3A&f=http%3A%2F%2Fstatic.lolesports.com%2Fteams%2F1776403069581_TYLLOGO.png",
+      "official": true,
+      "status": "resolved",
+      "background": "none",
+      "ids": [],
+      "name": "TYLOO GAMING"
+    },
+    "all-gamers": {
+      "logo": "assets/generated/teams/all-gamers.png",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook",
+      "sourceUrl": "https://am-a.akamaihd.net/image?resize=256%3A&f=http%3A%2F%2Fstatic.lolesports.com%2Fteams%2F1707126806655_AG.png",
+      "official": true,
+      "status": "resolved",
+      "background": "light",
+      "ids": [],
+      "name": "ALL GAMERS"
+    },
+    "nova-esports": {
+      "logo": "assets/generated/teams/nova-esports.png",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook",
+      "sourceUrl": "https://am-a.akamaihd.net/image?resize=256%3A&f=http%3A%2F%2Fstatic.lolesports.com%2Fteams%2F1741178535000_NOVA.png",
+      "official": true,
+      "status": "resolved",
+      "background": "none",
+      "ids": [],
+      "name": "NOVA ESPORTS"
+    },
+    "jd-gaming": {
+      "logo": "assets/generated/teams/jd-gaming.png",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook",
+      "sourceUrl": "https://am-a.akamaihd.net/image?resize=256%3A&f=http%3A%2F%2Fstatic.lolesports.com%2Fteams%2F1707126862498_JDG.png",
+      "official": true,
+      "status": "resolved",
+      "background": "light",
+      "ids": [],
+      "name": "JD GAMING"
+    },
+    "jdg": {
+      "logo": "assets/generated/teams/jd-gaming.png",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook",
+      "sourceUrl": "https://am-a.akamaihd.net/image?resize=256%3A&f=http%3A%2F%2Fstatic.lolesports.com%2Fteams%2F1707126862498_JDG.png",
+      "official": true,
+      "status": "resolved",
+      "background": "light",
+      "ids": [],
+      "name": "JD GAMING"
+    },
+    "titan-esports-club": {
+      "logo": "assets/generated/teams/titan-esports-club.png",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook",
+      "sourceUrl": "https://am-a.akamaihd.net/image?resize=256%3A&f=http%3A%2F%2Fstatic.lolesports.com%2Fteams%2F1776403053335_TEC.png",
+      "official": true,
+      "status": "resolved",
+      "background": "light",
+      "ids": [],
+      "name": "TITAN ESPORTS CLUB"
+    },
+    "xi-lai-gaming": {
+      "logo": "assets/generated/teams/xi-lai-gaming.png",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook",
+      "sourceUrl": "https://am-a.akamaihd.net/image?resize=256%3A&f=http%3A%2F%2Fstatic.lolesports.com%2Fteams%2F1735920774181_XLGA.PNG",
+      "official": true,
+      "status": "resolved",
+      "background": "none",
+      "ids": [],
+      "name": "Xi Lai Gaming"
+    },
+    "edward-gaming": {
+      "logo": "assets/generated/teams/edward-gaming.png",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook",
+      "sourceUrl": "https://am-a.akamaihd.net/image?resize=256%3A&f=http%3A%2F%2Fstatic.lolesports.com%2Fteams%2F1735920597800_edg1.png",
+      "official": true,
+      "status": "resolved",
+      "background": "none",
+      "ids": [],
+      "name": "EDWARD Gaming"
+    },
+    "edg": {
+      "logo": "assets/generated/teams/edward-gaming.png",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook",
+      "sourceUrl": "https://am-a.akamaihd.net/image?resize=256%3A&f=http%3A%2F%2Fstatic.lolesports.com%2Fteams%2F1735920597800_edg1.png",
+      "official": true,
+      "status": "resolved",
+      "background": "none",
+      "ids": [],
+      "name": "EDWARD Gaming"
+    },
+    "bilibili-gaming": {
+      "logo": "assets/generated/teams/bilibili-gaming.png",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook",
+      "sourceUrl": "https://am-a.akamaihd.net/image?resize=256%3A&f=http%3A%2F%2Fstatic.lolesports.com%2Fteams%2F1707126028220_BLG.png",
+      "official": true,
+      "status": "resolved",
+      "background": "none",
+      "ids": [],
+      "name": "Bilibili Gaming"
+    },
+    "dragon-ranger-gaming": {
+      "logo": "assets/generated/teams/dragon-ranger-gaming.png",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook",
+      "sourceUrl": "https://am-a.akamaihd.net/image?resize=256%3A&f=http%3A%2F%2Fstatic.lolesports.com%2Fteams%2F1707126143797_DRG.png",
+      "official": true,
+      "status": "resolved",
+      "background": "none",
+      "ids": [],
+      "name": "DRAGON RANGER GAMING"
     }
   },
   "competitions": {
     "vct-americas": {
-      "source": "Wikimedia Commons",
-      "status": "error"
+      "logo": "assets/generated/competitions/vct-americas.png",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook",
+      "sourceUrl": "https://am-a.akamaihd.net/image?resize=256%3A&f=http%3A%2F%2Fstatic.lolesports.com%2Fleagues%2F1757677856494_VCT23_INT_AMERICAS_Logo_MARK_RGB_Orange.png",
+      "official": true,
+      "status": "resolved",
+      "background": "none",
+      "ids": [],
+      "name": "VCT Americas"
     },
     "vct-emea": {
-      "source": "Wikimedia Commons",
-      "status": "error"
+      "logo": "assets/generated/competitions/vct-emea.png",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook",
+      "sourceUrl": "https://am-a.akamaihd.net/image?resize=256%3A&f=http%3A%2F%2Fstatic.lolesports.com%2Fleagues%2F1757677841319_VCT23_INT_EMEA_Logo_MARK_RGB_GREEN.png",
+      "official": true,
+      "status": "resolved",
+      "background": "none",
+      "ids": [],
+      "name": "VCT EMEA"
     },
     "vct-pacific": {
-      "source": "Wikimedia Commons",
-      "status": "error"
+      "logo": "assets/generated/competitions/vct-pacific.png",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook",
+      "sourceUrl": "https://am-a.akamaihd.net/image?resize=256%3A&f=http%3A%2F%2Fstatic.lolesports.com%2Fleagues%2F1757677849568_VCT23_INT_PACIFIC_Logo_MARK_RGB_Blue.png",
+      "official": true,
+      "status": "resolved",
+      "background": "none",
+      "ids": [],
+      "name": "VCT Pacific"
     },
     "vct-china": {
-      "source": "Wikimedia Commons",
-      "status": "error"
+      "logo": "assets/generated/competitions/vct-cn.png",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook",
+      "sourceUrl": "https://am-a.akamaihd.net/image?resize=256%3A&f=http%3A%2F%2Fstatic.lolesports.com%2Fleagues%2F1757677833011_VCT24_CN_Logo_Mark_RGB_Red.png",
+      "official": true,
+      "status": "resolved",
+      "background": "none",
+      "ids": [],
+      "name": "VCT CN"
     },
     "valorant-masters": {
       "source": "Wikimedia Commons",
@@ -103,8 +708,16 @@
       "status": "error"
     },
     "lpl": {
-      "source": "Wikimedia Commons",
-      "status": "error"
+      "logo": "assets/generated/competitions/lpl.png",
+      "source": "PandaScore",
+      "sourceUrl": "https://cdn-api.pandascore.co/images/league/image/4592/600px-LPL_Logo_lightmode.png",
+      "official": false,
+      "status": "resolved",
+      "background": "light",
+      "ids": [
+        "pandascore:4592"
+      ],
+      "name": "LPL"
     },
     "lcs": {
       "source": "Wikimedia Commons",
@@ -117,6 +730,928 @@
     "worlds": {
       "source": "Wikimedia Commons",
       "status": "error"
+    },
+    "vct-cn": {
+      "logo": "assets/generated/competitions/vct-cn.png",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook",
+      "sourceUrl": "https://am-a.akamaihd.net/image?resize=256%3A&f=http%3A%2F%2Fstatic.lolesports.com%2Fleagues%2F1757677833011_VCT24_CN_Logo_Mark_RGB_Red.png",
+      "official": true,
+      "status": "resolved",
+      "background": "none",
+      "ids": [],
+      "name": "VCT CN"
+    },
+    "a1-esport-valorant-cup": {
+      "logo": "assets/generated/competitions/a1-esport-valorant-cup.png",
+      "source": "PandaScore",
+      "sourceUrl": "https://cdn-api.pandascore.co/images/league/image/5139/a1_esports_valorant_cup_logo-png",
+      "official": false,
+      "status": "resolved",
+      "background": "light",
+      "ids": [
+        "pandascore:5139"
+      ],
+      "name": "A1 Esport Valorant Cup"
+    },
+    "afreecatv-sea-invitational": {
+      "logo": "assets/generated/competitions/afreecatv-sea-invitational.png",
+      "source": "PandaScore",
+      "sourceUrl": "https://cdn-api.pandascore.co/images/league/image/4917/afreecatv_sea_invitational_lightmode-png",
+      "official": false,
+      "status": "resolved",
+      "background": "light",
+      "ids": [
+        "pandascore:4917"
+      ],
+      "name": "AfreecaTV SEA Invitational"
+    },
+    "afreecatv-valorant-league": {
+      "logo": "assets/generated/competitions/afreecatv-valorant-league.png",
+      "source": "PandaScore",
+      "sourceUrl": "https://cdn-api.pandascore.co/images/league/image/5118/600px-2023_avl_logo_lightmode-png",
+      "official": false,
+      "status": "resolved",
+      "background": "light",
+      "ids": [
+        "pandascore:5118"
+      ],
+      "name": "AfreecaTV VALORANT League"
+    },
+    "agents-series": {
+      "logo": "assets/generated/competitions/agents-series.png",
+      "source": "PandaScore",
+      "sourceUrl": "https://cdn-api.pandascore.co/images/league/image/4675/600px-Agents_Series_Italy_lightmode.png",
+      "official": false,
+      "status": "resolved",
+      "background": "light",
+      "ids": [
+        "pandascore:4675"
+      ],
+      "name": "Agents Series"
+    },
+    "aorus-league": {
+      "logo": "assets/generated/competitions/aorus-league.png",
+      "source": "PandaScore",
+      "sourceUrl": "https://cdn-api.pandascore.co/images/league/image/4578/600px-Aorus_League.png",
+      "official": false,
+      "status": "resolved",
+      "background": "none",
+      "ids": [
+        "pandascore:4578"
+      ],
+      "name": "Aorus League"
+    },
+    "asia-pacific-predator-league": {
+      "logo": "assets/generated/competitions/asia-pacific-predator-league.png",
+      "source": "PandaScore",
+      "sourceUrl": "https://cdn-api.pandascore.co/images/league/image/4860/asia_pacific_predator_league_2024_allmode-png",
+      "official": false,
+      "status": "resolved",
+      "background": "none",
+      "ids": [
+        "pandascore:4860"
+      ],
+      "name": "Asia Pacific Predator League"
+    },
+    "balkan-league": {
+      "logo": "assets/generated/competitions/balkan-league.png",
+      "source": "PandaScore",
+      "sourceUrl": "https://cdn-api.pandascore.co/images/league/image/4838/471px-valorant_balkan_league_lightmode-png",
+      "official": false,
+      "status": "resolved",
+      "background": "light",
+      "ids": [
+        "pandascore:4838"
+      ],
+      "name": "Balkan League"
+    },
+    "beacon": {
+      "logo": "assets/generated/competitions/beacon.png",
+      "source": "PandaScore",
+      "sourceUrl": "https://cdn-api.pandascore.co/images/league/image/4944/600px-beacon_icon_allmode-png",
+      "official": false,
+      "status": "resolved",
+      "background": "none",
+      "ids": [
+        "pandascore:4944"
+      ],
+      "name": "Beacon"
+    },
+    "campeonato-de-elite": {
+      "logo": "assets/generated/competitions/campeonato-de-elite.png",
+      "source": "PandaScore",
+      "sourceUrl": "https://cdn-api.pandascore.co/images/league/image/4872/valorant_campeonato_de_elite_lightmode-png",
+      "official": false,
+      "status": "resolved",
+      "background": "light",
+      "ids": [
+        "pandascore:4872"
+      ],
+      "name": "Campeonato de Elite"
+    },
+    "challengers-league-turkey": {
+      "logo": "assets/generated/competitions/challengers-league-turkey.png",
+      "source": "PandaScore",
+      "sourceUrl": "https://cdn-api.pandascore.co/images/league/image/4933/800px-valorant_challengers_turkiye_birlik_lightmode-png",
+      "official": false,
+      "status": "resolved",
+      "background": "none",
+      "ids": [
+        "pandascore:4933"
+      ],
+      "name": "Challengers League Turkey"
+    },
+    "china-evolution-series": {
+      "logo": "assets/generated/competitions/china-evolution-series.png",
+      "source": "PandaScore",
+      "sourceUrl": "https://cdn-api.pandascore.co/images/league/image/5136/vct_china_evo_allmode-png",
+      "official": false,
+      "status": "resolved",
+      "background": "none",
+      "ids": [
+        "pandascore:5136"
+      ],
+      "name": "China Evolution Series"
+    },
+    "circuito-tormenta-liga-radiante": {
+      "logo": "assets/generated/competitions/circuito-tormenta-liga-radiante.png",
+      "source": "PandaScore",
+      "sourceUrl": "https://cdn-api.pandascore.co/images/league/image/4804/600px-liga_radiante-png",
+      "official": false,
+      "status": "resolved",
+      "background": "none",
+      "ids": [
+        "pandascore:4804"
+      ],
+      "name": "Circuito Tormenta: Liga Radiante"
+    },
+    "cloudy-s-tournament": {
+      "logo": "assets/generated/competitions/cloudy-s-tournament.png",
+      "source": "PandaScore",
+      "sourceUrl": "https://cdn-api.pandascore.co/images/league/image/5201/cloudy_tournament_allmode-png",
+      "official": false,
+      "status": "resolved",
+      "background": "none",
+      "ids": [
+        "pandascore:5201"
+      ],
+      "name": "Cloudy's Tournament"
+    },
+    "convergence": {
+      "logo": "assets/generated/competitions/convergence.png",
+      "source": "PandaScore",
+      "sourceUrl": "https://cdn-api.pandascore.co/images/league/image/5186/800px-convergence_lightmode-png",
+      "official": false,
+      "status": "resolved",
+      "background": "none",
+      "ids": [
+        "pandascore:5186"
+      ],
+      "name": "Convergence"
+    },
+    "emg-pro-series": {
+      "logo": "assets/generated/competitions/emg-pro-series.png",
+      "source": "PandaScore",
+      "sourceUrl": "https://cdn-api.pandascore.co/images/league/image/5114/842px-emg_pro_lightmode-png",
+      "official": false,
+      "status": "resolved",
+      "background": "none",
+      "ids": [
+        "pandascore:5114"
+      ],
+      "name": "EMG Pro Series"
+    },
+    "eurat-vengeance-series": {
+      "logo": "assets/generated/competitions/eurat-vengeance-series.png",
+      "source": "PandaScore",
+      "sourceUrl": "https://cdn-api.pandascore.co/images/league/image/4604/600px-EURAT_Valorant_Vengeance_Series.png",
+      "official": false,
+      "status": "resolved",
+      "background": "none",
+      "ids": [
+        "pandascore:4604"
+      ],
+      "name": "EURAT Vengeance Series"
+    },
+    "fel-valorant-cup": {
+      "logo": "assets/generated/competitions/fel-valorant-cup.png",
+      "source": "PandaScore",
+      "sourceUrl": "https://cdn-api.pandascore.co/images/league/image/4915/600px-fel_valorant_cup_2-png",
+      "official": false,
+      "status": "resolved",
+      "background": "none",
+      "ids": [
+        "pandascore:4915"
+      ],
+      "name": "FEL Valorant Cup"
+    },
+    "fgc-valorant-invitational": {
+      "logo": "assets/generated/competitions/fgc-valorant-invitational.png",
+      "source": "PandaScore",
+      "sourceUrl": "https://cdn-api.pandascore.co/images/league/image/4926/fgc_valorant_invitational-png",
+      "official": false,
+      "status": "resolved",
+      "background": "none",
+      "ids": [
+        "pandascore:4926"
+      ],
+      "name": "FGC Valorant Invitational"
+    },
+    "finest-invitational": {
+      "logo": "assets/generated/competitions/finest-invitational.png",
+      "source": "PandaScore",
+      "sourceUrl": "https://cdn-api.pandascore.co/images/league/image/4677/Finest_Invitational_lightmode.png",
+      "official": false,
+      "status": "resolved",
+      "background": "none",
+      "ids": [
+        "pandascore:4677"
+      ],
+      "name": "Finest Invitational"
+    },
+    "for-those-who-dare": {
+      "logo": "assets/generated/competitions/for-those-who-dare.png",
+      "source": "PandaScore",
+      "sourceUrl": "https://cdn-api.pandascore.co/images/league/image/5160/for_those_who_dare_lightmode-png",
+      "official": false,
+      "status": "resolved",
+      "background": "light",
+      "ids": [
+        "pandascore:5160"
+      ],
+      "name": "For Those Who Dare"
+    },
+    "gamegune": {
+      "logo": "assets/generated/competitions/gamegune.png",
+      "source": "PandaScore",
+      "sourceUrl": "https://cdn-api.pandascore.co/images/league/image/4691/900px-GameGune_22.png",
+      "official": false,
+      "status": "resolved",
+      "background": "none",
+      "ids": [
+        "pandascore:4691"
+      ],
+      "name": "GameGune"
+    },
+    "gamers-club-elite-cup": {
+      "logo": "assets/generated/competitions/gamers-club-elite-cup.png",
+      "source": "PandaScore",
+      "sourceUrl": "https://cdn-api.pandascore.co/images/league/image/4839/gamers_club_elite_cup-png",
+      "official": false,
+      "status": "resolved",
+      "background": "light",
+      "ids": [
+        "pandascore:4839"
+      ],
+      "name": "Gamers Club Elite Cup"
+    },
+    "g-loot-clash": {
+      "logo": "assets/generated/competitions/g-loot-clash.png",
+      "source": "PandaScore",
+      "sourceUrl": "https://cdn-api.pandascore.co/images/league/image/4912/800px-g-loot_valorant_clash_lightmode-png",
+      "official": false,
+      "status": "resolved",
+      "background": "light",
+      "ids": [
+        "pandascore:4912"
+      ],
+      "name": "G-Loot Clash"
+    },
+    "gwangju-esports-series": {
+      "logo": "assets/generated/competitions/gwangju-esports-series.png",
+      "source": "PandaScore",
+      "sourceUrl": "https://cdn-api.pandascore.co/images/league/image/4913/600px-gwangju_esports_series_asia_allmode-jpg",
+      "official": false,
+      "status": "resolved",
+      "background": "none",
+      "ids": [
+        "pandascore:4913"
+      ],
+      "name": "Gwangju Esports Series"
+    },
+    "hereticsxp": {
+      "logo": "assets/generated/competitions/hereticsxp.png",
+      "source": "PandaScore",
+      "sourceUrl": "https://cdn-api.pandascore.co/images/league/image/5196/team_heretics_2022_allmode-png",
+      "official": false,
+      "status": "resolved",
+      "background": "none",
+      "ids": [
+        "pandascore:5196"
+      ],
+      "name": "HereticsXP"
+    },
+    "hero-esports-asian-champions-league": {
+      "logo": "assets/generated/competitions/hero-esports-asian-champions-league.png",
+      "source": "PandaScore",
+      "sourceUrl": "https://cdn-api.pandascore.co/images/league/image/5394/325px-hero_esports_asian_champions_league_lightmode-png",
+      "official": false,
+      "status": "resolved",
+      "background": "none",
+      "ids": [
+        "pandascore:5394"
+      ],
+      "name": "HERO ESPORTS Asian Champions League"
+    },
+    "huya-panghu-cup": {
+      "logo": "assets/generated/competitions/huya-panghu-cup.png",
+      "source": "PandaScore",
+      "sourceUrl": "https://cdn-api.pandascore.co/images/league/image/4576/HuyaTV.png",
+      "official": false,
+      "status": "resolved",
+      "background": "none",
+      "ids": [
+        "pandascore:4576"
+      ],
+      "name": "Huya PangHu Cup"
+    },
+    "icebox-northern-classic": {
+      "logo": "assets/generated/competitions/icebox-northern-classic.png",
+      "source": "PandaScore",
+      "sourceUrl": "https://cdn-api.pandascore.co/images/league/image/4681/600px-ICEBOX_Northern_Classic_lightmode.png",
+      "official": false,
+      "status": "resolved",
+      "background": "none",
+      "ids": [
+        "pandascore:4681"
+      ],
+      "name": "ICEBOX Northern Classic"
+    },
+    "ignis-invitational": {
+      "logo": "assets/generated/competitions/ignis-invitational.png",
+      "source": "PandaScore",
+      "sourceUrl": "https://cdn-api.pandascore.co/images/league/image/4832/600px-volcano_thunderstorm_allmode-png",
+      "official": false,
+      "status": "resolved",
+      "background": "light",
+      "ids": [
+        "pandascore:4832"
+      ],
+      "name": "Ignis Invitational"
+    },
+    "imbatv-fearless-invitational": {
+      "logo": "assets/generated/competitions/imbatv-fearless-invitational.png",
+      "source": "PandaScore",
+      "sourceUrl": "https://cdn-api.pandascore.co/images/league/image/4615/ImbaTV_Fearless_Invitational.png",
+      "official": false,
+      "status": "resolved",
+      "background": "none",
+      "ids": [
+        "pandascore:4615"
+      ],
+      "name": "ImbaTV Fearless Invitational"
+    },
+    "intel-arabian-cup-playground": {
+      "logo": "assets/generated/competitions/intel-arabian-cup-playground.png",
+      "source": "PandaScore",
+      "sourceUrl": "https://cdn-api.pandascore.co/images/league/image/5124/playground_valorant_darkmode-png",
+      "official": false,
+      "status": "resolved",
+      "background": "none",
+      "ids": [
+        "pandascore:5124"
+      ],
+      "name": "Intel Arabian Cup Playground"
+    },
+    "intel-rivals-series": {
+      "logo": "assets/generated/competitions/intel-rivals-series.png",
+      "source": "PandaScore",
+      "sourceUrl": "https://cdn-api.pandascore.co/images/league/image/4726/intel_rival_series_1640953553925.png",
+      "official": false,
+      "status": "resolved",
+      "background": "light",
+      "ids": [
+        "pandascore:4726"
+      ],
+      "name": "Intel Rivals Series"
+    },
+    "kcx3-karmine-corp-vs-the-world": {
+      "logo": "assets/generated/competitions/kcx3-karmine-corp-vs-the-world.png",
+      "source": "PandaScore",
+      "sourceUrl": "https://cdn-api.pandascore.co/images/league/image/5209/kcx_3_allmode-png",
+      "official": false,
+      "status": "resolved",
+      "background": "none",
+      "ids": [
+        "pandascore:5209"
+      ],
+      "name": "KCX3: Karmine Corp vs The World"
+    },
+    "knights-arena-freezeout": {
+      "logo": "assets/generated/competitions/knights-arena-freezeout.png",
+      "source": "PandaScore",
+      "sourceUrl": "https://cdn-api.pandascore.co/images/league/image/4930/600px-knights_arena_freezeout_lightmode-png",
+      "official": false,
+      "status": "resolved",
+      "background": "light",
+      "ids": [
+        "pandascore:4930"
+      ],
+      "name": "Knights Arena Freezeout"
+    },
+    "knights-arena-valorampage": {
+      "logo": "assets/generated/competitions/knights-arena-valorampage.png",
+      "source": "PandaScore",
+      "sourceUrl": "https://cdn-api.pandascore.co/images/league/image/4735/Knights_Arena_VALORAMPAGE_allmode.png",
+      "official": false,
+      "status": "resolved",
+      "background": "light",
+      "ids": [
+        "pandascore:4735"
+      ],
+      "name": "Knights Arena Valorampage"
+    },
+    "ludwig-x-tarik-invitational": {
+      "logo": "assets/generated/competitions/ludwig-x-tarik-invitational.png",
+      "source": "PandaScore",
+      "sourceUrl": "https://cdn-api.pandascore.co/images/league/image/5213/ezgif-1-6f85ac5e18-png",
+      "official": false,
+      "status": "resolved",
+      "background": "none",
+      "ids": [
+        "pandascore:5213"
+      ],
+      "name": "Ludwig x Tarik Invitational"
+    },
+    "lvp": {
+      "logo": "assets/generated/competitions/lvp.png",
+      "source": "PandaScore",
+      "sourceUrl": "https://cdn-api.pandascore.co/images/league/image/4597/1200px-lvp_lightmode-png",
+      "official": false,
+      "status": "resolved",
+      "background": "light",
+      "ids": [
+        "pandascore:4597"
+      ],
+      "name": "LVP"
+    },
+    "mandatory-cup": {
+      "logo": "assets/generated/competitions/mandatory-cup.png",
+      "source": "PandaScore",
+      "sourceUrl": "https://cdn-api.pandascore.co/images/league/image/5191/mandatory_cup_2023_lightmode-png",
+      "official": false,
+      "status": "resolved",
+      "background": "light",
+      "ids": [
+        "pandascore:5191"
+      ],
+      "name": "Mandatory Cup"
+    },
+    "masters-pro-league": {
+      "logo": "assets/generated/competitions/masters-pro-league.png",
+      "source": "PandaScore",
+      "sourceUrl": "https://cdn-api.pandascore.co/images/league/image/4955/600px-masters_pro_league_lightmode-png",
+      "official": false,
+      "status": "resolved",
+      "background": "light",
+      "ids": [
+        "pandascore:4955"
+      ],
+      "name": "Masters Pro League"
+    },
+    "medusa-series": {
+      "logo": "assets/generated/competitions/medusa-series.png",
+      "source": "PandaScore",
+      "sourceUrl": "https://cdn-api.pandascore.co/images/league/image/4812/600px-medusa_series_full_allmode-png",
+      "official": false,
+      "status": "resolved",
+      "background": "none",
+      "ids": [
+        "pandascore:4812"
+      ],
+      "name": "MEDUSA Series"
+    },
+    "mel-premiership": {
+      "logo": "assets/generated/competitions/mel-premiership.png",
+      "source": "PandaScore",
+      "sourceUrl": "https://cdn-api.pandascore.co/images/league/image/4801/mct_mel_valorant_premiership_allmode-png",
+      "official": false,
+      "status": "resolved",
+      "background": "none",
+      "ids": [
+        "pandascore:4801"
+      ],
+      "name": "MEL Premiership"
+    },
+    "multiplatform-esports-game": {
+      "logo": "assets/generated/competitions/multiplatform-esports-game.png",
+      "source": "PandaScore",
+      "sourceUrl": "https://cdn-api.pandascore.co/images/league/image/5166/ezgif-7-763c5c59ad-png",
+      "official": false,
+      "status": "resolved",
+      "background": "light",
+      "ids": [
+        "pandascore:5166"
+      ],
+      "name": "Multiplatform Esports Game"
+    },
+    "nerd-street-gamers": {
+      "logo": "assets/generated/competitions/nerd-street-gamers.png",
+      "source": "PandaScore",
+      "sourceUrl": "https://cdn-api.pandascore.co/images/league/image/4598/600px-NSG_logo.png",
+      "official": false,
+      "status": "resolved",
+      "background": "light",
+      "ids": [
+        "pandascore:4598"
+      ],
+      "name": "Nerd Street Gamers"
+    },
+    "norwegian-valorant-league": {
+      "logo": "assets/generated/competitions/norwegian-valorant-league.png",
+      "source": "PandaScore",
+      "sourceUrl": "https://cdn-api.pandascore.co/images/league/image/5188/norwegian_valorant_league_allmode-png",
+      "official": false,
+      "status": "resolved",
+      "background": "none",
+      "ids": [
+        "pandascore:5188"
+      ],
+      "name": "Norwegian Valorant League"
+    },
+    "one-pro-invitational": {
+      "logo": "assets/generated/competitions/one-pro-invitational.png",
+      "source": "PandaScore",
+      "sourceUrl": "https://cdn-api.pandascore.co/images/league/image/4939/800px-riot_games_one_pro_invitational-jpeg",
+      "official": false,
+      "status": "resolved",
+      "background": "light",
+      "ids": [
+        "pandascore:4939"
+      ],
+      "name": "ONE PRO INVITATIONAL"
+    },
+    "open-fire": {
+      "logo": "assets/generated/competitions/open-fire.png",
+      "source": "PandaScore",
+      "sourceUrl": "https://cdn-api.pandascore.co/images/league/image/4715/esa_esports_2021_allmode-png",
+      "official": false,
+      "status": "resolved",
+      "background": "none",
+      "ids": [
+        "pandascore:4715"
+      ],
+      "name": "Open Fire"
+    },
+    "open-tour": {
+      "logo": "assets/generated/competitions/open-tour.png",
+      "source": "PandaScore",
+      "sourceUrl": "https://cdn-api.pandascore.co/images/league/image/4683/Valorant_Open_Tour_France.png",
+      "official": false,
+      "status": "resolved",
+      "background": "none",
+      "ids": [
+        "pandascore:4683"
+      ],
+      "name": "Open Tour"
+    },
+    "pittsburgh-knights-monthly-gauntlet": {
+      "logo": "assets/generated/competitions/pittsburgh-knights-monthly-gauntlet.png",
+      "source": "PandaScore",
+      "sourceUrl": "https://cdn-api.pandascore.co/images/league/image/4583/Knights_May_Gauntlet.png",
+      "official": false,
+      "status": "resolved",
+      "background": "none",
+      "ids": [
+        "pandascore:4583"
+      ],
+      "name": "Pittsburgh Knights Monthly Gauntlet"
+    },
+    "ple-gg-valorant-nations-circuit": {
+      "logo": "assets/generated/competitions/ple-gg-valorant-nations-circuit.png",
+      "source": "PandaScore",
+      "sourceUrl": "https://cdn-api.pandascore.co/images/league/image/4577/600px-Valorant-Nations-Circuit.png",
+      "official": false,
+      "status": "resolved",
+      "background": "light",
+      "ids": [
+        "pandascore:4577"
+      ],
+      "name": "PLE.GG VALORANT Nations Circuit"
+    },
+    "red-bull-home-ground": {
+      "logo": "assets/generated/competitions/red-bull-home-ground.png",
+      "source": "PandaScore",
+      "sourceUrl": "https://cdn-api.pandascore.co/images/league/image/4676/Red_Bull_Home_Ground_2_allmode.png",
+      "official": false,
+      "status": "resolved",
+      "background": "none",
+      "ids": [
+        "pandascore:4676"
+      ],
+      "name": "Red Bull Home Ground"
+    },
+    "riot-games-one": {
+      "logo": "assets/generated/competitions/riot-games-one.png",
+      "source": "PandaScore",
+      "sourceUrl": "https://cdn-api.pandascore.co/images/league/image/5178/ezgif-4-d98674db4b-png",
+      "official": false,
+      "status": "resolved",
+      "background": "light",
+      "ids": [
+        "pandascore:5178"
+      ],
+      "name": "Riot Games ONE"
+    },
+    "saudi-eleague": {
+      "logo": "assets/generated/competitions/saudi-eleague.png",
+      "source": "PandaScore",
+      "sourceUrl": "https://cdn-api.pandascore.co/images/league/image/5340/800px-saudi_eleague_allmode-png",
+      "official": false,
+      "status": "resolved",
+      "background": "none",
+      "ids": [
+        "pandascore:5340"
+      ],
+      "name": "Saudi eLeague"
+    },
+    "sea-esports-championship": {
+      "logo": "assets/generated/competitions/sea-esports-championship.png",
+      "source": "PandaScore",
+      "sourceUrl": "https://cdn-api.pandascore.co/images/league/image/4721/600px-SEA_Esports_Championship_2021_allmode.png",
+      "official": false,
+      "status": "resolved",
+      "background": "none",
+      "ids": [
+        "pandascore:4721"
+      ],
+      "name": "SEA Esports Championship"
+    },
+    "sean-gares-showdown": {
+      "logo": "assets/generated/competitions/sean-gares-showdown.png",
+      "source": "PandaScore",
+      "sourceUrl": "https://cdn-api.pandascore.co/images/league/image/5190/sean_gares_showdown_allmode-png",
+      "official": false,
+      "status": "resolved",
+      "background": "none",
+      "ids": [
+        "pandascore:5190"
+      ],
+      "name": "Sean Gares Showdown"
+    },
+    "sentinels-invitational": {
+      "logo": "assets/generated/competitions/sentinels-invitational.png",
+      "source": "PandaScore",
+      "sourceUrl": "https://cdn-api.pandascore.co/images/league/image/5159/800px-sen_invitational_lightmode-png",
+      "official": false,
+      "status": "resolved",
+      "background": "light",
+      "ids": [
+        "pandascore:5159"
+      ],
+      "name": "Sentinels Invitational"
+    },
+    "skyesports-championship": {
+      "logo": "assets/generated/competitions/skyesports-championship.png",
+      "source": "PandaScore",
+      "sourceUrl": "https://cdn-api.pandascore.co/images/league/image/4659/SkyEsports_Championship_3.0.png",
+      "official": false,
+      "status": "resolved",
+      "background": "light",
+      "ids": [
+        "pandascore:4659"
+      ],
+      "name": "Skyesports Championship"
+    },
+    "skyesports-grand-slam": {
+      "logo": "assets/generated/competitions/skyesports-grand-slam.png",
+      "source": "PandaScore",
+      "sourceUrl": "https://cdn-api.pandascore.co/images/league/image/4778/799px-Grandslam_skyesports.png",
+      "official": false,
+      "status": "resolved",
+      "background": "none",
+      "ids": [
+        "pandascore:4778"
+      ],
+      "name": "Skyesports Grand Slam"
+    },
+    "skyesports-pro-invitational": {
+      "logo": "assets/generated/competitions/skyesports-pro-invitational.png",
+      "source": "PandaScore",
+      "sourceUrl": "https://cdn-api.pandascore.co/images/league/image/4856/600px-skyesports_logo-png",
+      "official": false,
+      "status": "resolved",
+      "background": "none",
+      "ids": [
+        "pandascore:4856"
+      ],
+      "name": "Skyesports Pro Invitational"
+    },
+    "soop-valorant-league": {
+      "logo": "assets/generated/competitions/soop-valorant-league.png",
+      "source": "PandaScore",
+      "sourceUrl": "https://cdn-api.pandascore.co/images/league/image/5328/800px-soop_valorant_league_darkmode-png",
+      "official": false,
+      "status": "resolved",
+      "background": "none",
+      "ids": [
+        "pandascore:5328"
+      ],
+      "name": "SOOP Valorant League"
+    },
+    "southeast-asian-games": {
+      "logo": "assets/generated/competitions/southeast-asian-games.png",
+      "source": "PandaScore",
+      "sourceUrl": "https://cdn-api.pandascore.co/images/league/image/5008/600px-2023_southeast_asian_games_allmode-png",
+      "official": false,
+      "status": "resolved",
+      "background": "none",
+      "ids": [
+        "pandascore:5008"
+      ],
+      "name": "Southeast Asian Games"
+    },
+    "spike-nations": {
+      "logo": "assets/generated/competitions/spike-nations.png",
+      "source": "PandaScore",
+      "sourceUrl": "https://cdn-api.pandascore.co/images/league/image/5193/valorant_spike_nations_logo-png",
+      "official": false,
+      "status": "resolved",
+      "background": "none",
+      "ids": [
+        "pandascore:5193"
+      ],
+      "name": "Spike Nations"
+    },
+    "strike-arabia": {
+      "logo": "assets/generated/competitions/strike-arabia.png",
+      "source": "PandaScore",
+      "sourceUrl": "https://cdn-api.pandascore.co/images/league/image/4650/600px-Strike_Arabia_Logo.png",
+      "official": false,
+      "status": "resolved",
+      "background": "light",
+      "ids": [
+        "pandascore:4650"
+      ],
+      "name": "Strike Arabia"
+    },
+    "superb-cup": {
+      "logo": "assets/generated/competitions/superb-cup.png",
+      "source": "PandaScore",
+      "sourceUrl": "https://cdn-api.pandascore.co/images/league/image/5332/800px-vct_off_season_logo_lightmode-png",
+      "official": false,
+      "status": "resolved",
+      "background": "light",
+      "ids": [
+        "pandascore:5332"
+      ],
+      "name": "Superb Cup"
+    },
+    "superdome": {
+      "logo": "assets/generated/competitions/superdome.png",
+      "source": "PandaScore",
+      "sourceUrl": "https://cdn-api.pandascore.co/images/league/image/4887/superdome_lightmode-png",
+      "official": false,
+      "status": "resolved",
+      "background": "light",
+      "ids": [
+        "pandascore:4887"
+      ],
+      "name": "Superdome"
+    },
+    "ten-valorant-global-invitational": {
+      "logo": "assets/generated/competitions/ten-valorant-global-invitational.png",
+      "source": "PandaScore",
+      "sourceUrl": "https://cdn-api.pandascore.co/images/league/image/5143/ten_2022-png",
+      "official": false,
+      "status": "resolved",
+      "background": "light",
+      "ids": [
+        "pandascore:5143"
+      ],
+      "name": "TEN Valorant Global Invitational"
+    },
+    "tesfed-turkish-cup": {
+      "logo": "assets/generated/competitions/tesfed-turkish-cup.png",
+      "source": "PandaScore",
+      "sourceUrl": "https://cdn-api.pandascore.co/images/league/image/5202/ezgif-5-d3fa39e518-png",
+      "official": false,
+      "status": "resolved",
+      "background": "light",
+      "ids": [
+        "pandascore:5202"
+      ],
+      "name": "TESFED Turkish Cup"
+    },
+    "the-cozy-clash": {
+      "logo": "assets/generated/competitions/the-cozy-clash.png",
+      "source": "PandaScore",
+      "sourceUrl": "https://cdn-api.pandascore.co/images/league/image/5192/the_cozy_clash_allmode-png",
+      "official": false,
+      "status": "resolved",
+      "background": "light",
+      "ids": [
+        "pandascore:5192"
+      ],
+      "name": "The Cozy Clash"
+    },
+    "the-esports-club-gauntlet": {
+      "logo": "assets/generated/competitions/the-esports-club-gauntlet.png",
+      "source": "PandaScore",
+      "sourceUrl": "https://cdn-api.pandascore.co/images/league/image/4725/The_Esports_Club_Gauntlet_S1.png",
+      "official": false,
+      "status": "resolved",
+      "background": "none",
+      "ids": [
+        "pandascore:4725"
+      ],
+      "name": "The Esports Club Gauntlet"
+    },
+    "tixinha-invitational": {
+      "logo": "assets/generated/competitions/tixinha-invitational.png",
+      "source": "PandaScore",
+      "sourceUrl": "https://cdn-api.pandascore.co/images/league/image/5331/800px-tixinha_invitational_logo_allmode-png",
+      "official": false,
+      "status": "resolved",
+      "background": "none",
+      "ids": [
+        "pandascore:5331"
+      ],
+      "name": "Tixinha Invitational"
+    },
+    "valorant-circuito-de-elite": {
+      "logo": "assets/generated/competitions/valorant-circuito-de-elite.png",
+      "source": "PandaScore",
+      "sourceUrl": "https://cdn-api.pandascore.co/images/league/image/4680/VCE_VAL.png",
+      "official": false,
+      "status": "resolved",
+      "background": "none",
+      "ids": [
+        "pandascore:4680"
+      ],
+      "name": "VALORANT Circuito de Elite"
+    },
+    "valorant-conquerors-championship": {
+      "logo": "assets/generated/competitions/valorant-conquerors-championship.png",
+      "source": "PandaScore",
+      "sourceUrl": "https://cdn-api.pandascore.co/images/league/image/4747/900px-VCC_2022_allmode.png",
+      "official": false,
+      "status": "resolved",
+      "background": "none",
+      "ids": [
+        "pandascore:4747"
+      ],
+      "name": "VALORANT Conquerors Championship"
+    },
+    "valorant-east-united": {
+      "logo": "assets/generated/competitions/valorant-east-united.png",
+      "source": "PandaScore",
+      "sourceUrl": "https://cdn-api.pandascore.co/images/league/image/4905/623c03abe705a-png",
+      "official": false,
+      "status": "resolved",
+      "background": "light",
+      "ids": [
+        "pandascore:4905"
+      ],
+      "name": "Valorant East: United"
+    },
+    "valorant-oceania-tour": {
+      "logo": "assets/generated/competitions/valorant-oceania-tour.png",
+      "source": "PandaScore",
+      "sourceUrl": "https://cdn-api.pandascore.co/images/league/image/4620/600px-VALORANT_Oceania_Tour_2021.png",
+      "official": false,
+      "status": "resolved",
+      "background": "light",
+      "ids": [
+        "pandascore:4620"
+      ],
+      "name": "VALORANT Oceania Tour"
+    },
+    "valorant-radiant-international-invitational": {
+      "logo": "assets/generated/competitions/valorant-radiant-international-invitational.png",
+      "source": "PandaScore",
+      "sourceUrl": "https://cdn-api.pandascore.co/images/league/image/5465/900px-valorant_radiant_international_invitational_2025_lightmode-png",
+      "official": false,
+      "status": "resolved",
+      "background": "light",
+      "ids": [
+        "pandascore:5465"
+      ],
+      "name": "VALORANT Radiant International Invitational"
+    },
+    "vcl": {
+      "logo": "assets/generated/competitions/vcl.png",
+      "source": "PandaScore",
+      "sourceUrl": "https://cdn-api.pandascore.co/images/league/image/4947/1200px-valorant_challengers_lightmode-png",
+      "official": false,
+      "status": "resolved",
+      "background": "light",
+      "ids": [
+        "pandascore:4947"
+      ],
+      "name": "VCL"
+    },
+    "vct": {
+      "logo": "assets/generated/competitions/vct.png",
+      "source": "PandaScore",
+      "sourceUrl": "https://cdn-api.pandascore.co/images/league/image/4531/800px-vct_2023_logo_lightmode-png",
+      "official": false,
+      "status": "resolved",
+      "background": "light",
+      "ids": [
+        "pandascore:4531"
+      ],
+      "name": "VCT"
     }
   }
 }

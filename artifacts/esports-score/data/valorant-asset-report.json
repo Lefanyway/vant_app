@@ -1,0 +1,738 @@
+{
+  "official": [
+    {
+      "type": "competition",
+      "name": "VCT Americas",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook"
+    },
+    {
+      "type": "team",
+      "name": "ENVY",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook"
+    },
+    {
+      "type": "team",
+      "name": "Evil Geniuses",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook"
+    },
+    {
+      "type": "team",
+      "name": "LOUD",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook"
+    },
+    {
+      "type": "team",
+      "name": "Cloud9",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook"
+    },
+    {
+      "type": "team",
+      "name": "KRÜ Visa",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook"
+    },
+    {
+      "type": "team",
+      "name": "FURIA",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook"
+    },
+    {
+      "type": "team",
+      "name": "100 Thieves",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook"
+    },
+    {
+      "type": "team",
+      "name": "Leviatán Esports",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook"
+    },
+    {
+      "type": "team",
+      "name": "NRG",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook"
+    },
+    {
+      "type": "team",
+      "name": "MIBR",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook"
+    },
+    {
+      "type": "team",
+      "name": "Sentinels",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook"
+    },
+    {
+      "type": "team",
+      "name": "G2 Esports",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook"
+    },
+    {
+      "type": "competition",
+      "name": "VCT EMEA",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook"
+    },
+    {
+      "type": "team",
+      "name": "NAVI",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook"
+    },
+    {
+      "type": "team",
+      "name": "Karmine Corp",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook"
+    },
+    {
+      "type": "team",
+      "name": "FUT Esports",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook"
+    },
+    {
+      "type": "team",
+      "name": "Gentle Mates",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook"
+    },
+    {
+      "type": "team",
+      "name": "PCIFIC Esports",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook"
+    },
+    {
+      "type": "team",
+      "name": "BBL Esports",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook"
+    },
+    {
+      "type": "team",
+      "name": "ULF Esports",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook"
+    },
+    {
+      "type": "team",
+      "name": "Team Vitality",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook"
+    },
+    {
+      "type": "team",
+      "name": "Team Heretics",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook"
+    },
+    {
+      "type": "team",
+      "name": "GIANTX",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook"
+    },
+    {
+      "type": "team",
+      "name": "FNATIC",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook"
+    },
+    {
+      "type": "team",
+      "name": "Team Liquid",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook"
+    },
+    {
+      "type": "competition",
+      "name": "VCT Pacific",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook"
+    },
+    {
+      "type": "team",
+      "name": "DetonatioN FocusMe",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook"
+    },
+    {
+      "type": "team",
+      "name": "Kiwoom DRX",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook"
+    },
+    {
+      "type": "team",
+      "name": "FULL SENSE",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook"
+    },
+    {
+      "type": "team",
+      "name": "Gen.G",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook"
+    },
+    {
+      "type": "team",
+      "name": "GLOBAL ESPORTS",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook"
+    },
+    {
+      "type": "team",
+      "name": "NONGSHIM REDFORCE",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook"
+    },
+    {
+      "type": "team",
+      "name": "Paper Rex",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook"
+    },
+    {
+      "type": "team",
+      "name": "Rex Regum Qeon",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook"
+    },
+    {
+      "type": "team",
+      "name": "T1",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook"
+    },
+    {
+      "type": "team",
+      "name": "Team Secret",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook"
+    },
+    {
+      "type": "team",
+      "name": "ZETA DIVISION",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook"
+    },
+    {
+      "type": "team",
+      "name": "VARREL",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook"
+    },
+    {
+      "type": "competition",
+      "name": "VCT CN",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook"
+    },
+    {
+      "type": "team",
+      "name": "Trace Esports",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook"
+    },
+    {
+      "type": "team",
+      "name": "WOLVES ESPORTS",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook"
+    },
+    {
+      "type": "team",
+      "name": "FunPlus Phoenix",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook"
+    },
+    {
+      "type": "team",
+      "name": "TYLOO GAMING",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook"
+    },
+    {
+      "type": "team",
+      "name": "ALL GAMERS",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook"
+    },
+    {
+      "type": "team",
+      "name": "NOVA ESPORTS",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook"
+    },
+    {
+      "type": "team",
+      "name": "JD GAMING",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook"
+    },
+    {
+      "type": "team",
+      "name": "TITAN ESPORTS CLUB",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook"
+    },
+    {
+      "type": "team",
+      "name": "Xi Lai Gaming",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook"
+    },
+    {
+      "type": "team",
+      "name": "EDWARD Gaming",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook"
+    },
+    {
+      "type": "team",
+      "name": "Bilibili Gaming",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook"
+    },
+    {
+      "type": "team",
+      "name": "DRAGON RANGER GAMING",
+      "source": "https://valorantesports.com/en-US/season/115571062868511862/handbook"
+    }
+  ],
+  "provider": [
+    {
+      "type": "competition",
+      "name": "A1 Esport Valorant Cup",
+      "source": "PandaScore"
+    },
+    {
+      "type": "competition",
+      "name": "AfreecaTV SEA Invitational",
+      "source": "PandaScore"
+    },
+    {
+      "type": "competition",
+      "name": "AfreecaTV VALORANT League",
+      "source": "PandaScore"
+    },
+    {
+      "type": "competition",
+      "name": "Agents Series",
+      "source": "PandaScore"
+    },
+    {
+      "type": "competition",
+      "name": "Aorus League",
+      "source": "PandaScore"
+    },
+    {
+      "type": "competition",
+      "name": "Asia Pacific Predator League",
+      "source": "PandaScore"
+    },
+    {
+      "type": "competition",
+      "name": "Balkan League",
+      "source": "PandaScore"
+    },
+    {
+      "type": "competition",
+      "name": "Beacon",
+      "source": "PandaScore"
+    },
+    {
+      "type": "competition",
+      "name": "Campeonato de Elite",
+      "source": "PandaScore"
+    },
+    {
+      "type": "competition",
+      "name": "Challengers League Turkey",
+      "source": "PandaScore"
+    },
+    {
+      "type": "competition",
+      "name": "China Evolution Series",
+      "source": "PandaScore"
+    },
+    {
+      "type": "competition",
+      "name": "Circuito Tormenta: Liga Radiante",
+      "source": "PandaScore"
+    },
+    {
+      "type": "competition",
+      "name": "Cloudy's Tournament",
+      "source": "PandaScore"
+    },
+    {
+      "type": "competition",
+      "name": "Convergence",
+      "source": "PandaScore"
+    },
+    {
+      "type": "competition",
+      "name": "EMG Pro Series",
+      "source": "PandaScore"
+    },
+    {
+      "type": "competition",
+      "name": "EURAT Vengeance Series",
+      "source": "PandaScore"
+    },
+    {
+      "type": "competition",
+      "name": "FEL Valorant Cup",
+      "source": "PandaScore"
+    },
+    {
+      "type": "competition",
+      "name": "FGC Valorant Invitational",
+      "source": "PandaScore"
+    },
+    {
+      "type": "competition",
+      "name": "Finest Invitational",
+      "source": "PandaScore"
+    },
+    {
+      "type": "competition",
+      "name": "For Those Who Dare",
+      "source": "PandaScore"
+    },
+    {
+      "type": "competition",
+      "name": "GameGune",
+      "source": "PandaScore"
+    },
+    {
+      "type": "competition",
+      "name": "Gamers Club Elite Cup",
+      "source": "PandaScore"
+    },
+    {
+      "type": "competition",
+      "name": "G-Loot Clash",
+      "source": "PandaScore"
+    },
+    {
+      "type": "competition",
+      "name": "Gwangju Esports Series",
+      "source": "PandaScore"
+    },
+    {
+      "type": "competition",
+      "name": "HereticsXP",
+      "source": "PandaScore"
+    },
+    {
+      "type": "competition",
+      "name": "HERO ESPORTS Asian Champions League",
+      "source": "PandaScore"
+    },
+    {
+      "type": "competition",
+      "name": "Huya PangHu Cup",
+      "source": "PandaScore"
+    },
+    {
+      "type": "competition",
+      "name": "ICEBOX Northern Classic",
+      "source": "PandaScore"
+    },
+    {
+      "type": "competition",
+      "name": "Ignis Invitational",
+      "source": "PandaScore"
+    },
+    {
+      "type": "competition",
+      "name": "ImbaTV Fearless Invitational",
+      "source": "PandaScore"
+    },
+    {
+      "type": "competition",
+      "name": "Intel Arabian Cup Playground",
+      "source": "PandaScore"
+    },
+    {
+      "type": "competition",
+      "name": "Intel Rivals Series",
+      "source": "PandaScore"
+    },
+    {
+      "type": "competition",
+      "name": "KCX3: Karmine Corp vs The World",
+      "source": "PandaScore"
+    },
+    {
+      "type": "competition",
+      "name": "Knights Arena Freezeout",
+      "source": "PandaScore"
+    },
+    {
+      "type": "competition",
+      "name": "Knights Arena Valorampage",
+      "source": "PandaScore"
+    },
+    {
+      "type": "competition",
+      "name": "LPL",
+      "source": "PandaScore"
+    },
+    {
+      "type": "competition",
+      "name": "Ludwig x Tarik Invitational",
+      "source": "PandaScore"
+    },
+    {
+      "type": "competition",
+      "name": "LVP",
+      "source": "PandaScore"
+    },
+    {
+      "type": "competition",
+      "name": "Mandatory Cup",
+      "source": "PandaScore"
+    },
+    {
+      "type": "competition",
+      "name": "Masters Pro League",
+      "source": "PandaScore"
+    },
+    {
+      "type": "competition",
+      "name": "MEDUSA Series",
+      "source": "PandaScore"
+    },
+    {
+      "type": "competition",
+      "name": "MEL Premiership",
+      "source": "PandaScore"
+    },
+    {
+      "type": "competition",
+      "name": "Multiplatform Esports Game",
+      "source": "PandaScore"
+    },
+    {
+      "type": "competition",
+      "name": "Nerd Street Gamers",
+      "source": "PandaScore"
+    },
+    {
+      "type": "competition",
+      "name": "Norwegian Valorant League",
+      "source": "PandaScore"
+    },
+    {
+      "type": "competition",
+      "name": "ONE PRO INVITATIONAL",
+      "source": "PandaScore"
+    },
+    {
+      "type": "competition",
+      "name": "Open Fire",
+      "source": "PandaScore"
+    },
+    {
+      "type": "competition",
+      "name": "Open Tour",
+      "source": "PandaScore"
+    },
+    {
+      "type": "competition",
+      "name": "Pittsburgh Knights Monthly Gauntlet",
+      "source": "PandaScore"
+    },
+    {
+      "type": "competition",
+      "name": "PLE.GG VALORANT Nations Circuit",
+      "source": "PandaScore"
+    },
+    {
+      "type": "competition",
+      "name": "Red Bull Home Ground",
+      "source": "PandaScore"
+    },
+    {
+      "type": "competition",
+      "name": "Riot Games ONE",
+      "source": "PandaScore"
+    },
+    {
+      "type": "competition",
+      "name": "Saudi eLeague",
+      "source": "PandaScore"
+    },
+    {
+      "type": "competition",
+      "name": "SEA Esports Championship",
+      "source": "PandaScore"
+    },
+    {
+      "type": "competition",
+      "name": "Sean Gares Showdown",
+      "source": "PandaScore"
+    },
+    {
+      "type": "competition",
+      "name": "Sentinels Invitational",
+      "source": "PandaScore"
+    },
+    {
+      "type": "competition",
+      "name": "Skyesports Championship",
+      "source": "PandaScore"
+    },
+    {
+      "type": "competition",
+      "name": "Skyesports Grand Slam",
+      "source": "PandaScore"
+    },
+    {
+      "type": "competition",
+      "name": "Skyesports Pro Invitational",
+      "source": "PandaScore"
+    },
+    {
+      "type": "competition",
+      "name": "SOOP Valorant League",
+      "source": "PandaScore"
+    },
+    {
+      "type": "competition",
+      "name": "Southeast Asian Games",
+      "source": "PandaScore"
+    },
+    {
+      "type": "competition",
+      "name": "Spike Nations",
+      "source": "PandaScore"
+    },
+    {
+      "type": "competition",
+      "name": "Strike Arabia",
+      "source": "PandaScore"
+    },
+    {
+      "type": "competition",
+      "name": "Superb Cup",
+      "source": "PandaScore"
+    },
+    {
+      "type": "competition",
+      "name": "Superdome",
+      "source": "PandaScore"
+    },
+    {
+      "type": "competition",
+      "name": "TEN Valorant Global Invitational",
+      "source": "PandaScore"
+    },
+    {
+      "type": "competition",
+      "name": "TESFED Turkish Cup",
+      "source": "PandaScore"
+    },
+    {
+      "type": "competition",
+      "name": "The Cozy Clash",
+      "source": "PandaScore"
+    },
+    {
+      "type": "competition",
+      "name": "The Esports Club Gauntlet",
+      "source": "PandaScore"
+    },
+    {
+      "type": "competition",
+      "name": "Tixinha Invitational",
+      "source": "PandaScore"
+    },
+    {
+      "type": "competition",
+      "name": "VALORANT Circuito de Elite",
+      "source": "PandaScore"
+    },
+    {
+      "type": "competition",
+      "name": "VALORANT Conquerors Championship",
+      "source": "PandaScore"
+    },
+    {
+      "type": "competition",
+      "name": "Valorant East: United",
+      "source": "PandaScore"
+    },
+    {
+      "type": "competition",
+      "name": "VALORANT Oceania Tour",
+      "source": "PandaScore"
+    },
+    {
+      "type": "competition",
+      "name": "VALORANT Radiant International Invitational",
+      "source": "PandaScore"
+    },
+    {
+      "type": "competition",
+      "name": "VCL",
+      "source": "PandaScore"
+    },
+    {
+      "type": "competition",
+      "name": "VCT",
+      "source": "PandaScore"
+    }
+  ],
+  "failed": [],
+  "missing": [
+    {
+      "type": "competition",
+      "name": "A1 eSports Invitational"
+    },
+    {
+      "type": "competition",
+      "name": "BtcTurk GameFest"
+    },
+    {
+      "type": "competition",
+      "name": "CHALLENGERS SHOWDOWN"
+    },
+    {
+      "type": "competition",
+      "name": "China Esports Festival Super Champions Cup"
+    },
+    {
+      "type": "competition",
+      "name": "ESL Clash of Nations"
+    },
+    {
+      "type": "competition",
+      "name": "Esports Shanghai Masters"
+    },
+    {
+      "type": "competition",
+      "name": "Esports World Cup"
+    },
+    {
+      "type": "competition",
+      "name": "Glitched Invitational"
+    },
+    {
+      "type": "competition",
+      "name": "Lioness Cup"
+    },
+    {
+      "type": "competition",
+      "name": "Monsters Reloaded"
+    },
+    {
+      "type": "competition",
+      "name": "Penta"
+    },
+    {
+      "type": "competition",
+      "name": "Project Blender"
+    },
+    {
+      "type": "competition",
+      "name": "Rising Heroes"
+    },
+    {
+      "type": "competition",
+      "name": "Scrimmage"
+    },
+    {
+      "type": "competition",
+      "name": "SEN City Classic"
+    },
+    {
+      "type": "competition",
+      "name": "Spotlight Series"
+    },
+    {
+      "type": "competition",
+      "name": "THE POKAL"
+    },
+    {
+      "type": "competition",
+      "name": "Tixinha & Sacy Invitational By Bonoxs"
+    },
+    {
+      "type": "competition",
+      "name": "VALORANT Radiant Asia Invitational"
+    },
+    {
+      "type": "competition",
+      "name": "VRL"
+    },
+    {
+      "type": "competition",
+      "name": "WALL-E Cup"
+    }
+  ]
+}
