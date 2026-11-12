@@ -67,6 +67,7 @@
     "zod-validation-error": "^3.4.0"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.119.0",
     "babel-preset-expo": "~58.0.19"
   }
 }

@@ -4,6 +4,7 @@ import http from "node:http";
 import https from "node:https";
 import app from "./app";
 import { logger } from "./lib/logger";
+import { supabaseServices } from "./providers/esports/supabase/read";
 
 const rawPort = process.env["PORT"];
 
@@ -27,6 +28,9 @@ const server = certificate && privateKey
 
 server.listen(port, () => {
   logger.info({ port, https: Boolean(certificate && privateKey), publicBaseUrl: process.env.PUBLIC_BASE_URL ?? null }, "Server listening");
+  const { store, sync } = supabaseServices();
+  if (sync) sync.start();
+  logger.info({ store: Boolean(store), sync: Boolean(sync) }, "Supabase store");
 });
 server.on("error", (err) => {
   logger.error({ err }, "Error listening on port");

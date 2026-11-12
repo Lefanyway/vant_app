@@ -28,7 +28,6 @@ export default function TabLayout() {
     <Tabs.Screen name="following" options={{ title: "Favoritos" }} />
     <Tabs.Screen name="matches" options={{ title: "Calendário" }} />
     <Tabs.Screen name="search" options={{ title: "Buscar" }} />
-    <Tabs.Screen name="profile" options={{ href: null }} />
   </Tabs>;
 }
 const styles = StyleSheet.create({ container: { position: "absolute", left: 12, right: 12 }, bar: { flexDirection: "row", borderWidth: 1, borderRadius: 40, padding: 5, overflow: "hidden" }, item: { flex: 1, minWidth: 0, height: 58, borderRadius: 32, alignItems: "center", justifyContent: "center", gap: 2 }, mark: { width: 22, height: 22 }, label: { fontSize: 10 } });

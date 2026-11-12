@@ -6,11 +6,11 @@ import { countryName, hasWholeWords, rankResults, slugify } from '../search-rank
 import type { CatalogType, Competition, EsportsDataProvider, Game, GameId, Match, MatchDetails, MatchQuery, MatchStatus, ProviderCapabilities, SearchResult, Team, TeamDetails, TeamMatchFilter, TeamNewsArticle, TeamPlayer, TeamStats } from '../types';
 
 type RawGame = { slug?: string };
-type RawPlayer = { id: number; name?: string; first_name?: string; last_name?: string; image_url?: string; nationality?: string; role?: string };
-type RawTeam = { id: number; name: string; acronym?: string; image_url?: string; location?: string; players?: RawPlayer[]; website?: string; social?: { url?: string }; current_videogame?: RawGame; videogame?: RawGame };
+export type RawPlayer = { id: number; name?: string; first_name?: string; last_name?: string; image_url?: string; nationality?: string; role?: string };
+export type RawTeam = { id: number; name: string; acronym?: string; image_url?: string; location?: string; players?: RawPlayer[]; website?: string; social?: { url?: string }; current_videogame?: RawGame; videogame?: RawGame };
 type RawLeague = { id: number; name: string; slug?: string; image_url?: string; videogame?: RawGame; series?: { full_name?: string; begin_at?: string | null }[] };
 type RawSerie = { full_name?: string; begin_at?: string | null; league?: RawLeague };
-type RawMatch = { id: number; begin_at?: string | null; scheduled_at?: string | null; status?: string; number_of_games?: number; opponents?: { opponent?: RawTeam }[]; league?: RawLeague; serie?: { name?: string; full_name?: string }; tournament?: { name?: string }; videogame?: RawGame; results?: { score: number; team_id: number }[]; streams_list?: { raw_url?: string; language?: string; official?: boolean }[]; games?: { id: number; position?: number }[] };
+export type RawMatch = { id: number; begin_at?: string | null; scheduled_at?: string | null; status?: string; number_of_games?: number; opponents?: { opponent?: RawTeam }[]; league?: RawLeague; serie?: { name?: string; full_name?: string }; tournament?: { name?: string }; videogame?: RawGame; results?: { score: number; team_id: number }[]; streams_list?: { raw_url?: string; language?: string; official?: boolean }[]; games?: { id: number; position?: number }[] };
 const games: Game[] = [{ id: 'valorant', name: 'VALORANT', shortName: 'VALORANT' }, { id: 'cs2', name: 'Counter-Strike 2', shortName: 'CS2' }, { id: 'lol', name: 'League of Legends', shortName: 'LoL' }];
 const slugs: Record<string, GameId> = { valorant: 'valorant', 'cs-go': 'cs2', 'league-of-legends': 'lol' };
 const providerSlug: Record<GameId, string> = { valorant: 'valorant', cs2: 'csgo', lol: 'lol' };
@@ -23,7 +23,7 @@ const external = (value: string) => {
 };
 const logo = (url?: string) => url ? `/api/esports/assets/logo?url=${encodeURIComponent(url)}` : undefined;
 const mapTeam = (raw: RawTeam, game: GameId): Team => ({ id: id(raw.id), externalIds: [{ provider: 'pandascore', id: String(raw.id) }], name: raw.name, acronym: raw.acronym, logoUrl: logo(raw.image_url), country: raw.location, gameId: game });
-const mapPlayer = (raw: RawPlayer): TeamPlayer => ({ id: id(raw.id), name: raw.name || [raw.first_name, raw.last_name].filter(Boolean).join(' ') || 'Unknown player', fullName: [raw.first_name, raw.last_name].filter(Boolean).join(' ') || undefined, imageUrl: logo(raw.image_url), country: raw.nationality, role: raw.role, status: raw.role?.toLowerCase().includes('coach') ? 'coach' : 'player' });
+export const mapPlayer = (raw: RawPlayer): TeamPlayer => ({ id: id(raw.id), name: raw.name || [raw.first_name, raw.last_name].filter(Boolean).join(' ') || 'Unknown player', fullName: [raw.first_name, raw.last_name].filter(Boolean).join(' ') || undefined, imageUrl: logo(raw.image_url), country: raw.nationality, role: raw.role, status: raw.role?.toLowerCase().includes('coach') ? 'coach' : 'player' });
 const mapCompetition = (raw: RawLeague, game: GameId, serieName?: string): Competition => ({ id: id(raw.id), externalIds: [{ provider: 'pandascore', id: String(raw.id) }], name: raw.name, slug: raw.slug, logoUrl: logo(raw.image_url), serieName, gameId: game });
 const timestamp = (match: Match) => match.startTime ? Date.parse(match.startTime) : Number.POSITIVE_INFINITY;
 const rank = (match: Match) => match.status === 'live' ? 0 : match.status === 'scheduled' ? 1 : 2;
@@ -98,7 +98,7 @@ export class PandaScoreAdapter implements EsportsDataProvider {
     }
     return ['valorant'];
   }
-  private mapMatch(row: RawMatch, knownGame?: GameId): Match | null {
+  mapMatch(row: RawMatch, knownGame?: GameId): Match | null {
     const game = gameFrom(row.videogame) ?? knownGame;
     if (!Number.isFinite(row.id)) throw new ProviderError('PROVIDER_INVALID_DATA', 'Esports provider returned an unsupported match');
     if (game !== 'valorant') {

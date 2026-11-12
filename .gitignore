@@ -53,3 +53,6 @@ Thumbs.db
 .env
 .env.*
 !.env.example
+
+# Local test account for the Supabase project (contains its password)
+supabase/seed.sql
