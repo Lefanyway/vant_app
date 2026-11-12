@@ -1,11 +1,14 @@
 import { Feather } from "@expo/vector-icons";
 import { useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Switch, Text, View } from "react-native";
+import { Pressable, StyleSheet, Switch, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { AuthField, FormMessage, PrimaryButton } from "@/components/AuthScreen";
 import { BackButton } from "@/components/BackButton";
+import { KeyboardAwareScrollViewCompat } from "@/components/KeyboardAwareScrollViewCompat";
 import { font } from "@/constants/type";
 import { useAuth } from "@/context/AuthContext";
+import { useNotifications } from "@/context/NotificationsContext";
+import { router } from "expo-router";
 import { useColors } from "@/hooks/useColors";
 import { authErrorMessage } from "@/lib/supabase";
 
@@ -21,6 +24,15 @@ export default function Profile() {
   const [draft, setDraft] = useState("");
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<{ text: string; tone: "error" | "info" } | null>(null);
+
+  const { unread, simulate } = useNotifications();
+  const [simulating, setSimulating] = useState(false);
+  const runSimulation = async () => {
+    setSimulating(true);
+    try { await simulate(); setMessage({ text: "Notificação de teste enviada.", tone: "info" }); }
+    catch { setMessage({ text: "Não foi possível enviar a notificação de teste.", tone: "error" }); }
+    finally { setSimulating(false); }
+  };
 
   const open = (mode: "name" | "password") => { setEditing(mode); setDraft(mode === "name" ? name : ""); setMessage(null); };
   const save = async () => {
@@ -38,7 +50,8 @@ export default function Profile() {
   };
 
   return (
-    <ScrollView style={{ flex: 1, backgroundColor: colors.background }} keyboardShouldPersistTaps="handled" contentContainerStyle={[styles.content, { paddingTop: Math.max(insets.top, 14), paddingBottom: insets.bottom + 40 }]}>
+    // The name and password fields scroll above the keyboard instead of hiding behind it.
+    <KeyboardAwareScrollViewCompat style={{ flex: 1, backgroundColor: colors.background }} bottomOffset={24} contentContainerStyle={[styles.content, { paddingTop: Math.max(insets.top, 14), paddingBottom: insets.bottom + 40 }]}>
       <View style={styles.nav}><BackButton /></View>
 
       <View style={styles.identity}>
@@ -68,6 +81,16 @@ export default function Profile() {
             thumbColor="#FFFFFF"
           />
         </View>
+        <Pressable accessibilityRole="button" onPress={() => router.push("/notifications")} style={[styles.row, styles.divider, { borderTopColor: colors.border }]}>
+          <Text style={[styles.rowLabel, { color: colors.foreground }]}>Notificações</Text>
+          {unread ? <Text style={[styles.count, { color: colors.primary }]}>{unread} novas</Text> : null}
+          <Feather name="chevron-right" size={18} color={colors.mutedForeground} />
+        </Pressable>
+        {/* For presentations with no match on: the database sends a real notification built from a recent result. */}
+        <Pressable accessibilityRole="button" disabled={simulating} onPress={() => void runSimulation()} style={[styles.row, styles.divider, { borderTopColor: colors.border }]}>
+          <Text style={[styles.rowLabel, { color: colors.primary }]}>{simulating ? "Enviando…" : "Simular notificação"}</Text>
+          <Feather name="bell" size={18} color={colors.primary} />
+        </Pressable>
       </View>
 
       <Text style={[styles.section, { color: colors.mutedForeground }]}>Conta</Text>
@@ -85,7 +108,7 @@ export default function Profile() {
       <Pressable accessibilityRole="button" onPress={() => void signOut()} style={styles.signOut}>
         <Text style={[styles.signOutText, { color: colors.destructive }]}>Sair da conta</Text>
       </Pressable>
-    </ScrollView>
+    </KeyboardAwareScrollViewCompat>
   );
 }
 
@@ -106,6 +129,8 @@ const styles = StyleSheet.create({
   panel: { borderRadius: 20, paddingHorizontal: 18 },
   row: { minHeight: 60, flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 12 },
   rowLabel: { flex: 1, fontSize: 15, fontFamily: font.medium },
+  divider: { borderTopWidth: 1 },
+  count: { fontSize: 13, fontFamily: font.semibold },
   inlineForm: { gap: 10, paddingBottom: 16 },
   signOut: { minHeight: 48, alignItems: "center", justifyContent: "center", marginTop: 28 },
   signOutText: { fontSize: 15, fontFamily: font.semibold },

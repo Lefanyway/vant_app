@@ -16,6 +16,7 @@ import { TeamBadge } from "@/components/MatchCard";
 import { useColors } from "@/hooks/useColors";
 import { TeamLink } from "@/components/TeamLink";
 import { useActiveScreen } from "@/hooks/useActiveScreen";
+import { WinProbability } from "@/components/WinProbability";
 
 type Tab = "Overview" | "Performance" | "Economy" | "H2H";
 
@@ -70,6 +71,7 @@ function DetailContent({ match, details, detailsLoading, detailsError, onRetry, 
 function Overview({ details, colors }: { details: MatchDetails; colors: ReturnType<typeof useColors> }) {
   const match = details.match;
   return <View>
+    <WinProbability match={match} />
     <SectionTitle title="Resumo da série" colors={colors} />
     <View style={[styles.panel, { backgroundColor: colors.card, borderColor: colors.border }]}>
       <InfoRow label="Competição" value={match.tournament} colors={colors} />

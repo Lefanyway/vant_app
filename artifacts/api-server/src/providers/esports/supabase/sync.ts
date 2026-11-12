@@ -5,9 +5,11 @@ import type { Match } from '../types';
 import { SupabaseStore, type IngestBatch, type IngestPlayer } from './store';
 
 const DAY = 86_400_000;
-const BACKFILL_DAYS = 90;
+// All of PandaScore's Valorant history (it starts in 2021): about 18 thousand matches, near 70 MB of the free 500 MB.
+const BACKFILL_FROM = Date.parse(process.env.VANT_BACKFILL_FROM || '2021-01-01T00:00:00Z');
 const AHEAD_DAYS = 14;
 const WINDOW_DAYS = 7;
+const BACKFILL_WEEKS_PER_TICK = 24;
 const TICK_MS = 10 * 60_000;
 
 // Tables keep PandaScore's own image URL; payload keeps the URL as the API serves it, through its logo proxy.
@@ -40,22 +42,23 @@ export class SupabaseSync {
     setInterval(tick, TICK_MS).unref();
   }
 
-  private async runOnce() {
+  async runOnce() {
     const now = Date.now();
     // Recent days and the coming two weeks change often: scores, reschedules, new matches.
     await this.syncRange(now - 2 * DAY, now + AHEAD_DAYS * DAY, 'window');
     const live = await this.client.request<RawMatch[]>('/valorant/matches/running', { per_page: 100 });
     await this.ingestRows(Array.isArray(live) ? live : [], 'live');
-    // The first run fills the last three months; later runs only fill what is missing.
+    // The first run fills the history back to BACKFILL_FROM; later runs only fill what is missing.
     const coverage = await this.store.coverage();
-    const backfillFrom = now - BACKFILL_DAYS * DAY;
-    if (!coverage || coverage.start > backfillFrom + DAY) await this.syncRange(backfillFrom, Math.min(coverage?.start ?? now, now - 2 * DAY), 'backfill');
+    // A few weeks per tick keep the free PandaScore quota (1000 requests an hour) free for the app itself.
+    if (!coverage || coverage.start > BACKFILL_FROM + DAY) await this.syncRange(BACKFILL_FROM, Math.min(coverage?.start ?? now, now - 2 * DAY), 'backfill', BACKFILL_WEEKS_PER_TICK);
   }
 
-  private async syncRange(from: number, to: number, kind: string) {
+  // Newest week first, so a run that stops halfway still leaves one unbroken span behind it.
+  private async syncRange(from: number, to: number, kind: string, maxWindows = Infinity) {
     let total = 0;
-    for (let start = from; start < to; start += WINDOW_DAYS * DAY) {
-      const end = Math.min(start + WINDOW_DAYS * DAY, to);
+    for (let end = to, windows = 0; end > from && windows < maxWindows; end -= WINDOW_DAYS * DAY, windows++) {
+      const start = Math.max(end - WINDOW_DAYS * DAY, from);
       const range = { start: new Date(start).toISOString(), end: new Date(end).toISOString() };
       const { rows } = await this.client.fetchAllPages<RawMatch>('/valorant/matches', { sort: 'begin_at', 'range[begin_at]': `${range.start},${range.end}` }, 30);
       total += await this.ingestRows(rows, kind, range);

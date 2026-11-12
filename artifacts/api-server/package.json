@@ -9,7 +9,8 @@
     "build": "node ./build.mjs",
     "start": "node --enable-source-maps ./dist/index.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "node ./test.mjs"
+    "test": "node ./test.mjs",
+    "sync:once": "tsx ./src/sync-once.ts"
   },
   "dependencies": {
     "@workspace/api-zod": "workspace:*",

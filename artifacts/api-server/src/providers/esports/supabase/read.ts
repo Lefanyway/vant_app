@@ -37,5 +37,14 @@ export function withSupabaseStore(provider: EsportsDataProvider): EsportsDataPro
     sync?.saveMatches(matches).catch(() => undefined);
     return matches;
   };
-  return Object.assign(Object.create(provider) as EsportsDataProvider, { getMatches });
+  // Team results come from stored matches; the provider answers only if Supabase cannot.
+  const fromProviderStats = provider.getTeamStats?.bind(provider);
+  const getTeamStats = async (teamId: string, period: '30d' = '30d') => {
+    try { return await store.teamStats(teamId, 30); }
+    catch (error) {
+      logger.warn({ err: error instanceof Error ? error.message : String(error) }, 'Supabase team stats failed; using provider');
+      return fromProviderStats ? fromProviderStats(teamId, period) : null;
+    }
+  };
+  return Object.assign(Object.create(provider) as EsportsDataProvider, { getMatches, getTeamStats });
 }

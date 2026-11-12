@@ -6,7 +6,7 @@ const output = ".test-dist/adapter.test.mjs";
 const routeOutput = ".test-dist/esports-route.test.mjs";
 const logoOutput = ".test-dist/logo-image.test.mjs";
 // Self-contained unit tests: bundled as they are, one output each.
-const plainTests = ["pandascore/news", "cache", "search-rank"];
+const plainTests = ["pandascore/news", "cache", "search-rank", "redis-cache"];
 const plainOutputs = plainTests.map((name) => `.test-dist/${name.replace("/", "-")}.test.mjs`);
 await rm(".test-dist", { recursive: true, force: true });
 await Promise.all([

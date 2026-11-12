@@ -15,6 +15,7 @@ export type TeamStats = {
   mapsWon?: number;
   averageRoundsWon?: number;
   mapWinRate?: number;
+  elo?: number;
 };
 export type TeamNewsArticle = {
   id: string;

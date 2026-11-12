@@ -4,6 +4,7 @@ import { getConfiguredProvider, getConfiguredStatsProvider } from "../providers/
 import { ESPORTS_CACHE_TTL, TtlCache } from "../providers/esports/cache";
 import type { GameId, Match, TeamMatchFilter, TeamOverview } from "../providers/esports/types";
 import { isCalendarDate, isTimezone } from '../providers/esports/date';
+import { redisCache } from "../lib/redis";
 
 const router = Router();
 const games = [{ id: "valorant", name: "VALORANT", shortName: "VALORANT" }, { id: "cs2", name: "Counter-Strike 2", shortName: "CS2" }, { id: "lol", name: "League of Legends", shortName: "LoL" }];
@@ -28,7 +29,11 @@ router.use((req, res, next) => {
   return next();
 });
 
-const cached = <T>(key: string, ttl: number, fetcher: () => Promise<T>): Promise<T> => cache.remember(key, ttl, fetcher);
+// Server memory first, then the shared Redis cache, then the origin (Supabase or PandaScore).
+const cached = <T>(key: string, ttl: number, fetcher: () => Promise<T>): Promise<T> => {
+  const redis = redisCache();
+  return cache.remember(key, ttl, redis ? () => redis.remember(key, ttl, fetcher) : fetcher);
+};
 
 function matchesTtl(date?: string): number {
   if (!date) return ESPORTS_CACHE_TTL.matchesToday;

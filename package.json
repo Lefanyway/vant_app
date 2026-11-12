@@ -11,7 +11,8 @@
     "typecheck:libs": "tsc --build",
     "typecheck": "pnpm run typecheck:libs && pnpm -r --filter \"./artifacts/**\" --filter \"./scripts\" --if-present run typecheck",
     "build:web": "node scripts/build-production.mjs",
-    "start:web": "node scripts/start-production.mjs"
+    "start:web": "node scripts/start-production.mjs",
+    "ml:train": "python ml/train.py"
   },
   "private": true,
   "dependencies": {

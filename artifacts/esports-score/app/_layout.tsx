@@ -19,6 +19,7 @@ import { View } from 'react-native';
 import * as SplashScreen from 'expo-splash-screen';
 import { AppProvider } from '@/context/AppContext';
 import { AuthProvider, useAuth } from '@/context/AuthContext';
+import { NotificationsProvider } from '@/context/NotificationsContext';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -36,6 +37,7 @@ function RootLayoutNav() {
           <Stack.Screen name="teams/[id]" options={{ headerShown: false }} />
           <Stack.Screen name="competitions/[id]" options={{ headerShown: false }} />
           <Stack.Screen name="profile" options={{ headerShown: false }} />
+          <Stack.Screen name="notifications" options={{ headerShown: false }} />
         </Stack.Protected>
         <Stack.Protected guard={!signedIn} redirectTo="/">
           <Stack.Screen name="login" options={{ headerShown: false }} />
@@ -67,7 +69,7 @@ export default function RootLayout() {
         <QueryClientProvider client={queryClient}>
           <GestureHandlerRootView>
             <KeyboardProvider>
-              <AuthProvider><AppProvider><StatusBar style="light" /><RootLayoutNav /></AppProvider></AuthProvider>
+              <AuthProvider><NotificationsProvider><AppProvider><StatusBar style="light" /><RootLayoutNav /></AppProvider></NotificationsProvider></AuthProvider>
             </KeyboardProvider>
           </GestureHandlerRootView>
         </QueryClientProvider>

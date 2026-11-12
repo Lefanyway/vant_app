@@ -1,4 +1,4 @@
-import type { Match } from '../types';
+import type { Match, TeamStats } from '../types';
 
 export type IngestCompetition = { id: string; name: string; slug?: string; logo_url?: string; region?: string; game_id: string };
 export type IngestTeam = { id: string; name: string; acronym?: string; logo_url?: string; country?: string; game_id: string };
@@ -55,6 +55,28 @@ export class SupabaseStore {
     params.append('start_time', `lt.${end}`);
     const rows = await this.rest<{ payload: Match }[]>(`matches?${params.toString()}`);
     return rows.map(row => row.payload);
+  }
+
+  // Results over the last days straight from stored matches, plus the model's current Elo for the team.
+  async teamStats(teamId: string, days = 30): Promise<TeamStats | null> {
+    const cutoff = new Date(Date.now() - days * 86_400_000).toISOString();
+    const id = `"${teamId.replace(/"/g, '')}"`;
+    const params = new URLSearchParams({ select: 'home_team_id,away_team_id,home_score,away_score', status: 'eq.finished', start_time: `gte.${cutoff}`, or: `(home_team_id.eq.${id},away_team_id.eq.${id})` });
+    const [rows, elo] = await Promise.all([
+      this.rest<{ home_team_id: string; away_team_id: string; home_score: number | null; away_score: number | null }[]>(`matches?${params.toString()}`),
+      this.rest<{ elo: number }[]>(`team_elo?select=elo&team_id=eq.${encodeURIComponent(teamId)}`),
+    ]);
+    let wins = 0, losses = 0, matches = 0;
+    for (const row of rows) {
+      if (row.home_score === null || row.away_score === null || row.home_score === row.away_score) continue;
+      matches++;
+      const own = row.home_team_id === teamId ? row.home_score : row.away_score;
+      const other = row.home_team_id === teamId ? row.away_score : row.home_score;
+      if (own > other) wins++; else losses++;
+    }
+    const rating = elo[0]?.elo;
+    if (!matches && rating === undefined) return null;
+    return { period: '30d', matches, wins, losses, ...(rating !== undefined ? { elo: Math.round(rating) } : {}) };
   }
 
   // The span of time a backfill or window sync has already written, so an empty day there is truly empty.

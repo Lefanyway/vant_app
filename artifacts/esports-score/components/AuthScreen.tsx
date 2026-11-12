@@ -1,6 +1,7 @@
 import { Feather } from "@expo/vector-icons";
 import { useState, type ReactNode } from "react";
-import { ActivityIndicator, Image, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View, type TextInputProps } from "react-native";
+import { ActivityIndicator, Image, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View, type TextInputProps } from "react-native";
+import { KeyboardAvoidingView } from "react-native-keyboard-controller";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { font } from "@/constants/type";
 import { useColors } from "@/hooks/useColors";
@@ -11,12 +12,13 @@ const mark = require("../assets/generated/games/valorant-mark.png");
 const noWebOutline = Platform.OS === "web" ? ({ outlineStyle: "none" } as object) : null;
 
 // One question per screen: a title, its field and one main action at the bottom.
+// The keyboard pushes the bottom action up on both platforms: Android draws edge to edge, so the window never resizes on its own.
 export function AuthScreen({ title, subtitle, back = false, logo = false, children, footer }: { title: string; subtitle?: ReactNode; back?: boolean; logo?: boolean; children?: ReactNode; footer: ReactNode }) {
   const colors = useColors();
   const insets = useSafeAreaInsets();
   return (
-    <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={{ flex: 1, backgroundColor: colors.background }}>
-      <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={[styles.content, { paddingTop: insets.top + 16, paddingBottom: Math.max(insets.bottom, 16) + 18 }]}>
+    <KeyboardAvoidingView behavior="padding" enabled={Platform.OS !== "web"} style={{ flex: 1, backgroundColor: colors.background }}>
+      <ScrollView keyboardShouldPersistTaps="handled" keyboardDismissMode="interactive" contentContainerStyle={[styles.content, { paddingTop: insets.top + 16, paddingBottom: Math.max(insets.bottom, 16) + 18 }]}>
         <View style={styles.top}>
           {back ? <Pressable accessibilityRole="button" accessibilityLabel="Voltar" onPress={goBackOrHome} hitSlop={8} style={styles.back}><Feather name="arrow-left" size={22} color={colors.foreground} /></Pressable> : null}
         </View>

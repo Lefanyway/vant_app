@@ -179,7 +179,7 @@ export type TeamOverview = {
   recentForm: ("W" | "L" | "D")[];
   capabilities: { overview: true; matches: boolean; roster: boolean; stats: boolean; news: boolean };
 };
-export type TeamStatsResult = { stats: { period: "30d"; matches: number; wins: number; losses: number; mapsPlayed?: number; mapsWon?: number; mapWinRate?: number } | null; available: boolean; error?: string };
+export type TeamStatsResult = { stats: { period: "30d"; matches: number; wins: number; losses: number; mapsPlayed?: number; mapsWon?: number; mapWinRate?: number; elo?: number } | null; available: boolean; error?: string };
 export type TeamMatchesResult = { matches: ApiMatch[]; hasMore: boolean };
 
 const playerPhoto = (player: ApiPlayer): ApiPlayer => ({ ...player, imageUrl: absoluteLogo(player.imageUrl) });
