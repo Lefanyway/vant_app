@@ -24,7 +24,7 @@ export class ApiError extends Error {
   }
 }
 const gameName = (id: string): Team["game"] => id === "cs2" ? "CS2" : id === "lol" ? "League of Legends" : "Valorant";
-const absoluteLogo = (url?: string) => {
+export const absoluteLogo = (url?: string) => {
   if (!url) return undefined;
   if (/^https?:\/\//i.test(url)) return url;
   return `${baseUrl}${url}${url.includes("/esports/assets/logo?") ? "&v=2" : ""}`;
@@ -159,16 +159,6 @@ export async function fetchTeam(id: string) {
   return toTeam(await request<ApiTeam>(`/teams/${encodeURIComponent(id)}`));
 }
 
-export async function fetchFollowedMatches(ids: string[]) {
-  const results = await Promise.all(ids.map(async (id) => {
-    try { return { ok: true as const, matches: (await fetchTeamMatches(id, "upcoming", 1)).matches.map(toMatch) }; }
-    catch { return { ok: false as const, matches: [] as Match[] }; }
-  }));
-  if (ids.length > 0 && results.every((result) => !result.ok)) throw new Error("Não foi possível carregar as partidas seguidas.");
-  const matches = [...new Map(results.flatMap((result) => result.matches).map((match) => [match.id, match])).values()];
-  matches.sort((a, b) => (Date.parse(a.startTime ?? "") || 0) - (Date.parse(b.startTime ?? "") || 0) || a.id.localeCompare(b.id));
-  return { matches, partial: results.some((result) => !result.ok) };
-}
 
 export type TeamOverview = {
   team: ApiTeamDetails;

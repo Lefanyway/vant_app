@@ -1,6 +1,6 @@
 import { Feather } from "@expo/vector-icons";
 import { useState } from "react";
-import { Pressable, StyleSheet, Switch, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { AuthField, FormMessage, PrimaryButton } from "@/components/AuthScreen";
 import { BackButton } from "@/components/BackButton";
@@ -72,18 +72,7 @@ export default function Profile() {
 
       <Text style={[styles.section, { color: colors.mutedForeground }]}>Preferências</Text>
       <View style={[styles.panel, { backgroundColor: colors.card }]}>
-        <View style={styles.row}>
-          <Text style={[styles.rowLabel, { color: colors.foreground }]}>Resultados das partidas salvas</Text>
-          <Switch
-            accessibilityLabel="Resultados das partidas salvas"
-            value={profile?.notify_saved_results ?? true}
-            onValueChange={(value) => { updateProfile({ notify_saved_results: value }).catch(() => setMessage({ text: "Não foi possível salvar a preferência.", tone: "error" })); }}
-            trackColor={{ false: colors.secondary, true: colors.primary }}
-            thumbColor="#FFFFFF"
-            style={{ alignSelf: "center" }}
-          />
-        </View>
-        <Pressable accessibilityRole="button" onPress={() => router.push("/notifications")} style={[styles.row, styles.divider, { borderTopColor: colors.border }]}>
+        <Pressable accessibilityRole="button" onPress={() => router.push("/notifications")} style={styles.row}>
           <Text style={[styles.rowLabel, { color: colors.foreground }]}>Notificações</Text>
           {unread ? <Text style={[styles.count, { color: colors.primary }]}>{unread} novas</Text> : null}
           <Feather name="chevron-right" size={18} color={colors.mutedForeground} />

@@ -1,4 +1,7 @@
 import { PlayerAvatar } from "@/components/PlayerAvatar";
+import { useSwipeTabs } from "@/components/SwipeTabs";
+import { GestureDetector } from "react-native-gesture-handler";
+import Animated from "react-native-reanimated";
 import { Feather } from "@expo/vector-icons";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { useLocalSearchParams } from "expo-router";
@@ -29,16 +32,22 @@ export default function TeamDetail() {
   const data = overview.data;
   const team = data?.team;
   const tabs: Tab[] = data ? ["Overview", "Matches", ...(data.capabilities.roster ? ["Roster" as const] : []), ...(data.capabilities.stats ? ["Stats" as const] : [])] : ["Overview", "Matches"];
+  // Swiping sideways on the page moves between the team tabs.
+  const swipe = useSwipeTabs(tabs, tab, setTab);
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
     <View style={[styles.nav, { paddingTop: insets.top, paddingHorizontal: 16 }]}><BackButton /></View>
+    <GestureDetector gesture={swipe.gesture}>
     <ScrollView style={styles.screen} contentContainerStyle={{ paddingBottom: 46 }}>
       {overview.isLoading ? <TeamSkeleton colors={colors} /> : overview.isError || !team ? <View style={styles.center}><Text style={[styles.message, { color: colors.mutedForeground }]}>{overview.isError ? errorMessage(overview.error, "Não foi possível carregar a equipe.") : "Equipe não encontrada."}</Text><Pressable onPress={() => overview.refetch()}><Text style={[styles.retry, { color: colors.primary }]}>Tentar novamente</Text></Pressable></View> : <>
         <TeamHeader team={team} colors={colors} />
         <View accessibilityRole="tablist" style={[styles.tabs, { borderBottomColor: colors.border }]}>{tabs.map((item) => <Pressable key={item} accessibilityRole="tab" accessibilityState={{ selected: tab === item }} onPress={() => setTab(item)} style={[styles.tab, tab === item && { borderBottomColor: colors.primary }]}><Text numberOfLines={1} style={[styles.tabText, { color: tab === item ? colors.primary : colors.mutedForeground }]}>{({ Overview: "Visão geral", Matches: "Partidas", Roster: "Elenco", Stats: "Estatísticas" })[item]}</Text></Pressable>)}</View>
+        <Animated.View key={tab} entering={swipe.entering}>
         {tab === "Overview" ? <Overview data={data} articles={news.data?.articles ?? []} colors={colors} onRosterPress={() => setTab("Roster")} /> : tab === "Matches" ? <MatchesTab teamId={teamId} team={toApiTeam(team)} colors={colors} /> : tab === "Roster" ? <RosterTab teamId={teamId} preview={data.rosterPreview} colors={colors} /> : <StatsTab teamId={teamId} colors={colors} />}
+        </Animated.View>
       </>}
     </ScrollView>
+    </GestureDetector>
     </View>
   );
 }

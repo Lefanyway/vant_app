@@ -1,23 +1,19 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { createContext, ReactNode, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
-import type { Match } from "@/lib/data";
 import { supabase } from "@/lib/supabase";
 
-type FavoriteKind = "team" | "competition" | "match";
-const storageKeys: Record<FavoriteKind, string> = { team: "esports-favorites", competition: "vant-competitions", match: "vant-matches" };
+// People follow teams and competitions; matches are reached through them.
+type FavoriteKind = "team" | "competition";
+const storageKeys: Record<FavoriteKind, string> = { team: "esports-favorites", competition: "vant-competitions" };
 
 type AppContextValue = {
   favoriteTeams: string[];
   favoriteCompetitions: string[];
-  favoriteMatches: string[];
-  savedMatches: Match[];
   favoritesReady: boolean;
   migrateFavorite: (oldId: string, newId: string) => void;
   toggleFavorite: (id: string) => void;
   toggleCompetition: (id: string) => void;
-  toggleMatch: (id: string) => void;
-  pinMatch: (match: Match) => void;
 };
 
 const AppContext = createContext<AppContextValue | null>(null);
@@ -31,21 +27,9 @@ function storedIds(value: string | null): string[] {
   }
 }
 
-function storedMatches(value: string | null): Match[] {
-  try {
-    const parsed: unknown = JSON.parse(value || "[]");
-    if (!Array.isArray(parsed)) return [];
-    return parsed.filter((item): item is Match => Boolean(item) && typeof item === "object" && typeof (item as Match).id === "string" && typeof (item as Match).teamA?.name === "string");
-  } catch {
-    return [];
-  }
-}
-
 export function AppProvider({ children }: { children: ReactNode }) {
   const [favoriteTeams, setTeams] = useState<string[]>([]);
   const [favoriteCompetitions, setCompetitions] = useState<string[]>([]);
-  const [favoriteMatches, setMatches] = useState<string[]>([]);
-  const [savedMatches, setSavedMatches] = useState<Match[]>([]);
   const [favoritesReady, setReady] = useState(false);
   const userId = useAuth().session?.user.id;
   const userRef = useRef(userId);
@@ -54,8 +38,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     userRef.current = userId;
     // Signing out leaves nothing of that account on the phone for the next one to inherit.
     if (previous && !userId) {
-      setTeams([]); setCompetitions([]); setMatches([]); setSavedMatches([]);
-      AsyncStorage.multiRemove([...Object.values(storageKeys), "vant-match-cards"]).catch(() => undefined);
+      setTeams([]); setCompetitions([]);
+      AsyncStorage.multiRemove(Object.values(storageKeys)).catch(() => undefined);
     }
   }, [userId]);
   // Every change is saved on the phone first and then in the signed-in account.
@@ -69,13 +53,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
   };
   useEffect(() => {
     let active = true;
-    AsyncStorage.multiGet(["esports-favorites", "vant-competitions", "vant-matches", "vant-match-cards"])
+    AsyncStorage.multiGet([storageKeys.team, storageKeys.competition])
       .then((values) => {
         if (!active) return;
         setTeams(storedIds(values[0][1]));
         setCompetitions(storedIds(values[1][1]));
-        setMatches(storedIds(values[2][1]));
-        setSavedMatches(storedMatches(values[3][1]));
       })
       .catch(() => undefined)
       .finally(() => { if (active) setReady(true); });
@@ -97,7 +79,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
       });
       merge("team", setTeams);
       merge("competition", setCompetitions);
-      merge("match", setMatches);
     });
     return () => { active = false; };
   }, [userId, favoritesReady]);
@@ -108,19 +89,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
     remote(kind, id, saved);
     return next;
   });
-  const pinMatch = (match: Match) => {
-    toggle(setMatches, "match", match.id);
-    setSavedMatches((current) => {
-      const next = current.some((item) => item.id === match.id) ? current.filter((item) => item.id !== match.id) : [match, ...current];
-      AsyncStorage.setItem("vant-match-cards", JSON.stringify(next)).catch(() => undefined);
-      return next;
-    });
-  };
   const value = useMemo(() => ({
     favoriteTeams,
     favoriteCompetitions,
-    favoriteMatches,
-    savedMatches,
     favoritesReady,
     migrateFavorite: (oldId: string, newId: string) => setTeams(current => {
       if (oldId === newId || !current.includes(oldId)) return current;
@@ -132,9 +103,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }),
     toggleFavorite: (id: string) => toggle(setTeams, "team", id),
     toggleCompetition: (id: string) => toggle(setCompetitions, "competition", id),
-    toggleMatch: (id: string) => toggle(setMatches, "match", id),
-    pinMatch,
-  }), [favoriteCompetitions, favoriteMatches, favoriteTeams, favoritesReady, savedMatches]);
+  }), [favoriteCompetitions, favoriteTeams, favoritesReady]);
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 }
 

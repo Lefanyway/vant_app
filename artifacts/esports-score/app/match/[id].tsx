@@ -1,6 +1,4 @@
-import { Ionicons } from "@expo/vector-icons";
 import { ResolvedLogo } from "@/components/ResolvedLogo";
-import { useApp } from "@/context/AppContext";
 import { Feather } from "@expo/vector-icons";
 import { useLocalSearchParams } from "expo-router";
 import { useEffect, useRef, useState } from "react";
@@ -40,8 +38,6 @@ export default function MatchDetail() {
 }
 
 function DetailContent({ match, details, detailsLoading, detailsError, onRetry, tab, setTab, colors }: { match: Match; details: MatchDetails | null; detailsLoading: boolean; detailsError: string | null; onRetry: () => void; tab: Tab; setTab: (tab: Tab) => void; colors: ReturnType<typeof useColors> }) {
-  const { favoriteMatches = [], toggleMatch } = useApp();
-  const saved = favoriteMatches.includes(match.id);
   const tabs: { key: Tab; label: string }[] = [
     { key: "Overview", label: "Detalhes" },
     ...((details?.stats?.playerStats.length ?? 0) > 0 ? [{ key: "Performance" as const, label: "Jogadores" }] : []),
@@ -50,7 +46,7 @@ function DetailContent({ match, details, detailsLoading, detailsError, onRetry, 
   ];
   return <>
     <View style={[styles.hero, { backgroundColor: colors.card }]}>
-      <View style={styles.heroActions}><Pressable accessibilityRole="button" accessibilityLabel="Compartilhar partida" onPress={() => void Share.share({ message: `${match.teamA.name} vs ${match.teamB.name} · ${match.tournament} · ${match.time}` })} style={styles.heroIcon}><Feather name="share" size={21} color={colors.foreground} /></Pressable><Pressable accessibilityRole="button" accessibilityLabel={saved ? "Remover partida dos favoritos" : "Salvar partida"} accessibilityState={{ selected: saved }} onPress={() => toggleMatch?.(match.id)} style={styles.heroIcon}><Ionicons name={saved ? "star" : "star-outline"} size={24} color={saved ? colors.primary : colors.foreground} /></Pressable></View>
+      <View style={styles.heroActions}><Pressable accessibilityRole="button" accessibilityLabel="Compartilhar partida" onPress={() => void Share.share({ message: `${match.teamA.name} vs ${match.teamB.name} · ${match.tournament} · ${match.time}` })} style={styles.heroIcon}><Feather name="share" size={21} color={colors.foreground} /></Pressable></View>
       <View style={styles.teams}>
         <TeamColumn team={match.teamA} colors={colors} />
         <View style={styles.scoreBlock}>

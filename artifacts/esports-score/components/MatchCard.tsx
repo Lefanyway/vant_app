@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import { AccessibilityInfo, Animated, Platform, Pressable, StyleSheet, Text, View } from "react-native";
-import { FavoriteStar } from "@/components/FavoriteStar";
 import { logoSlot, ResolvedLogo } from "@/components/ResolvedLogo";
 import { TeamLink } from "@/components/TeamLink";
 import { font } from "@/constants/type";
@@ -68,7 +67,6 @@ export function MatchCard({ match, onPress }: { match: Match; onPress: () => voi
       </Pressable>
       <View style={styles.metaColumn}>
         {format ? <Text maxFontSizeMultiplier={1.2} style={[styles.format, { color: colors.mutedForeground }]}>{format}</Text> : null}
-        <FavoriteStar match={match} />
       </View>
     </View>
   );
@@ -112,6 +110,6 @@ const styles = StyleSheet.create({
   identity: { flex: 1, minWidth: 0, flexDirection: "row", alignItems: "center", gap: 8 },
   name: { flex: 1, minWidth: 0, fontSize: 14, lineHeight: 18 },
   score: { width: 22, textAlign: "right", fontSize: 15, fontVariant: ["tabular-nums"] },
-  metaColumn: { alignItems: "center", justifyContent: "center" },
+  metaColumn: { minWidth: 40, alignItems: "center", justifyContent: "center" },
   format: { fontSize: 10, fontFamily: font.semibold },
 });

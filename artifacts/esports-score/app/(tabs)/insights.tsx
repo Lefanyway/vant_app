@@ -5,6 +5,7 @@ import { EmptyState, ListSkeleton } from "@/components/MobileChrome";
 import { ResolvedLogo } from "@/components/ResolvedLogo";
 import { font } from "@/constants/type";
 import { useColors } from "@/hooks/useColors";
+import { absoluteLogo } from "@/lib/api";
 import { openMatch } from "@/lib/navigation";
 import { supabase } from "@/lib/supabase";
 
@@ -56,10 +57,14 @@ export default function Insights() {
           const favorite = home === undefined ? null : home >= 0.5 ? match.payload.homeTeam : match.payload.awayTeam;
           return <Pressable key={match.id} accessibilityRole="button" onPress={() => openMatch(match.id)} style={({ pressed }) => [styles.row, { backgroundColor: colors.card, opacity: pressed ? 0.75 : 1 }]}>
             <View style={styles.rowCopy}>
-              <Text numberOfLines={1} style={[styles.rowTitle, { color: colors.foreground }]}>{match.payload.homeTeam.name} vs {match.payload.awayTeam.name}</Text>
+              <View accessibilityLabel={`${match.payload.homeTeam.name} contra ${match.payload.awayTeam.name}`} style={styles.logos}>
+                <ResolvedLogo type="team" name={match.payload.homeTeam.name} entityId={match.payload.homeTeam.id} logoUrl={absoluteLogo(match.payload.homeTeam.logoUrl)} size={30} />
+                <Text style={[styles.rowMeta, { color: colors.mutedForeground }]}>vs</Text>
+                <ResolvedLogo type="team" name={match.payload.awayTeam.name} entityId={match.payload.awayTeam.id} logoUrl={absoluteLogo(match.payload.awayTeam.logoUrl)} size={30} />
+              </View>
               <Text numberOfLines={1} style={[styles.rowMeta, { color: colors.mutedForeground }]}>{new Date(match.start_time).toLocaleString("pt-BR", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })} · {match.payload.competition.name}</Text>
             </View>
-            {favorite && home !== undefined ? <View style={styles.pick}><Text style={[styles.pickValue, { color: colors.primary }]}>{pct(Math.max(home, 1 - home))}</Text><Text numberOfLines={1} style={[styles.rowMeta, { color: colors.mutedForeground }]}>{favorite.acronym ?? favorite.name}</Text></View> : null}
+            {favorite && home !== undefined ? <View style={styles.pick}><Text style={[styles.pickValue, { color: colors.primary }]}>{pct(Math.max(home, 1 - home))}</Text><Text numberOfLines={1} style={[styles.rowMeta, { color: colors.foreground }]}>{favorite.name}</Text></View> : null}
           </Pressable>;
         }) : <EmptyState title="Nenhuma partida agendada" />}
 
@@ -92,9 +97,9 @@ const styles = StyleSheet.create({
   note: { fontSize: 12, lineHeight: 17, fontFamily: font.medium, textAlign: "center" },
   row: { borderRadius: 16, padding: 14, marginBottom: 8, flexDirection: "row", alignItems: "center", gap: 12 },
   rowCopy: { flex: 1, minWidth: 0, gap: 3 },
-  rowTitle: { fontSize: 14, fontFamily: font.semibold },
   rowMeta: { fontSize: 11, fontFamily: font.medium },
-  pick: { alignItems: "flex-end", maxWidth: 90 },
+  pick: { alignItems: "flex-end", maxWidth: 130 },
+  logos: { flexDirection: "row", alignItems: "center", gap: 8 },
   pickValue: { fontSize: 18, fontFamily: font.bold, fontVariant: ["tabular-nums"] },
   rank: { flexDirection: "row", alignItems: "center", gap: 10, minHeight: 40 },
   position: { width: 18, fontSize: 13, fontFamily: font.bold, textAlign: "right" },
