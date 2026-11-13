@@ -20,6 +20,8 @@ export default function Insights() {
   const insets = useSafeAreaInsets();
   const query = useQuery({ queryKey: ["insights"], queryFn: fetchInsights, staleTime: 10 * 60_000 });
   const data = query.data;
+  // A copy saved on the phone by an older version may lack results.
+  const results = query.data?.results ?? [];
   const [allResults, setAllResults] = useState(false);
   const section = (title: string) => <Text style={[styles.section, { color: colors.mutedForeground }]}>{title}</Text>;
   return (
@@ -36,12 +38,12 @@ export default function Insights() {
           <Text style={[styles.note, { color: colors.mutedForeground }]}>Acertos em {data.run.test_matches.toLocaleString("pt-BR")} partidas, cada uma prevista só com o que aconteceu antes dela.</Text>
         </View> : null}
 
-        {data.results.length ? <>
+        {results.length ? <>
           {section("Como o modelo foi")}
           <View style={[styles.dayCard, { backgroundColor: colors.card }]}>
-            <Text style={[styles.dayTitle, { color: colors.foreground }]}>Acertou {data.results.filter(modelHit).length} de {data.results.length} nos últimos 2 dias</Text>
-            {(allResults ? data.results : data.results.slice(0, 5)).map((match, index) => <ResultRow key={match.id} match={match} first={index === 0} colors={colors} />)}
-            {data.results.length > 5 ? <Pressable accessibilityRole="button" onPress={() => setAllResults(!allResults)} style={styles.more}><Text style={[styles.moreText, { color: colors.primary }]}>{allResults ? "Mostrar menos" : `Ver todas (${data.results.length})`}</Text></Pressable> : null}
+            <Text style={[styles.dayTitle, { color: colors.foreground }]}>Acertou {results.filter(modelHit).length} de {results.length} nos últimos 2 dias</Text>
+            {(allResults ? results : results.slice(0, 5)).map((match, index) => <ResultRow key={match.id} match={match} first={index === 0} colors={colors} />)}
+            {results.length > 5 ? <Pressable accessibilityRole="button" onPress={() => setAllResults(!allResults)} style={styles.more}><Text style={[styles.moreText, { color: colors.primary }]}>{allResults ? "Mostrar menos" : `Ver todas (${results.length})`}</Text></Pressable> : null}
           </View>
         </> : null}
 

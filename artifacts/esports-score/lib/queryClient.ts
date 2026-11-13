@@ -25,6 +25,7 @@ const saved = new Set(["matches", "competitions", "insights", "team-overview", "
 export const persistOptions = {
   persister: createAsyncStoragePersister({ storage: AsyncStorage, key: "vant-cache" }),
   maxAge: DAY,
-  buster: "1",
+  // Bump when a saved query changes shape, so phones drop the old copy.
+  buster: "2",
   dehydrateOptions: { shouldDehydrateQuery: (query: Query) => query.state.status === "success" && saved.has(String(query.queryKey[0])) },
 };
