@@ -1,5 +1,6 @@
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { router } from "expo-router";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { ListSkeleton } from "@/components/MobileChrome";
 import { ResolvedLogo } from "@/components/ResolvedLogo";
@@ -50,11 +51,13 @@ export function FollowingSettings() {
         : !rows.length ? <Text style={[styles.empty, { color: colors.mutedForeground }]}>Siga equipes e competições pela busca para recebê-las aqui.</Text>
         : rows.map((item, index) => (
           <View key={`${item.kind}:${item.entity_id}`} style={[styles.row, index > 0 && { borderTopWidth: 1, borderTopColor: colors.border }]}>
+            <Pressable accessibilityRole="link" accessibilityLabel={`Abrir ${item.name}`} onPress={() => router.push(item.kind === "team" ? `/teams/${encodeURIComponent(item.entity_id)}` : `/competitions/${encodeURIComponent(item.entity_id)}`)} style={styles.open}>
             <ResolvedLogo type={item.kind} name={item.name} entityId={item.entity_id} logoUrl={item.logo_url} size={30} />
             <View style={styles.copy}>
               <Text numberOfLines={1} style={[styles.name, { color: colors.foreground }]}>{item.name.trim()}</Text>
               <Text style={[styles.meta, { color: colors.mutedForeground }]}>{item.kind === "team" ? "Equipe" : "Competição"}{item.notify === null ? "" : item.notify ? " · com avisos" : " · sem avisos"}</Text>
             </View>
+            </Pressable>
             {item.notify === null ? null : <Pressable accessibilityRole="switch" accessibilityState={{ checked: item.notify }} accessibilityLabel={`Avisos de ${item.name}`} onPress={() => void setNotify(item)} style={styles.icon}>
               <Feather name={item.notify ? "bell" : "bell-off"} size={20} color={item.notify ? colors.primary : colors.mutedForeground} />
             </Pressable>}
@@ -70,6 +73,7 @@ export function FollowingSettings() {
 const styles = StyleSheet.create({
   panel: { borderRadius: 20, paddingHorizontal: 14 },
   row: { minHeight: 60, flexDirection: "row", alignItems: "center", gap: 10 },
+  open: { flex: 1, minWidth: 0, minHeight: 60, flexDirection: "row", alignItems: "center", gap: 10 },
   copy: { flex: 1, minWidth: 0, gap: 2 },
   name: { fontSize: 15, fontFamily: font.medium },
   meta: { fontSize: 12, fontFamily: font.regular },

@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { StyleSheet, Text, View } from "react-native";
 import { EmptyState, ListSkeleton } from "@/components/MobileChrome";
 import { MatchCard } from "@/components/MatchCard";
+import { UpcomingCard } from "@/components/UpcomingCard";
 import { ResolvedLogo } from "@/components/ResolvedLogo";
 import { useColors } from "@/hooks/useColors";
 import { fetchCompetitionMatches, fetchTeamMatches, toMatch } from "@/lib/api";
@@ -30,6 +31,8 @@ export function FollowedMatches({ kind, ids, filter = "upcoming" }: { kind: "tea
   const days = new Map<string, Match[]>();
   for (const match of query.data ?? []) days.set(dayKey(match.startTime!), [...(days.get(dayKey(match.startTime!)) ?? []), match]);
   if (!days.size) return filter === "upcoming" ? <Text style={[styles.none, { color: colors.mutedForeground }]}>Nenhuma partida marcada por enquanto.</Text> : null;
+  // Upcoming matches use the standard card; past results stay grouped by day.
+  if (filter === "upcoming") return <View>{(query.data ?? []).map((match) => <UpcomingCard key={match.id} match={match} />)}</View>;
   return <View>
     {[...days.values()].map((matches) => {
       const competitions = new Map<string, Match[]>();

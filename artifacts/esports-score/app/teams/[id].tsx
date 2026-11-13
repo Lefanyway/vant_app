@@ -1,6 +1,8 @@
 import { Image } from "expo-image";
 import { PlayerAvatar } from "@/components/PlayerAvatar";
 import { Flag } from "@/components/Flag";
+import { UpcomingCard } from "@/components/UpcomingCard";
+import { RecentForm } from "@/components/RecentForm";
 import { useSwipeTabs } from "@/components/SwipeTabs";
 import { GestureDetector } from "react-native-gesture-handler";
 import Animated from "react-native-reanimated";
@@ -59,7 +61,7 @@ function TeamHeader({ team, colors }: { team: NonNullable<Awaited<ReturnType<typ
   const { favoriteTeams, toggleFavorite } = useApp();
   const followed = favoriteTeams.includes(team.id);
   return <View style={[styles.header, { backgroundColor: colors.card, borderColor: colors.border }]}>
-    <View style={styles.identity}><ResolvedLogo type="team" name={team.name} entityId={team.id} game={team.gameId} logoUrl={team.logoUrl} size={86} /><View style={styles.copy}><Text style={[styles.teamName, { color: colors.foreground }]}>{team.name}</Text>{team.acronym ? <Text style={[styles.acronym, { color: colors.mutedForeground }]}>{team.acronym}</Text> : null}<View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}><Text style={[styles.meta, { color: colors.mutedForeground }]}>{team.gameId === "cs2" ? "CS2" : team.gameId === "lol" ? "League of Legends" : "Valorant"}</Text>{team.country ? <View style={{ marginTop: 4 }}><Flag code={team.country} width={20} /></View> : null}</View></View></View>
+    <View style={styles.identity}><ResolvedLogo type="team" name={team.name} entityId={team.id} game={team.gameId} logoUrl={team.logoUrl} size={86} /><View style={styles.copy}><Text style={[styles.teamName, { color: colors.foreground }]}>{team.name}</Text>{team.acronym ? <Text style={[styles.acronym, { color: colors.mutedForeground }]}>{team.acronym}</Text> : null}<View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>{team.country ? <View style={{ marginTop: 6 }}><Flag code={team.country} width={24} /></View> : null}</View></View></View>
     <View style={{ flexDirection: "row", gap: 8 }}>
       <Pressable accessibilityRole="button" onPress={() => toggleFavorite(team.id)} style={[styles.follow, { borderColor: followed ? colors.primary : colors.border, backgroundColor: followed ? colors.accent : colors.secondary }]}><Feather name={followed ? "check" : "plus"} size={14} color={followed ? colors.primary : colors.foreground} /><Text style={[styles.followText, { color: followed ? colors.primary : colors.foreground }]}>{followed ? "Seguindo" : "Seguir"}</Text></Pressable>
       {/* Puts the team's next matches in the phone calendar, with a reminder 15 minutes before each. */}
@@ -72,11 +74,8 @@ function Overview({ data, articles, colors, onRosterPress }: { data: NonNullable
   const team = toApiTeam(data.team);
   return <View>
     <Section title="Próxima partida" colors={colors} />
-    {data.nextMatch ? <MatchRow match={toMatch(data.nextMatch)} focusTeam={team} colors={colors} /> : <Empty text="Nenhuma partida agendada." colors={colors} />}
-    <Section title="Últimos resultados" colors={colors} />
-    <View style={styles.form}>{data.recentForm.length ? data.recentForm.map((item, index) => <View key={`${item}-${index}`} style={[styles.formDot, { backgroundColor: item === "W" ? colors.positive : item === "L" ? colors.destructive : colors.secondary }]}><Text style={[styles.formText, { color: item === "D" ? colors.mutedForeground : colors.background }]}>{item === "W" ? "V" : item === "L" ? "D" : "E"}</Text></View>) : <Text style={[styles.muted, { color: colors.mutedForeground }]}>Nenhuma partida finalizada.</Text>}</View>
-    <Section title="Partidas recentes" colors={colors} />
-    {data.recentMatches.length ? data.recentMatches.map((match) => <MatchRow key={match.id} match={toMatch(match)} focusTeam={team} colors={colors} />) : <Empty text="Nenhuma partida encontrada." colors={colors} />}
+    {data.nextMatch ? <UpcomingCard match={toMatch(data.nextMatch)} /> : <Empty text="Nenhuma partida agendada." colors={colors} />}
+    {data.recentMatches.length ? <RecentForm matches={data.recentMatches.map(toMatch)} teamId={team.id} /> : null}
     <Section title="Competições" colors={colors} />
     {data.competitions.length ? <View>{data.competitions.map((competition) => {
       const linked = Boolean(competition.id) && !competition.id.startsWith("unknown:");

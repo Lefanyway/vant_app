@@ -3,7 +3,7 @@ import { Feather } from "@expo/vector-icons";
 import { useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Pressable, ScrollView, Share, StyleSheet, Text, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { BackButton } from "@/components/BackButton";
 import { Pulse } from "@/components/MobileChrome";
@@ -17,6 +17,7 @@ import { TeamLink } from "@/components/TeamLink";
 import { useActiveScreen } from "@/hooks/useActiveScreen";
 import { WinProbability } from "@/components/WinProbability";
 import { ResultList } from "@/components/ResultRow";
+import { ShareButton } from "@/components/ShareButton";
 import { WatchOptions } from "@/components/WatchOptions";
 
 type Tab = "Overview" | "Performance" | "Economy" | "H2H";
@@ -51,7 +52,7 @@ function DetailContent({ match, details, detailsLoading, updatedAt, detailsError
   ];
   return <>
     <View style={[styles.hero, { backgroundColor: colors.card }]}>
-      <View style={styles.heroActions}><Pressable accessibilityRole="button" accessibilityLabel="Compartilhar partida" onPress={() => void Share.share({ message: `${match.teamA.name} vs ${match.teamB.name} · ${match.tournament} · ${match.time}` })} style={styles.heroIcon}><Feather name="share" size={21} color={colors.foreground} /></Pressable></View>
+      <View style={styles.heroActions}><ShareButton label="Compartilhar partida" message={`${match.teamA.name} vs ${match.teamB.name} · ${match.tournament} · ${match.time}`} /></View>
       <View style={styles.teams}>
         <TeamColumn team={match.teamA} colors={colors} />
         <View style={styles.scoreBlock}>
