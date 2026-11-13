@@ -40,7 +40,7 @@ export function CompetitionGroups({ matches }: { matches: Match[] }) {
           <ResolvedLogo type="competition" name={name} entityId={group[0].competitionId} logoUrl={group[0].competitionLogoUrl} size={34} />
           <View style={styles.copy}>
             <Text numberOfLines={1} style={[styles.competition, { color: colors.foreground }]}>{name}</Text>
-            {group[0].stage ? <Text numberOfLines={1} style={[styles.stage, { color: colors.mutedForeground }]}>{group[0].stage}</Text> : null}
+            {group[0].stage && !name.includes(group[0].stage) ? <Text numberOfLines={1} style={[styles.stage, { color: colors.mutedForeground }]}>{group[0].stage}</Text> : null}
           </View>
         </View>
         {group.map((match) => <MatchCard key={match.id} match={match} showDay onPress={() => openMatch(match.id, match)} />)}

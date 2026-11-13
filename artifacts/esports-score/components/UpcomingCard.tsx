@@ -13,7 +13,7 @@ export function UpcomingCard({ match }: { match: Match }) {
   const start = match.startTime ? new Date(match.scheduledTime ?? match.startTime) : null;
   const live = match.status === "Live";
   return <Pressable accessibilityRole="button" accessibilityLabel={`${match.teamA.name} contra ${match.teamB.name}, ${start ? start.toLocaleString("pt-BR", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) : "data a definir"}`} onPress={() => openMatch(match.id, match)} style={({ pressed }) => [styles.card, { backgroundColor: colors.card, borderColor: colors.border, opacity: pressed ? 0.8 : 1 }]}>
-    <Text numberOfLines={1} style={[styles.competition, { color: colors.mutedForeground }]}>{[match.tournament, match.stage].filter(Boolean).join(" · ")}</Text>
+    <Text numberOfLines={1} style={[styles.competition, { color: colors.mutedForeground }]}>{match.stage && !match.tournament.includes(match.stage) ? `${match.tournament} · ${match.stage}` : match.tournament}</Text>
     <View style={styles.body}>
       <View style={styles.when}>
         <Text style={[styles.date, { color: colors.mutedForeground }]}>{start ? start.toLocaleDateString("pt-BR", { day: "numeric", month: "short" }) : "A definir"}</Text>
