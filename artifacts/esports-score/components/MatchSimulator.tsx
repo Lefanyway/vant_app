@@ -39,6 +39,10 @@ export function MatchSimulator({ coefficients }: { coefficients: Coefficients })
         <Text style={[styles.note, { color: colors.mutedForeground }]}>Elo {Math.round(result.data.elo[0])} × {Math.round(result.data.elo[1])} · {result.data.meetings ? `${result.data.meetings} confronto${result.data.meetings > 1 ? "s" : ""} anterior${result.data.meetings > 1 ? "es" : ""}` : "nunca se enfrentaram"}</Text>
         <PredictionWhy features={result.data.features} coefficients={coefficients} home={a.name} away={b.name} />
       </View>}
+    {a || b ? <View style={styles.actions}>
+      <Pressable accessibilityRole="button" onPress={() => setTeams([null, null])} style={[styles.action, { backgroundColor: colors.secondary }]}><Feather name="rotate-ccw" size={15} color={colors.foreground} /><Text style={[styles.actionText, { color: colors.foreground }]}>Nova simulação</Text></Pressable>
+      {a && b ? <Pressable accessibilityRole="button" accessibilityLabel="Inverter os times" onPress={() => setTeams([b, a])} style={[styles.action, { backgroundColor: colors.secondary }]}><Feather name="repeat" size={15} color={colors.foreground} /><Text style={[styles.actionText, { color: colors.foreground }]}>Inverter</Text></Pressable> : null}
+    </View> : null}
     <TeamPicker visible={choosing !== null} onClose={() => setChoosing(null)} onPick={(team) => { setTeams((current) => choosing === 0 ? [team, current[1]] : [current[0], team]); setChoosing(null); }} />
   </View>;
 }
@@ -69,6 +73,9 @@ function TeamPicker({ visible, onClose, onPick }: { visible: boolean; onClose: (
 
 const styles = StyleSheet.create({
   card: { borderRadius: 22, padding: 16, gap: 14 },
+  actions: { flexDirection: "row", justifyContent: "center", gap: 10 },
+  action: { minHeight: 40, borderRadius: 20, paddingHorizontal: 16, flexDirection: "row", alignItems: "center", gap: 8 },
+  actionText: { fontSize: 14, fontFamily: font.semibold },
   slots: { flexDirection: "row", gap: 10 },
   slot: { flex: 1, minWidth: 0, borderRadius: 18, paddingVertical: 14, paddingHorizontal: 8, alignItems: "center", gap: 8 },
   plus: { width: 44, height: 44, borderRadius: 22, borderWidth: 1.5, borderStyle: "dashed", alignItems: "center", justifyContent: "center" },
