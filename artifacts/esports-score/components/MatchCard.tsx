@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { AccessibilityInfo, Animated, Platform, Pressable, StyleSheet, Text, View } from "react-native";
 import { logoSlot, ResolvedLogo } from "@/components/ResolvedLogo";
-import { TeamLink } from "@/components/TeamLink";
 import { font } from "@/constants/type";
 import { useColors } from "@/hooks/useColors";
 import { formatLabel, type Match } from "@/lib/data";
@@ -77,20 +76,19 @@ function TeamLine({ team, score, emphasize, live }: { team: Match["teamA"]; scor
   const label = listTeamLabel(team);
   return (
     <View style={styles.teamLine}>
-      <TeamLink team={team} fill>
-        <View style={styles.identity}>
-          <ResolvedLogo type="team" name={team.name} game={team.game} logoUrl={team.logoUrl} entityId={team.id} size={logoSlot.list.size} maxWidth={logoSlot.list.maxWidth} />
-          <Text
-            maxFontSizeMultiplier={1.3}
-            numberOfLines={1}
-            ellipsizeMode="tail"
-            accessibilityLabel={team.name}
-            style={[styles.name, { color: colors.foreground, fontFamily: font.semibold }, singleLine]}
-          >
-            {label}
-          </Text>
-        </View>
-      </TeamLink>
+      {/* The whole card opens the match; team pages open from the match screen. */}
+      <View style={styles.identity}>
+        <ResolvedLogo type="team" name={team.name} game={team.game} logoUrl={team.logoUrl} entityId={team.id} size={logoSlot.list.size} maxWidth={logoSlot.list.maxWidth} />
+        <Text
+          maxFontSizeMultiplier={1.3}
+          numberOfLines={1}
+          ellipsizeMode="tail"
+          accessibilityLabel={team.name}
+          style={[styles.name, { color: colors.foreground, fontFamily: font.semibold }, singleLine]}
+        >
+          {label}
+        </Text>
+      </View>
       <Text maxFontSizeMultiplier={1.2} style={[styles.score, { color: live ? colors.live : emphasize ? colors.foreground : colors.mutedForeground, fontFamily: font.bold }]}>
         {score === undefined ? "" : score}
       </Text>

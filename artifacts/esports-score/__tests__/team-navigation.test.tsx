@@ -48,6 +48,7 @@ const mockLoading = new Set<string>();
 const mockQueryKeys: unknown[][] = [];
 
 jest.mock("@/lib/api", () => ({
+  ApiError: class ApiError extends Error { status = 0; },
   fetchTeamOverview: () => Promise.resolve(null), fetchTeamMatches: () => Promise.resolve({ matches: [], hasMore: false }),
   fetchTeamRoster: () => Promise.resolve([]), fetchTeamStats: () => Promise.resolve({ stats: null, available: false }),
   fetchSearch: () => Promise.resolve([]), fetchTeams: () => Promise.resolve([]), fetchMatches: () => Promise.resolve([]),
@@ -174,10 +175,12 @@ describe("team profile entry points", () => {
     jest.useRealTimers();
   });
 
-  it("links followed teams, match cards, and match detail teams", async () => {
+  it("links followed teams and match detail teams; a match card opens the match", async () => {
     mockFavoriteTeams = ["loud"];
     renderWithQuery(<Following />);
-    fireEvent.press(await screen.findByTestId("team-link-loud"), { stopPropagation: jest.fn() });
+    // Tapping a followed team filters its matches; the link to its page shows once it is selected.
+    fireEvent.press(await screen.findByTestId("team-chip-loud", {}, { timeout: 5000 }));
+    fireEvent.press(screen.getByTestId("team-link-loud"), { stopPropagation: jest.fn() });
     expect(router.push).toHaveBeenCalledWith("/teams/loud");
 
     const match = {
@@ -186,8 +189,11 @@ describe("team profile entry points", () => {
       detail: "Match", teamA: { ...team, game: "Valorant", short: "LOUD", color: "#4C8DFF" },
       teamB: { ...opponent, game: "Valorant", short: "FNC", color: "#4C8DFF" },
     } as any;
-    fireEvent.press(renderWithQuery(<MatchCard match={match} onPress={jest.fn()} />).getByTestId("team-link-loud"), { stopPropagation: jest.fn() });
-    expect(router.push).toHaveBeenCalledWith("/teams/loud");
+    const openCard = jest.fn();
+    const card = renderWithQuery(<MatchCard match={match} onPress={openCard} />);
+    expect(card.queryByTestId("team-link-loud")).toBeNull();
+    fireEvent.press(card.getByTestId("match-match-1"));
+    expect(openCard).toHaveBeenCalled();
 
     mockQueryState["match-details"] = {
       match: { ...match },
@@ -196,7 +202,7 @@ describe("team profile entry points", () => {
     };
     mockRouteParams = { id: "match-1" };
     renderWithQuery(<MatchDetail />);
-    fireEvent.press(await screen.findByTestId("team-link-loud"), { stopPropagation: jest.fn() });
+    fireEvent.press(await screen.findByTestId("team-link-loud", {}, { timeout: 5000 }), { stopPropagation: jest.fn() });
     expect(router.push).toHaveBeenCalledWith("/teams/loud");
   });
 });

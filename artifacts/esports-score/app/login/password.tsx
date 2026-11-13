@@ -1,4 +1,4 @@
-import { router, useLocalSearchParams } from "expo-router";
+import { Redirect, router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import { Text } from "react-native";
 import { AuthField, AuthScreen, FormMessage, PrimaryButton } from "@/components/AuthScreen";
@@ -22,6 +22,8 @@ export default function LoginPassword() {
     try { await signIn(String(email), password); }
     catch (failure) { setError(authErrorMessage(failure)); setBusy(false); }
   };
+  // Opened without an e-mail (a refresh or a direct link): start from the e-mail step.
+  if (!email) return <Redirect href="/login" />;
   return (
     <AuthScreen
       back

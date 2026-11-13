@@ -26,7 +26,7 @@ export default function NotificationsScreen() {
   // Opening the list counts as reading it; the dots stay until the next visit.
   useEffect(() => () => { void markAllRead(); }, [markAllRead]);
   return (
-    <View style={{ flex: 1, backgroundColor: colors.background, paddingTop: Math.max(insets.top, 14) }}>
+    <View style={{ flex: 1, backgroundColor: colors.background, paddingTop: Math.max(insets.top, 8) }}>
       <View style={styles.nav}><BackButton /><Text style={[styles.title, { color: colors.foreground }]}>Notificações</Text><View style={styles.spacer} /></View>
       <FlatList
         data={items}

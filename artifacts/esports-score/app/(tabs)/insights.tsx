@@ -10,6 +10,8 @@ import { openMatch } from "@/lib/navigation";
 import { fetchInsights, type Upcoming } from "@/lib/insights";
 
 const pct = (value: number) => `${Math.round(value * 100)}%`;
+// Logos alone do not say who plays when a team has no logo, so the sigla goes beside it.
+const short = (team: { name: string; acronym?: string }) => team.acronym?.trim() || team.name.trim();
 
 export default function Insights() {
   const colors = useColors();
@@ -39,12 +41,14 @@ export default function Insights() {
             <View style={styles.rowCopy}>
               <View accessibilityLabel={`${match.payload.homeTeam.name} contra ${match.payload.awayTeam.name}`} style={styles.logos}>
                 <ResolvedLogo type="team" name={match.payload.homeTeam.name} entityId={match.payload.homeTeam.id} logoUrl={absoluteLogo(match.payload.homeTeam.logoUrl)} size={30} />
+                <Text numberOfLines={1} style={[styles.teamShort, { color: colors.foreground }]}>{short(match.payload.homeTeam)}</Text>
                 <Text style={[styles.rowMeta, { color: colors.mutedForeground }]}>vs</Text>
                 <ResolvedLogo type="team" name={match.payload.awayTeam.name} entityId={match.payload.awayTeam.id} logoUrl={absoluteLogo(match.payload.awayTeam.logoUrl)} size={30} />
+                <Text numberOfLines={1} style={[styles.teamShort, { color: colors.foreground }]}>{short(match.payload.awayTeam)}</Text>
               </View>
               <Text numberOfLines={1} style={[styles.rowMeta, { color: colors.mutedForeground }]}>{new Date(match.start_time).toLocaleString("pt-BR", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })} · {match.payload.competition.name}</Text>
             </View>
-            {favorite && home !== undefined ? <View style={styles.pick}><Text style={[styles.pickValue, { color: colors.primary }]}>{pct(Math.max(home, 1 - home))}</Text><Text numberOfLines={1} style={[styles.rowMeta, { color: colors.foreground }]}>{favorite.name}</Text></View> : null}
+            {favorite && home !== undefined ? <View style={styles.pick}><Text style={[styles.pickValue, { color: colors.primary }]}>{pct(Math.max(home, 1 - home))}</Text><Text numberOfLines={1} style={[styles.rowMeta, { color: colors.foreground }]}>{short(favorite)}</Text></View> : <Text style={[styles.rowMeta, { color: colors.mutedForeground }]}>Sem previsão</Text>}
           </Pressable>;
         }) : <EmptyState title="Nenhuma partida agendada" />}
 
@@ -79,7 +83,8 @@ const styles = StyleSheet.create({
   rowCopy: { flex: 1, minWidth: 0, gap: 3 },
   rowMeta: { fontSize: 11, fontFamily: font.medium },
   pick: { alignItems: "flex-end", maxWidth: 130 },
-  logos: { flexDirection: "row", alignItems: "center", gap: 8 },
+  logos: { flexDirection: "row", alignItems: "center", gap: 6 },
+  teamShort: { flexShrink: 1, fontSize: 13, fontFamily: font.semibold },
   pickValue: { fontSize: 18, fontFamily: font.bold, fontVariant: ["tabular-nums"] },
   rank: { flexDirection: "row", alignItems: "center", gap: 10, minHeight: 40 },
   position: { width: 18, fontSize: 13, fontFamily: font.bold, textAlign: "right" },

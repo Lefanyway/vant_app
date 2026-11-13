@@ -52,7 +52,7 @@ export default function Profile() {
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
-    <View style={[styles.nav, { paddingTop: Math.max(insets.top, 14), paddingHorizontal: 20 }]}><BackButton /></View>
+    <View style={[styles.nav, { paddingTop: Math.max(insets.top, 8), paddingHorizontal: 8 }]}><BackButton /></View>
     {/* The name and password fields scroll above the keyboard instead of hiding behind it. */}
     <KeyboardAwareScrollViewCompat style={{ flex: 1 }} bottomOffset={24} contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + 40 }]}>
 

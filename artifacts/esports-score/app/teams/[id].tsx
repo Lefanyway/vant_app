@@ -14,8 +14,8 @@ import { ResolvedLogo } from "@/components/ResolvedLogo";
 import { TeamLink } from "@/components/TeamLink";
 import { useApp } from "@/context/AppContext";
 import { useColors } from "@/hooks/useColors";
-import { errorMessage, fetchTeamMatches, fetchTeamNews, fetchTeamOverview, fetchTeamRoster, fetchTeamStats, toApiTeam, toMatch, type ApiPlayer, type TeamNewsArticle } from "@/lib/api";
-import { openCompetition, openMatch } from "@/lib/navigation";
+import { ApiError, errorMessage, fetchTeamMatches, fetchTeamNews, fetchTeamOverview, fetchTeamRoster, fetchTeamStats, toApiTeam, toMatch, type ApiPlayer, type TeamNewsArticle } from "@/lib/api";
+import { goBackOrHome, openCompetition, openMatch } from "@/lib/navigation";
 import type { Match, Team } from "@/lib/data";
 import { matchDayLabel } from "@/lib/matches";
 
@@ -37,10 +37,10 @@ export default function TeamDetail() {
   const swipe = useSwipeTabs(tabs, tab, setTab);
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
-    <View style={[styles.nav, { paddingTop: insets.top, paddingHorizontal: 16 }]}><BackButton /></View>
+    <View style={[styles.nav, { paddingTop: Math.max(insets.top, 8), paddingHorizontal: 8 }]}><BackButton /></View>
     <GestureDetector gesture={swipe.gesture}>
     <ScrollView style={styles.screen} contentContainerStyle={{ paddingBottom: 46 }}>
-      {overview.isLoading ? <TeamSkeleton colors={colors} /> : overview.isError || !team ? <View style={styles.center}><Text style={[styles.message, { color: colors.mutedForeground }]}>{overview.isError ? errorMessage(overview.error, "Não foi possível carregar a equipe.") : "Equipe não encontrada."}</Text><Pressable onPress={() => overview.refetch()}><Text style={[styles.retry, { color: colors.primary }]}>Tentar novamente</Text></Pressable></View> : <>
+      {overview.isLoading ? <TeamSkeleton colors={colors} /> : overview.isError || !team ? <View style={styles.center}><Text style={[styles.message, { color: colors.mutedForeground }]}>{overview.isError && !(overview.error instanceof ApiError && overview.error.status === 404) ? errorMessage(overview.error, "Não foi possível carregar a equipe.") : "Equipe não encontrada."}</Text>{overview.error instanceof ApiError && overview.error.status === 404 ? <Pressable accessibilityRole="button" onPress={goBackOrHome}><Text style={[styles.retry, { color: colors.primary }]}>Voltar</Text></Pressable> : <Pressable onPress={() => overview.refetch()}><Text style={[styles.retry, { color: colors.primary }]}>Tentar novamente</Text></Pressable>}</View> : <>
         <TeamHeader team={team} colors={colors} />
         <View accessibilityRole="tablist" style={[styles.tabs, { borderBottomColor: colors.border }]}>{tabs.map((item) => <Pressable key={item} accessibilityRole="tab" accessibilityState={{ selected: tab === item }} onPress={() => setTab(item)} style={[styles.tab, tab === item && { borderBottomColor: colors.primary }]}><Text numberOfLines={1} style={[styles.tabText, { color: tab === item ? colors.primary : colors.mutedForeground }]}>{({ Overview: "Visão geral", Matches: "Partidas", Roster: "Elenco", Stats: "Estatísticas" })[item]}</Text></Pressable>)}</View>
         <Animated.View key={tab} entering={swipe.entering}>

@@ -7,10 +7,10 @@ import { Pressable, ScrollView, Share, StyleSheet, Text, View } from "react-nati
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { BackButton } from "@/components/BackButton";
 import { Pulse } from "@/components/MobileChrome";
-import { applyMatchStats, errorMessage, fetchMatch, fetchMatchDetails, fetchMatchStats, type MatchDetails } from "@/lib/api";
+import { ApiError, applyMatchStats, errorMessage, fetchMatch, fetchMatchDetails, fetchMatchStats, type MatchDetails } from "@/lib/api";
 import type { Match } from "@/lib/data";
 import { hasScore } from "@/lib/matches";
-import { openCompetition, openMatch } from "@/lib/navigation";
+import { goBackOrHome, openCompetition, openMatch } from "@/lib/navigation";
 import { TeamBadge } from "@/components/MatchCard";
 import { useColors } from "@/hooks/useColors";
 import { TeamLink } from "@/components/TeamLink";
@@ -31,10 +31,12 @@ export default function MatchDetail() {
   const statsQuery = useQuery({ queryKey: ["match-stats", id], queryFn: ({ signal }) => fetchMatchStats(String(id), signal), enabled: Boolean(id), staleTime: 60_000 });
   const knownMatch = detailsQuery.data?.match ?? previewQuery.data;
   const details = detailsQuery.data ? applyMatchStats(detailsQuery.data, statsQuery.data) : null;
+  // A missing match gets a way back instead of a retry that would fail again.
+  const notFound = [previewQuery.error, detailsQuery.error].some(error => error instanceof ApiError && error.status === 404) || (!previewQuery.isError && !detailsQuery.isError);
   return <View style={{ flex: 1, backgroundColor: colors.background }}>
     <View style={[styles.nav, { paddingTop: Math.max(insets.top, 8), paddingHorizontal: 8 }]}><BackButton /></View>
     <ScrollView style={styles.screen} contentContainerStyle={{ paddingBottom: 50 }}>
-    {knownMatch ? <DetailContent match={knownMatch} details={details} detailsLoading={detailsQuery.isLoading} updatedAt={detailsQuery.dataUpdatedAt} detailsError={detailsQuery.isError ? errorMessage(detailsQuery.error, "Não foi possível carregar o restante da partida.") : null} onRetry={() => { void detailsQuery.refetch(); void statsQuery.refetch(); }} tab={tab} setTab={setTab} colors={colors} /> : previewQuery.isLoading || detailsQuery.isLoading ? <DetailSkeleton colors={colors} /> : <View style={styles.errorBox}><Text style={[styles.message, { color: colors.mutedForeground }]}>{detailsQuery.isError || previewQuery.isError ? errorMessage(detailsQuery.error ?? previewQuery.error, "Não foi possível carregar a partida.") : "Partida não encontrada."}</Text><Pressable onPress={() => { void previewQuery.refetch(); void detailsQuery.refetch(); }}><Text style={[styles.retry, { color: colors.primary }]}>Tentar de novo</Text></Pressable></View>}
+    {knownMatch ? <DetailContent match={knownMatch} details={details} detailsLoading={detailsQuery.isLoading} updatedAt={detailsQuery.dataUpdatedAt} detailsError={detailsQuery.isError ? errorMessage(detailsQuery.error, "Não foi possível carregar o restante da partida.") : null} onRetry={() => { void detailsQuery.refetch(); void statsQuery.refetch(); }} tab={tab} setTab={setTab} colors={colors} /> : previewQuery.isLoading || detailsQuery.isLoading ? <DetailSkeleton colors={colors} /> : notFound ? <View style={styles.errorBox}><Text style={[styles.message, { color: colors.mutedForeground }]}>Partida não encontrada.</Text><Pressable onPress={goBackOrHome}><Text style={[styles.retry, { color: colors.primary }]}>Voltar</Text></Pressable></View> : <View style={styles.errorBox}><Text style={[styles.message, { color: colors.mutedForeground }]}>{errorMessage(detailsQuery.error ?? previewQuery.error, "Não foi possível carregar a partida.")}</Text><Pressable onPress={() => { void previewQuery.refetch(); void detailsQuery.refetch(); }}><Text style={[styles.retry, { color: colors.primary }]}>Tentar novamente</Text></Pressable></View>}
   </ScrollView>
   </View>;
 }
@@ -60,10 +62,10 @@ function DetailContent({ match, details, detailsLoading, updatedAt, detailsError
       </View>
       {details && updatedAt ? <Text style={[styles.updated, { color: colors.mutedForeground }]}>Atualizado às {new Date(updatedAt).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}</Text> : null}
     </View>
-    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tabs}>{tabs.map(item => <Pressable key={item.key} accessibilityRole="tab" accessibilityState={{ selected: tab === item.key }} onPress={() => setTab(item.key)} style={[styles.tab, { borderBottomColor: tab === item.key ? colors.foreground : "transparent" }]}><Text style={[styles.tabText, { color: tab === item.key ? colors.foreground : colors.mutedForeground }]}>{item.label}</Text></Pressable>)}</ScrollView>
+    {tabs.length > 1 ? <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tabs}>{tabs.map(item => <Pressable key={item.key} accessibilityRole="tab" accessibilityState={{ selected: tab === item.key }} onPress={() => setTab(item.key)} style={[styles.tab, { borderBottomColor: tab === item.key ? colors.foreground : "transparent" }]}><Text style={[styles.tabText, { color: tab === item.key ? colors.foreground : colors.mutedForeground }]}>{item.label}</Text></Pressable>)}</ScrollView> : null}
     <Pressable disabled={!match.competitionId || match.competitionId.startsWith("unknown:")} onPress={() => match.competitionId && openCompetition(match.competitionId)} style={[styles.competitionRow, { backgroundColor: colors.card }]}>
       <ResolvedLogo type="competition" name={match.tournament} entityId={match.competitionId} logoUrl={match.competitionLogoUrl} size={34} />
-      <Text style={[styles.competitionCopy, { color: colors.foreground }]}>{match.tournament}<Text style={{ color: colors.mutedForeground }}>{"\n"}Valorant{match.format ? ` · ${match.format}` : ""}</Text></Text>
+      <Text style={[styles.competitionCopy, { color: colors.foreground }]}>{match.tournament}<Text style={{ color: colors.mutedForeground }}>{"\n"}{[match.format, match.startTime ? new Date(match.startTime).toLocaleString("pt-BR", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }) : "Data a definir"].filter(Boolean).join(" · ")}</Text></Text>
       <Feather name="chevron-right" size={22} color={colors.primary} />
     </Pressable>
     {details ? <>{tab === "Overview" ? <Overview details={details} colors={colors} /> : tab === "Performance" ? <Performance details={details} colors={colors} /> : tab === "Economy" ? <Economy details={details} colors={colors} /> : <H2H details={details} colors={colors} />}</> : detailsLoading ? <DetailSkeleton colors={colors} /> : <View style={styles.errorBox}><Text style={[styles.message, { color: colors.mutedForeground }]}>{detailsError ?? "Não foi possível carregar os detalhes."}</Text><Pressable onPress={onRetry}><Text style={[styles.retry, { color: colors.primary }]}>Tentar novamente</Text></Pressable></View>}
@@ -74,12 +76,6 @@ function Overview({ details, colors }: { details: MatchDetails; colors: ReturnTy
   return <View>
     {match.streams?.length && match.status !== "Finished" && match.status !== "Cancelled" ? <WatchOptions streams={match.streams} /> : null}
     <WinProbability match={match} />
-    <SectionTitle title="Resumo da série" colors={colors} />
-    <View style={[styles.panel, { backgroundColor: colors.card, borderColor: colors.border }]}>
-      <InfoRow label="Competição" value={match.tournament} colors={colors} />
-      {match.format ? <InfoRow label="Formato" value={match.format} colors={colors} /> : null}
-      <InfoRow label="Início" value={match.startTime ? `${new Date(match.startTime).toLocaleString("pt-BR", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}` : "A definir"} colors={colors} last />
-    </View>
     {details.maps.some(map => map.mapName) ? <SectionTitle title="Mapas" colors={colors} /> : null}
     {!details.maps.some(map => map.mapName) ? null : <View style={[styles.panel, { backgroundColor: colors.card, borderColor: colors.border }]}>{details.maps.filter((map) => map.mapName).map((map, index, named) => <InfoRow key={map.id} last={index === named.length - 1} label={map.mapName ?? `Mapa ${map.mapNumber}`} value={typeof map.homeScore === "number" && typeof map.awayScore === "number" ? `${map.homeScore}–${map.awayScore}` : "A definir"} colors={colors} />)}</View>}
     <RecentMatches details={details} colors={colors} />
@@ -109,7 +105,7 @@ function PastMatch({ match, colors, focusTeamId }: { match: Match; colors: Retur
   const own = focusTeamId === match.teamA.id ? match.scoreA : match.scoreB;
   const opponent = focusTeamId === match.teamA.id ? match.scoreB : match.scoreA;
   const result = !focusTeamId || !scored || own === undefined || opponent === undefined ? "—" : own > opponent ? "W" : own < opponent ? "L" : "D";
-  return <Pressable onPress={() => openMatch(match.id, match)} style={[styles.pastMatch, { backgroundColor: colors.card, borderColor: colors.border }]}><Text style={[styles.resultMark, { color: result === "W" ? colors.positive : result === "L" ? colors.destructive : colors.mutedForeground }]}>{result === "W" ? "V" : result === "L" ? "D" : result === "D" ? "E" : "—"}</Text><Text style={[styles.pastScore, { color: colors.foreground }]}>{hasScore(match) ? `${match.scoreA}–${match.scoreB}` : "—"}</Text><Text style={[styles.pastTeams, { color: colors.foreground }]} numberOfLines={1}>{match.teamA.name} vs {match.teamB.name}</Text><Text style={[styles.pastDate, { color: colors.mutedForeground }]}>{match.startTime ? new Date(match.startTime).toLocaleDateString("pt-BR", { month: "short", day: "numeric" }) : "A definir"}</Text></Pressable>;
+  return <Pressable onPress={() => openMatch(match.id, match)} style={[styles.pastMatch, { backgroundColor: colors.card, borderColor: colors.border }]}><Text style={[styles.resultMark, { color: result === "W" ? colors.positive : result === "L" ? colors.destructive : colors.mutedForeground }]}>{result === "W" ? "V" : result === "L" ? "D" : result === "D" ? "E" : "—"}</Text><Text style={[styles.pastScore, { color: colors.foreground }]}>{!hasScore(match) ? "—" : focusTeamId ? `${own}–${opponent}` : `${match.scoreA}–${match.scoreB}`}</Text><Text style={[styles.pastTeams, { color: colors.foreground }]} numberOfLines={1}>{focusTeamId ? `vs ${focusTeamId === match.teamA.id ? match.teamB.name : match.teamA.name}` : `${match.teamA.name} vs ${match.teamB.name}`}</Text><Text style={[styles.pastDate, { color: colors.mutedForeground }]}>{match.startTime ? new Date(match.startTime).toLocaleDateString("pt-BR", { month: "short", day: "numeric" }) : "A definir"}</Text></Pressable>;
 }
 
 function TeamColumn({ team, colors }: { team: Match["teamA"]; colors: ReturnType<typeof useColors> }) { return <TeamLink team={team} fill><View style={styles.teamColumn}><TeamBadge {...team} size={62} /><Text numberOfLines={2} style={[styles.teamName, { color: colors.foreground }]}>{team.name}</Text></View></TeamLink>; }
