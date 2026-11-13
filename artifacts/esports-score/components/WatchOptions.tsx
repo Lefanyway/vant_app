@@ -9,6 +9,7 @@ const platforms = {
   twitch: { label: "Twitch", color: "#9146FF", icon: "twitch" },
   youtube: { label: "YouTube", color: "#FF0000", icon: "youtube" },
   kick: { label: "Kick", color: "#53FC18", icon: null },
+  weibo: { label: "Weibo", color: "#E6162D", icon: "tv" },
   other: { label: "Transmissão", color: "#282E34", icon: "tv" },
 } as const;
 
@@ -19,12 +20,22 @@ export function describeStream(stream: Stream) {
   const [, rawHost = "", rawPath = ""] = /^https?:\/\/([^/?#]+)([^?#]*)/i.exec(stream.url) ?? [];
   const host = rawHost.toLowerCase().replace(/^www\./, "");
   const path = rawPath.split("/").filter(Boolean);
-  const platform: keyof typeof platforms = host.endsWith("twitch.tv") ? "twitch" : host.endsWith("youtube.com") || host === "youtu.be" ? "youtube" : host.endsWith("kick.com") ? "kick" : "other";
+  const platform: keyof typeof platforms = host.endsWith("twitch.tv") ? "twitch" : host.endsWith("youtube.com") || host === "youtu.be" ? "youtube" : host.endsWith("kick.com") ? "kick" : host.endsWith("weibo.com") ? "weibo" : "other";
   // Channel pages carry the channel in the path; video links do not, so the platform name stands in.
   const first = path[0] ?? "";
-  const channel = platform === "youtube" ? (first.startsWith("@") ? first.slice(1) : ["c", "user"].includes(first) && path[1] ? path[1] : platforms.youtube.label) : first && first !== "videos" ? first : platforms[platform].label;
+  const channel = platform === "youtube" ? (first.startsWith("@") ? first.slice(1) : ["c", "user"].includes(first) && path[1] ? path[1] : platforms.youtube.label) : first && first !== "videos" && !/^\d+$/.test(first) ? first : platforms[platform].label;
   const language = stream.language ? languages[stream.language.toLowerCase().slice(0, 2)] ?? stream.language.toUpperCase() : null;
   return { platform, channel, language };
+}
+
+// Riot's official channels, for VCT matches the provider lists without a stream.
+export function officialStreams(tournament: string): Stream[] {
+  if (!/\b(vct|champions|masters|game changers)\b/i.test(tournament)) return [];
+  return [
+    { url: "https://www.twitch.tv/valorant_br", language: "pt", official: true },
+    { url: "https://www.twitch.tv/valorant", language: "en", official: true },
+    { url: "https://www.youtube.com/@VALORANTEsports", language: "en", official: true },
+  ];
 }
 
 // Portuguese first, then official broadcasts.

@@ -19,7 +19,7 @@ import { WinProbability } from "@/components/WinProbability";
 import { ResultList } from "@/components/ResultRow";
 import { RecentByTeam } from "@/components/RecentByTeam";
 import { ShareButton } from "@/components/ShareButton";
-import { WatchOptions } from "@/components/WatchOptions";
+import { officialStreams, WatchOptions } from "@/components/WatchOptions";
 
 type Tab = "Overview" | "Performance" | "Economy" | "H2H";
 
@@ -77,7 +77,7 @@ function DetailContent({ match, details, detailsLoading, updatedAt, detailsError
 function Overview({ details, colors }: { details: MatchDetails; colors: ReturnType<typeof useColors> }) {
   const match = details.match;
   return <View>
-    {match.streams?.length && match.status !== "Finished" && match.status !== "Cancelled" ? <WatchOptions streams={match.streams} /> : null}
+    {match.status !== "Finished" && match.status !== "Cancelled" && (match.streams?.length || officialStreams(match.tournament).length) ? <WatchOptions streams={match.streams?.length ? match.streams : officialStreams(match.tournament)} /> : null}
     <WinProbability match={match} />
     {details.maps.some(map => map.mapName) ? <SectionTitle title="Mapas" colors={colors} /> : null}
     {!details.maps.some(map => map.mapName) ? null : <View style={[styles.panel, { backgroundColor: colors.card, borderColor: colors.border }]}>{details.maps.filter((map) => map.mapName).map((map, index, named) => <InfoRow key={map.id} last={index === named.length - 1} label={map.mapName ?? `Mapa ${map.mapNumber}`} value={typeof map.homeScore === "number" && typeof map.awayScore === "number" ? `${map.homeScore}–${map.awayScore}` : "A definir"} colors={colors} />)}</View>}

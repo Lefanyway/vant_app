@@ -13,3 +13,10 @@ test("lists the Portuguese broadcast first", () => {
   expect(links[0].props.accessibilityLabel).toBe("Assistir em gaules, Twitch");
   expect(screen.getByText("Twitch · Inglês · oficial")).toBeTruthy();
 });
+
+test("names Weibo and falls back to Riot's channels for VCT", () => {
+  expect(describeStream({ url: "https://weibo.com/7864854446", language: "zh" })).toMatchObject({ platform: "weibo", channel: "Weibo" });
+  const { officialStreams } = require("@/components/WatchOptions");
+  expect(officialStreams("VCT 2026: Americas Stage 2")[0].url).toBe("https://www.twitch.tv/valorant_br");
+  expect(officialStreams("Asia Pacific Predator League")).toEqual([]);
+});
