@@ -8,11 +8,18 @@ import { useApp } from "@/context/AppContext";
 import { useColors } from "@/hooks/useColors";
 import { supabase } from "@/lib/supabase";
 
-type Followed = { kind: "team" | "competition"; entity_id: string; notify: boolean; name: string; logo_url?: string };
+type Followed = { kind: "team" | "competition"; entity_id: string; notify: boolean | null; name: string; logo_url?: string };
 
 // The account's followed teams and competitions, with names and logos from the stored catalog.
 async function fetchFollowed(): Promise<Followed[]> {
-  const { data, error } = await supabase.from("favorites").select("kind, entity_id, notify").in("kind", ["team", "competition"]);
+  const kinds = ["team", "competition"];
+  let { data, error } = await supabase.from("favorites").select("kind, entity_id, notify").in("kind", kinds);
+  // Until the notify column exists in the database, list the favorites anyway and hide the bell (notify: null).
+  if (error && (error.code === "42703" || /notify/i.test(error.message))) {
+    const plain = await supabase.from("favorites").select("kind, entity_id").in("kind", kinds);
+    data = (plain.data ?? []).map((row) => ({ ...row, notify: null }));
+    error = plain.error;
+  }
   if (error) throw error;
   const ids = (kind: string) => (data ?? []).filter((row) => row.kind === kind).map((row) => row.entity_id as string);
   const [teams, competitions] = await Promise.all([
@@ -46,11 +53,11 @@ export function FollowingSettings() {
             <ResolvedLogo type={item.kind} name={item.name} entityId={item.entity_id} logoUrl={item.logo_url} size={30} />
             <View style={styles.copy}>
               <Text numberOfLines={1} style={[styles.name, { color: colors.foreground }]}>{item.name.trim()}</Text>
-              <Text style={[styles.meta, { color: colors.mutedForeground }]}>{item.kind === "team" ? "Equipe" : "Competição"} · {item.notify ? "com avisos" : "sem avisos"}</Text>
+              <Text style={[styles.meta, { color: colors.mutedForeground }]}>{item.kind === "team" ? "Equipe" : "Competição"}{item.notify === null ? "" : item.notify ? " · com avisos" : " · sem avisos"}</Text>
             </View>
-            <Pressable accessibilityRole="switch" accessibilityState={{ checked: item.notify }} accessibilityLabel={`Avisos de ${item.name}`} onPress={() => void setNotify(item)} style={styles.icon}>
+            {item.notify === null ? null : <Pressable accessibilityRole="switch" accessibilityState={{ checked: item.notify }} accessibilityLabel={`Avisos de ${item.name}`} onPress={() => void setNotify(item)} style={styles.icon}>
               <Feather name={item.notify ? "bell" : "bell-off"} size={20} color={item.notify ? colors.primary : colors.mutedForeground} />
-            </Pressable>
+            </Pressable>}
             <Pressable accessibilityRole="button" accessibilityLabel={`Deixar de seguir ${item.name}`} onPress={() => (item.kind === "team" ? toggleFavorite : toggleCompetition)(item.entity_id)} style={styles.icon}>
               <Ionicons name="star" size={20} color={colors.primary} />
             </Pressable>
