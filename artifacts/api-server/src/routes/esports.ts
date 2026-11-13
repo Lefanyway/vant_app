@@ -50,7 +50,12 @@ router.get("/esports/assets/logo", async (req: Request, res, next) => {
     const logo = await getLogo(url);
     if ("status" in logo) return res.status(logo.status).end();
     // The source URL changes when the team uploads a new logo, so a week of client caching is safe.
-    return res.type(logo.contentType).set("Cache-Control", "public, max-age=604800").send(logo.body);
+    // Opened directly in a browser, an image may not run anything or load anything else.
+    return res.type(logo.contentType).set({
+      "Cache-Control": "public, max-age=604800",
+      "Content-Security-Policy": "default-src 'none'; style-src 'unsafe-inline'; img-src data:; sandbox",
+      "X-Content-Type-Options": "nosniff",
+    }).send(logo.body);
   } catch (error) { return next(error); }
 });
 

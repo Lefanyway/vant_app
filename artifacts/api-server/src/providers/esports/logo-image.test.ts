@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { PNG } from "pngjs";
-import { normalizePng, normalizeSvg } from "./logo-image.ts";
+import { normalizePng, normalizeSvg, pngSize, sanitizeSvg } from "./logo-image.ts";
 
 function image(width: number, height: number, paint: (x: number, y: number, data: Buffer, index: number) => void) {
   const png = new PNG({ width, height });
@@ -67,4 +67,21 @@ test("adds a viewBox and a light plate only to a black SVG", () => {
   assert.match(dark, /fill="#000"/);
   const colored = normalizeSvg(`<svg viewBox="0 0 10 10"><path fill="#ff4655" d="M0 0h10v10H0z"/></svg>`);
   assert.equal(colored.includes("data-vant-plate"), false);
+});
+
+test("strips everything from an SVG logo that could run or load something", () => {
+  const hostile = `<svg xmlns="http://www.w3.org/2000/svg" onload="alert(1)"><script>alert(2)</script><foreignObject><div>x</div></foreignObject><image href="https://evil.test/x.png"/><a xlink:href="javascript:alert(3)"><rect fill="url(https://evil.test/p)" width="4" height="4"/></a><style>@import url(https://evil.test/s.css);</style><use href="#shape"/></svg>`;
+  const clean = sanitizeSvg(hostile);
+  for (const banned of ["onload", "<script", "foreignObject", "evil.test", "javascript:", "@import"]) assert.equal(clean.includes(banned), false, banned);
+  assert.match(clean, /<use href="#shape"\/>/);
+  assert.match(normalizeSvg(hostile), /^<svg/);
+});
+
+test("reads PNG dimensions from the header without decoding", () => {
+  const png = image(3, 2, (_x, _y, data, index) => { data[index + 3] = 255; });
+  assert.deepEqual(pngSize(png), { width: 3, height: 2 });
+  const huge = Buffer.from(png);
+  huge.writeUInt32BE(50_000, 16);
+  assert.equal(normalizePng(huge), null);
+  assert.equal(pngSize(Buffer.from("not a png")), null);
 });

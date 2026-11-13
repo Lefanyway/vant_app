@@ -65,7 +65,7 @@ npm run check:phone
 
 O script imprime o endereco da API. Abra o endereco terminado em
 `/api/healthz` no Safari do celular: deve aparecer `{"status":"ok"}`.
-O IP observado nesta verificacao foi 192.168.0.10 e a API estava na porta 5000,
+Exemplo: com o computador em 192.168.0.10, o endereco fica `http://192.168.0.10:5000`,
 mas o script detecta o IP novamente em cada execucao.
 
 - Timeout ANTES de aparecer o app: confira Expo rodando, QR novo, mesmo Wi-Fi,

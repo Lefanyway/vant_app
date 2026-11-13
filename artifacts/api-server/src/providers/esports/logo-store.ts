@@ -9,9 +9,26 @@ type LogoResult = Logo | { status: number };
 
 const ALLOWED_HOSTS = ["images.pandascore.co", "cdn.pandascore.co", "cdn-api.pandascore.co"];
 const MEMORY_LIMIT = 512;
+const MAX_BYTES = 2 * 1024 * 1024;
+
+// Reads the body in chunks and gives up past MAX_BYTES, so a huge or endless response never fills memory.
+async function readLimited(response: Response): Promise<Buffer | null> {
+  if (!response.body) return Buffer.alloc(0);
+  const reader = response.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let total = 0;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) return Buffer.concat(chunks);
+    total += value.byteLength;
+    if (total > MAX_BYTES) { await reader.cancel().catch(() => undefined); return null; }
+    chunks.push(value);
+  }
+}
+
 // Prepared logos survive API restarts here, so a new session does not download and redraw every logo again.
 // Bump the folder name when prepareLogo changes its output.
-const diskDir = process.env.LOGO_CACHE_DIR || path.join(tmpdir(), "vant-logos-v2");
+const diskDir = process.env.LOGO_CACHE_DIR || path.join(tmpdir(), "vant-logos-v3");
 
 const memory = new Map<string, Logo>();
 const pending = new Map<string, Promise<LogoResult>>();
@@ -51,9 +68,10 @@ async function load(url: URL): Promise<LogoResult> {
   if (!response.ok) return { status: 404 };
   const contentType = response.headers.get("content-type") ?? "";
   if (!contentType.startsWith("image/")) return { status: 415 };
-  const body = Buffer.from(await response.arrayBuffer());
+  if (Number(response.headers.get("content-length") ?? 0) > MAX_BYTES) return { status: 413 };
+  const body = await readLimited(response);
+  if (body === null) return { status: 413 };
   if (!body.length) return { status: 404 };
-  if (body.length > 2 * 1024 * 1024) return { status: 413 };
 
   const logo = prepareLogo(body, contentType);
   mkdir(diskDir, { recursive: true })

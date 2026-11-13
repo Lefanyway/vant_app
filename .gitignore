@@ -56,3 +56,13 @@ Thumbs.db
 
 # Local test account for the Supabase project (contains its password)
 supabase/seed.sql
+
+# Third-party team and competition logos are loaded from PandaScore at runtime, never committed
+artifacts/esports-score/assets/generated/teams/
+artifacts/esports-score/assets/generated/competitions/
+artifacts/esports-score/static-build/
+
+# Local work material that stays out of the repository
+attached_assets/
+.agents/
+.local/

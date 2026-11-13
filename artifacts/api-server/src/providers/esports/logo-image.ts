@@ -82,7 +82,17 @@ function composite(source: PNG, originX: number, originY: number, sourceWidth: n
   }
 }
 
+const MAX_SOURCE_EDGE = 4000;
+
+// Width and height sit in the IHDR chunk at a fixed offset, so oversized images are refused before decoding.
+export function pngSize(input: Buffer): { width: number; height: number } | null {
+  if (input.length < 24 || input.readUInt32BE(0) !== 0x89504e47 || input.toString("ascii", 12, 16) !== "IHDR") return null;
+  return { width: input.readUInt32BE(16), height: input.readUInt32BE(20) };
+}
+
 export function normalizePng(input: Buffer): Buffer | null {
+  const size = pngSize(input);
+  if (!size || !size.width || !size.height || size.width > MAX_SOURCE_EDGE || size.height > MAX_SOURCE_EDGE) return null;
   let source: PNG;
   try { source = PNG.sync.read(input); } catch { return null; }
   if (!source.width || !source.height || source.width > 4000 || source.height > 4000) return null;
@@ -139,9 +149,24 @@ function isDarkPaint(color: string) {
   return color === "currentcolor" || color === "black" || color === "#000" || color === "#000000" || color === "#111" || color === "#111111" || color === "#0d0d0d";
 }
 
+// A logo is shapes and colors only: scripts, event handlers, embedded HTML and outside references are removed.
+// The route also sends a sandboxing Content-Security-Policy, so anything missed here still cannot run.
+export function sanitizeSvg(source: string) {
+  return source
+    .replace(/<!DOCTYPE[^>]*>/gi, "")
+    .replace(/<!ENTITY[^>]*>/gi, "")
+    .replace(/<(script|foreignObject|iframe|object|embed|audio|video|handler|listener)\b[\s\S]*?<\/\1\s*>/gi, "")
+    .replace(/<(script|foreignObject|iframe|object|embed|audio|video|handler|listener)\b[^>]*\/?>/gi, "")
+    .replace(/\s+on[a-z]+\s*=\s*("[^"]*"|'[^']*'|[^\s>]+)/gi, "")
+    .replace(/\s+(?:xlink:)?href\s*=\s*("(?!#)[^"]*"|'(?!#)[^']*')/gi, "")
+    .replace(/@import[^;]*;?/gi, "")
+    .replace(/url\(\s*(['"]?)(?!#)[^)]*\1\s*\)/gi, "none")
+    .replace(/javascript:/gi, "");
+}
+
 export function normalizeSvg(source: string) {
-  let svg = source.trim();
-  if (!/<svg[\s>]/i.test(svg)) return source;
+  let svg = sanitizeSvg(source.trim());
+  if (!/<svg[\s>]/i.test(svg)) return svg;
   if (!/viewBox=/i.test(svg)) {
     const width = /width=["']([\d.]+)/i.exec(svg);
     const height = /height=["']([\d.]+)/i.exec(svg);
