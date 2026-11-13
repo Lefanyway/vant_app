@@ -4,6 +4,7 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { AuthField, FormMessage, PrimaryButton } from "@/components/AuthScreen";
 import { BackButton } from "@/components/BackButton";
+import { FollowingSettings } from "@/components/FollowingSettings";
 import { KeyboardAwareScrollViewCompat } from "@/components/KeyboardAwareScrollViewCompat";
 import { font } from "@/constants/type";
 import { useAuth } from "@/context/AuthContext";
@@ -69,6 +70,9 @@ export default function Profile() {
       </View> : null}
 
       {message ? <View style={styles.message}><FormMessage text={message.text} tone={message.tone} /></View> : null}
+
+      <Text style={[styles.section, { color: colors.mutedForeground }]}>Seguindo</Text>
+      <FollowingSettings />
 
       <Text style={[styles.section, { color: colors.mutedForeground }]}>Preferências</Text>
       <View style={[styles.panel, { backgroundColor: colors.card }]}>
