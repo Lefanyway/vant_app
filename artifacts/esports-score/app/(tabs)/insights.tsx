@@ -7,6 +7,7 @@ import { EmptyState, ListSkeleton } from "@/components/MobileChrome";
 import { MatchSimulator } from "@/components/MatchSimulator";
 import { PredictionWhy } from "@/components/PredictionWhy";
 import { ResolvedLogo } from "@/components/ResolvedLogo";
+import { ModelExplainer } from "@/components/ModelExplainer";
 import { font } from "@/constants/type";
 import { useColors } from "@/hooks/useColors";
 import { absoluteLogo } from "@/lib/api";
@@ -37,6 +38,7 @@ export default function Insights() {
           </View>
           <Text style={[styles.note, { color: colors.mutedForeground }]}>Acertos em {data.run.test_matches.toLocaleString("pt-BR")} partidas, cada uma prevista só com o que aconteceu antes dela.</Text>
         </View> : null}
+        <ModelExplainer />
 
         {results.length ? <>
           {section("Como o modelo foi")}
