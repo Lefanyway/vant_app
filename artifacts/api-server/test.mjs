@@ -6,8 +6,8 @@ const output = ".test-dist/adapter.test.mjs";
 const routeOutput = ".test-dist/esports-route.test.mjs";
 const logoOutput = ".test-dist/logo-image.test.mjs";
 // Self-contained unit tests: bundled as they are, one output each.
-const plainTests = ["pandascore/news", "cache", "search-rank", "redis-cache"];
-const plainOutputs = plainTests.map((name) => `.test-dist/${name.replace("/", "-")}.test.mjs`);
+const plainTests = ["pandascore/news", "cache", "search-rank", "redis-cache", "supabase/store", "supabase/sync", "supabase/read"];
+const plainOutputs = plainTests.map((name) => `.test-dist/${name.replaceAll("/", "-")}.test.mjs`);
 await rm(".test-dist", { recursive: true, force: true });
 await Promise.all([
   ...plainTests.map((name, index) => build({
@@ -17,6 +17,8 @@ await Promise.all([
     platform: "node",
     outfile: plainOutputs[index],
     sourcemap: "inline",
+    // The real logger, loaded from node_modules: pino cannot be bundled.
+    external: ["pino", "pino-pretty"],
   })),
   build({
   entryPoints: ["src/providers/esports/vlr/adapter.test.ts"],

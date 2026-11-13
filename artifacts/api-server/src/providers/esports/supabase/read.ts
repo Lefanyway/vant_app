@@ -19,8 +19,8 @@ export function supabaseServices() {
 }
 
 // Days already synced are read from Supabase; days around now still come from the provider, then are saved.
-export function withSupabaseStore(provider: EsportsDataProvider): EsportsDataProvider {
-  const { store, sync } = supabaseServices();
+export function withSupabaseStore(provider: EsportsDataProvider, services: { store: SupabaseStore | null; sync: Pick<SupabaseSync, 'saveMatches'> | null } = supabaseServices()): EsportsDataProvider {
+  const { store, sync } = services;
   if (!store) return provider;
   const fromProvider = provider.getMatches.bind(provider);
   const getMatches = async (query: MatchQuery = {}): Promise<Match[]> => {

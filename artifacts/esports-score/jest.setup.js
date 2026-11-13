@@ -19,3 +19,5 @@ jest.mock("@/context/NotificationsContext", () => ({
   useNotifications: () => ({ items: [], unread: 0, markAllRead: async () => undefined, simulate: async () => undefined }),
   NotificationsProvider: ({ children }) => children,
 }));
+
+jest.mock("react-native-keyboard-controller", () => require("react-native-keyboard-controller/jest"));
