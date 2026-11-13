@@ -102,11 +102,11 @@ export function Scoreboard({ showSearch = true, showIdentity = true }: { showSea
       {showIdentity ? <GameIdentity /> : null}
       <View style={styles.dateRow}>
         <View style={[styles.datePill, { backgroundColor: colors.card }]}>
-          <Pressable accessibilityRole="button" accessibilityLabel="Dia anterior" onPress={() => setSelectedDate((current) => shiftKey(current, -1))} style={styles.dateButton}><Feather name="chevron-left" size={18} color={colors.primary} /></Pressable>
+          <Pressable accessibilityRole="button" accessibilityLabel="Dia anterior" onPress={() => setSelectedDate((current) => shiftKey(current, -1))} hitSlop={4} style={styles.dateButton}><Feather name="chevron-left" size={18} color={colors.primary} /></Pressable>
           <Text style={[styles.dateLabel, { color: colors.primary, fontFamily: font.bold }]}>{dayLabel(selectedDate, todayKey)}</Text>
-          <Pressable accessibilityRole="button" accessibilityLabel="Próximo dia" onPress={() => setSelectedDate((current) => shiftKey(current, 1))} style={styles.dateButton}><Feather name="chevron-right" size={18} color={colors.primary} /></Pressable>
+          <Pressable accessibilityRole="button" accessibilityLabel="Próximo dia" onPress={() => setSelectedDate((current) => shiftKey(current, 1))} hitSlop={4} style={styles.dateButton}><Feather name="chevron-right" size={18} color={colors.primary} /></Pressable>
         </View>
-        <Pressable accessibilityRole="button" accessibilityLabel="Abrir calendário" onPress={() => setCalendarOpen(true)} style={styles.dateButton}><Feather name="calendar" size={18} color={colors.foreground} /></Pressable>
+        <Pressable accessibilityRole="button" accessibilityLabel="Abrir calendário" onPress={() => setCalendarOpen(true)} hitSlop={4} style={styles.dateButton}><Feather name="calendar" size={18} color={colors.foreground} /></Pressable>
       </View>
       <View style={styles.filters}>
         {filters.map((filter) => {
@@ -115,7 +115,7 @@ export function Scoreboard({ showSearch = true, showIdentity = true }: { showSea
           const background = selected ? (live ? colors.live : colors.foreground) : colors.secondary;
           const text = selected ? (live ? "#FFFFFF" : colors.background) : colors.foreground;
           return (
-            <Pressable key={filter.id} accessibilityRole="button" accessibilityState={{ selected }} onPress={() => setStatus(filter.id)} style={[styles.chip, { backgroundColor: background }]}>
+            <Pressable key={filter.id} accessibilityRole="button" accessibilityState={{ selected }} onPress={() => setStatus(filter.id)} hitSlop={6} style={[styles.chip, { backgroundColor: background }]}>
               {live ? <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: selected ? "#FFFFFF" : colors.live }} /> : null}
               <Text numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.8} maxFontSizeMultiplier={1.15} style={[styles.chipText, { color: text, fontFamily: font.semibold }]}>{filter.label}</Text>
             </Pressable>
@@ -171,9 +171,9 @@ function Calendar({ visible, selected, onClose, onSelect }: { visible: boolean; 
       <Pressable style={styles.backdrop} onPress={onClose}>
         <Pressable style={[styles.sheet, { backgroundColor: colors.card }]} onPress={(event) => event.stopPropagation()}>
           <View style={styles.monthRow}>
-            <Pressable accessibilityRole="button" accessibilityLabel="Mês anterior" onPress={() => setMonth(new Date(month.getFullYear(), month.getMonth() - 1, 1))} style={styles.dateButton}><Feather name="chevron-left" size={18} color={colors.foreground} /></Pressable>
+            <Pressable accessibilityRole="button" accessibilityLabel="Mês anterior" onPress={() => setMonth(new Date(month.getFullYear(), month.getMonth() - 1, 1))} hitSlop={4} style={styles.dateButton}><Feather name="chevron-left" size={18} color={colors.foreground} /></Pressable>
             <Text style={[styles.monthLabel, { color: colors.foreground, fontFamily: font.bold }]}>{month.toLocaleDateString("pt-BR", { month: "long", year: "numeric" })}</Text>
-            <Pressable accessibilityRole="button" accessibilityLabel="Próximo mês" onPress={() => setMonth(new Date(month.getFullYear(), month.getMonth() + 1, 1))} style={styles.dateButton}><Feather name="chevron-right" size={18} color={colors.foreground} /></Pressable>
+            <Pressable accessibilityRole="button" accessibilityLabel="Próximo mês" onPress={() => setMonth(new Date(month.getFullYear(), month.getMonth() + 1, 1))} hitSlop={4} style={styles.dateButton}><Feather name="chevron-right" size={18} color={colors.foreground} /></Pressable>
           </View>
           <View style={styles.week}>
             {["D", "S", "T", "Q", "Q", "S", "S"].map((label, index) => <Text key={`${label}-${index}`} style={[styles.weekday, { color: colors.mutedForeground }]}>{label}</Text>)}
@@ -202,12 +202,12 @@ const styles = StyleSheet.create({
   brand: { fontSize: 18, letterSpacing: 1 },
   search: { flex: 1, minWidth: 0, height: 40, borderRadius: 20, flexDirection: "row", alignItems: "center", paddingHorizontal: 12, gap: 8 },
   searchInput: { flex: 1, minWidth: 0, fontSize: 15, paddingVertical: 0 },
-  dateRow: { flexDirection: "row", alignItems: "center", gap: 8, marginTop: 8, marginBottom: 8 },
-  datePill: { flex: 1, minHeight: 44, borderRadius: 22, flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
-  dateButton: { width: 44, height: 44, alignItems: "center", justifyContent: "center" },
+  dateRow: { flexDirection: "row", alignItems: "center", gap: 8, marginTop: 6, marginBottom: 6 },
+  datePill: { flex: 1, minHeight: 36, borderRadius: 18, flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
+  dateButton: { width: 40, height: 36, alignItems: "center", justifyContent: "center" },
   dateLabel: { fontSize: 15 },
   filters: { flexDirection: "row", gap: 8, marginBottom: 10 },
-  chip: { flex: 1, minHeight: 44, borderRadius: 22, alignItems: "center", justifyContent: "center", paddingHorizontal: 4, flexDirection: "row", gap: 4 },
+  chip: { flex: 1, minHeight: 32, borderRadius: 16, alignItems: "center", justifyContent: "center", paddingHorizontal: 4, flexDirection: "row", gap: 4 },
   chipText: { fontSize: 12 },
   stale: { fontSize: 12, marginBottom: 8 },
   list: { paddingBottom: 8 },

@@ -20,4 +20,4 @@ export default function Home() {
     </SwipeTabs>
   </View>;
 }
-const styles = StyleSheet.create({ segmentWrap: { paddingHorizontal: 10, paddingVertical: 9 }, segment: { flexDirection: "row", borderRadius: 30, padding: 3 }, segmentItem: { flex: 1, minHeight: 44, borderRadius: 24, alignItems: "center", justifyContent: "center" }, segmentText: { fontSize: 13, fontWeight: "700" } });
+const styles = StyleSheet.create({ segmentWrap: { paddingHorizontal: 10, paddingVertical: 6 }, segment: { flexDirection: "row", borderRadius: 30, padding: 3 }, segmentItem: { flex: 1, minHeight: 34, borderRadius: 18, alignItems: "center", justifyContent: "center" }, segmentText: { fontSize: 13, fontWeight: "700" } });

@@ -1,14 +1,13 @@
 import { Feather } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
 import { BlurView } from "expo-blur";
-import { Image, Platform, Pressable, StyleSheet, Text, View } from "react-native";
+import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { font } from "@/constants/type";
 import { useColors } from "@/hooks/useColors";
 
-const valorantMark = require("../../assets/generated/games/valorant-mark.png");
-const labels: Record<string, string> = { index: "Valorant", following: "Favoritos", insights: "Previsões", search: "Buscar" };
-const icons = { following: "star", insights: "bar-chart-2", search: "search" } as const;
+const labels: Record<string, string> = { index: "Partidas", following: "Favoritos", insights: "Previsões", search: "Buscar" };
+const icons = { index: "clock", following: "star", insights: "bar-chart-2", search: "search" } as const;
 export default function TabLayout() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
@@ -18,17 +17,17 @@ export default function TabLayout() {
       {state.routes.filter(route => labels[route.name]).map(route => {
         const active = state.routes[state.index].key === route.key;
         return <Pressable key={route.key} accessibilityRole="tab" accessibilityState={{ selected: active }} accessibilityLabel={labels[route.name]} onPress={() => { const event = emitter.emit({ type: "tabPress", target: route.key, canPreventDefault: true }); if (!active && !event.defaultPrevented) navigateToTab(route.key); }} style={[styles.item, { backgroundColor: active ? colors.secondary : "transparent" }]}>
-          {route.name === "index" ? <Image source={valorantMark} resizeMode="contain" accessibilityLabel="Valorant" style={styles.mark} /> : <Feather name={icons[route.name as keyof typeof icons]} size={22} color={active ? colors.primary : colors.mutedForeground} />}
+          <Feather name={icons[route.name as keyof typeof icons]} size={22} color={active ? colors.primary : colors.mutedForeground} />
           <Text style={[styles.label, { color: active ? colors.primary : colors.mutedForeground, fontFamily: font.semibold }]}>{labels[route.name]}</Text>
         </Pressable>;
       })}
     </View>
   </View>}>
-    <Tabs.Screen name="index" options={{ title: "Valorant" }} />
-    <Tabs.Screen name="following" options={{ title: "Favoritos" }} />
+    <Tabs.Screen name="index" options={{ title: "Partidas" }} />
     <Tabs.Screen name="insights" options={{ title: "Previsões" }} />
+    <Tabs.Screen name="following" options={{ title: "Favoritos" }} />
     <Tabs.Screen name="search" options={{ title: "Buscar" }} />
   </Tabs>;
 }
-const styles = StyleSheet.create({ container: { position: "absolute", left: 12, right: 12 }, bar: { flexDirection: "row", borderWidth: 1, borderRadius: 40, padding: 5, overflow: "hidden" }, item: { flex: 1, minWidth: 0, height: 58, borderRadius: 32, alignItems: "center", justifyContent: "center", gap: 2 }, mark: { width: 22, height: 22 }, label: { fontSize: 10 } });
+const styles = StyleSheet.create({ container: { position: "absolute", left: 12, right: 12 }, bar: { flexDirection: "row", borderWidth: 1, borderRadius: 40, padding: 5, overflow: "hidden" }, item: { flex: 1, minWidth: 0, height: 58, borderRadius: 32, alignItems: "center", justifyContent: "center", gap: 2 }, label: { fontSize: 10 } });
 

@@ -1,3 +1,4 @@
+import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { useEffect, useState } from "react";
 import { Text, View } from "react-native";
@@ -31,10 +32,13 @@ export function ResolvedLogo({ type, name, size = 28, maxWidth: _maxWidth, game,
   // One neutral plate keeps black, white and colored marks readable.
   const plate = type === "team" || type === "competition";
   const inset = Math.max(3, Math.round(size * .12));
+  // Without a logo, teams show a shield and competitions a trophy, like most score apps.
+  const fallback = type === "team" ? "shield" : type === "competition" ? "trophy" : null;
+  const placeholder = (color: string) => fallback ? <Ionicons name={fallback} size={Math.round(size * .5)} color={color} /> : <Text maxFontSizeMultiplier={1.2} style={{ color, fontSize: Math.max(10, Math.round(size * .3)), fontWeight: "700" }}>{initials(name)}</Text>;
   return (
-    <View accessibilityLabel={!source ? `Logo de ${name} indisponível` : undefined} style={{ width: size, height: size, flexShrink: 0, borderRadius: Math.round(size * .2), overflow: "hidden", backgroundColor: plate ? "#65717D" : colors.secondary, alignItems: "center", justifyContent: "center" }}>
-      {source && loadedIdentity !== identity ? <Text style={{ position: "absolute", color: "#FFFFFF", fontSize: Math.max(10, size * .3), fontWeight: "600" }}>{initials(name)}</Text> : null}
-      {source ? <Image source={source} contentFit="contain" transition={0} onLoad={() => setLoadedIdentity(identity)} cachePolicy="memory-disk" recyclingKey={entityId ?? `${type}:${name}`} accessibilityLabel={`Logo de ${name}`} style={{ width: size - inset * 2, height: size - inset * 2 }} onError={() => { if (localSource) setLocalFailed(true); else setRemoteFailed(true); }} /> : <Text maxFontSizeMultiplier={1.2} style={{ color: colors.mutedForeground, fontSize: Math.max(10, Math.round(size * .3)), fontWeight: "700" }}>{initials(name)}</Text>}
+    <View accessibilityLabel={!source ? `Logo de ${name} indisponível` : undefined} style={{ width: size, height: size, flexShrink: 0, borderRadius: Math.round(size * .2), overflow: "hidden", backgroundColor: plate && source ? "#65717D" : colors.secondary, alignItems: "center", justifyContent: "center" }}>
+      {source && loadedIdentity !== identity ? <View style={{ position: "absolute" }}>{placeholder("#FFFFFF")}</View> : null}
+      {source ? <Image source={source} contentFit="contain" transition={0} onLoad={() => setLoadedIdentity(identity)} cachePolicy="memory-disk" recyclingKey={entityId ?? `${type}:${name}`} accessibilityLabel={`Logo de ${name}`} style={{ width: size - inset * 2, height: size - inset * 2 }} onError={() => { if (localSource) setLocalFailed(true); else setRemoteFailed(true); }} /> : placeholder(colors.mutedForeground)}
     </View>
   );
 }

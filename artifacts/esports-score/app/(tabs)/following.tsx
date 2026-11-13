@@ -5,6 +5,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { MobileHeader, ScreenTabs, EmptyState, ListSkeleton } from "@/components/MobileChrome";
 import { SwipeTabs } from "@/components/SwipeTabs";
+import { FavoritesDiscover } from "@/components/FavoritesDiscover";
 import { CompetitionListItem } from "@/components/CompetitionListItem";
 import { TeamBadge } from "@/components/MatchCard";
 import { TeamLink } from "@/components/TeamLink";
@@ -28,17 +29,17 @@ export default function Following() {
     if (!teams.length) throw new Error("Não foi possível carregar as equipes.");
     return teams;
   }, staleTime: 10 * 60_000 });
-  const competitionsQuery = useQuery({ queryKey: ["competitions", "valorant"], queryFn: () => fetchCompetitions("valorant"), enabled: tab === "competitions" && favoriteCompetitions.length > 0, staleTime: 10 * 60_000 });
+  const competitionsQuery = useQuery({ queryKey: ["competitions", "valorant"], queryFn: () => fetchCompetitions("valorant"),  staleTime: 10 * 60_000 });
   const teams = ((teamsQuery.data ?? []) as Array<Team | ApiTeamDetails>).map(asTeam);
   const competitions = (competitionsQuery.data ?? []).filter(row => favoriteCompetitions.includes(row.id));
   return <View style={{ flex: 1, backgroundColor: colors.background }}>
     <MobileHeader><ScreenTabs items={[{ key: "teams", label: "Equipes" }, { key: "competitions", label: "Competições" }]} selected={tab} onChange={setTab} /></MobileHeader>
     <SwipeTabs tabs={["teams", "competitions"] as const} selected={tab} onChange={setTab}>
     <ScrollView contentContainerStyle={{ paddingHorizontal: 8, paddingTop: 12, paddingBottom: 110 + insets.bottom }}>
-      {tab === "teams" ? !favoritesReady || favoriteTeams.length > 0 && teamsQuery.isLoading ? <ListSkeleton /> : teamsQuery.isError ? <EmptyState title="Não foi possível carregar" onRetry={() => void teamsQuery.refetch()} /> : teams.length === 0 ? <EmptyState title="Suas equipes favoritas" description="Busque uma equipe e toque na estrela para acompanhá-la aqui." /> : teams.map(team => <View key={team.id} style={[styles.row, { backgroundColor: colors.card }]}>
+      {tab === "teams" ? !favoritesReady || favoriteTeams.length > 0 && teamsQuery.isLoading ? <ListSkeleton /> : teamsQuery.isError ? <EmptyState title="Não foi possível carregar" onRetry={() => void teamsQuery.refetch()} /> : teams.length === 0 ? <FavoritesDiscover kind="teams" /> : teams.map(team => <View key={team.id} style={[styles.row, { backgroundColor: colors.card }]}>
         <View style={styles.link}><TeamLink team={team} compact><TeamBadge {...team} size={38} /><View style={styles.copy}><Text style={[styles.name, { color: colors.foreground }]}>{team.name}</Text><Text style={[styles.meta, { color: colors.mutedForeground }]}>Valorant</Text></View></TeamLink></View>
         <Pressable accessibilityRole="button" accessibilityLabel={`Deixar de seguir ${team.name}`} onPress={() => toggleFavorite(team.id)} style={styles.star}><Ionicons name="star" size={23} color={colors.primary} /></Pressable>
-      </View>) : competitionsQuery.isLoading ? <ListSkeleton /> : competitionsQuery.isError ? <EmptyState title="Não foi possível carregar" onRetry={() => void competitionsQuery.refetch()} /> : competitions.length ? competitions.map(row => <CompetitionListItem key={row.id} id={row.id} name={row.name} region={row.region || "Valorant"} logoUrl={row.logoUrl} onPress={() => openCompetition(row.id)} />) : <EmptyState title="Suas competições favoritas" description="Toque na estrela de um campeonato para fixá-lo aqui." />}
+      </View>) : favoriteCompetitions.length === 0 ? <FavoritesDiscover kind="competitions" /> : competitionsQuery.isLoading ? <ListSkeleton /> : competitionsQuery.isError ? <EmptyState title="Não foi possível carregar" onRetry={() => void competitionsQuery.refetch()} /> : competitions.length ? competitions.map(row => <CompetitionListItem key={row.id} id={row.id} name={row.name} region={row.region || "Valorant"} logoUrl={row.logoUrl} onPress={() => openCompetition(row.id)} />) : <FavoritesDiscover kind="competitions" />}
       {tab === "teams" && teams.length > 0 && teams.length < favoriteTeams.length ? <Pressable onPress={() => void teamsQuery.refetch()} style={{ padding: 12 }}><Text style={[styles.meta, { color: colors.mutedForeground }]}>Algumas equipes não puderam ser atualizadas. Seus favoritos continuam salvos. Toque para tentar novamente.</Text></Pressable> : null}
     </ScrollView>
     </SwipeTabs>
