@@ -14,7 +14,7 @@ export function MobileHeader({ title = 'Buscar no VANT', children }: { title?: s
   const { unread } = useNotifications();
   return <View style={[styles.header, { paddingTop: insets.top + 8, backgroundColor: colors.secondary }]}>
     <View style={styles.top}>
-      <View style={styles.icon}><Image source={valorantMark} resizeMode="contain" accessibilityLabel="Valorant" style={styles.mark} /></View>
+      <Pressable accessibilityRole="link" accessibilityLabel="Ir para o início" onPress={() => router.navigate('/')} style={styles.icon}><Image source={valorantMark} resizeMode="contain" accessibilityLabel="Valorant" style={styles.mark} /></Pressable>
       <Pressable accessibilityRole="button" accessibilityLabel="Buscar equipes e competições" onPress={() => router.navigate('/search')} style={[styles.search, { backgroundColor: colors.card }]}>
         <Feather name="search" size={22} color={colors.foreground} /><Text style={[styles.placeholder, { color: colors.mutedForeground }]} numberOfLines={1}>{title}</Text>
       </Pressable>

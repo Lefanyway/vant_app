@@ -30,7 +30,7 @@ export function FavoritesDiscover({ kind }: { kind: "teams" | "competitions" }) 
     <View style={styles.hero}>
       <Text style={[styles.heroTitle, { color: colors.foreground }]}>É hora de adicionar favoritos</Text>
       <Text style={[styles.heroCopy, { color: colors.mutedForeground }]}>As partidas das suas equipes e competições favoritas aparecem aqui.</Text>
-      <Pressable accessibilityRole="button" onPress={() => router.push("/search")} style={[styles.add, { backgroundColor: colors.accent }]}>
+      <Pressable accessibilityRole="button" onPress={() => router.push({ pathname: "/favorites/add", params: { kind: kind === "teams" ? "team" : "competition" } })} style={[styles.add, { backgroundColor: colors.accent }]}>
         <View style={[styles.addIcon, { borderColor: colors.primary }]}><Feather name="plus" size={22} color={colors.primary} /></View>
         <Text style={[styles.addText, { color: colors.primary }]}>Adicionar</Text>
       </Pressable>
