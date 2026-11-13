@@ -41,7 +41,11 @@ export default function Insights() {
         {results.length ? <>
           {section("Como o modelo foi")}
           <View style={[styles.dayCard, { backgroundColor: colors.card }]}>
-            <Text style={[styles.dayTitle, { color: colors.foreground }]}>Acertou {results.filter(modelHit).length} de {results.length} nos últimos 2 dias</Text>
+            <View style={styles.scoreHead}>
+              <Text style={[styles.scoreBig, { color: colors.foreground }]}>{results.filter(modelHit).length}<Text style={{ color: colors.mutedForeground }}>/{results.length}</Text></Text>
+              <Text style={[styles.rowMeta, { color: colors.mutedForeground, flex: 1 }]}>acertos do modelo{"\n"}nos últimos 2 dias</Text>
+            </View>
+            <View style={[styles.hitBar, { backgroundColor: colors.destructive }]}><View style={{ width: `${Math.round(results.filter(modelHit).length / results.length * 100)}%`, height: 6, backgroundColor: colors.positive }} /></View>
             {(allResults ? results : results.slice(0, 5)).map((match, index) => <ResultRow key={match.id} match={match} first={index === 0} colors={colors} />)}
             {results.length > 5 ? <Pressable accessibilityRole="button" onPress={() => setAllResults(!allResults)} style={styles.more}><Text style={[styles.moreText, { color: colors.primary }]}>{allResults ? "Mostrar menos" : `Ver todas (${results.length})`}</Text></Pressable> : null}
           </View>
@@ -120,14 +124,25 @@ function ResultRow({ match, first, colors }: { match: Finished; first: boolean; 
   const hit = modelHit(match);
   const home = match.predictions!.home_win_prob;
   const homeWon = match.home_score! > match.away_score!;
-  const pick = home >= 0.5 ? match.payload.homeTeam : match.payload.awayTeam;
+  const homePick = home >= 0.5;
   return <Pressable accessibilityRole="button" accessibilityLabel={`${hit ? "Acertou" : "Errou"}: ${match.payload.homeTeam.name} ${match.home_score} a ${match.away_score} ${match.payload.awayTeam.name}`} onPress={() => openMatch(match.id)} style={[styles.resultRow, !first && { borderTopWidth: 1, borderTopColor: colors.border }]}>
-    <View style={[styles.mark, { backgroundColor: hit ? colors.positive : colors.destructive }]}><Feather name={hit ? "check" : "x"} size={14} color="#FFFFFF" /></View>
-    <View style={styles.teams}>
-      <Text numberOfLines={1} style={[styles.resultTeams, { color: colors.foreground }]}><Text style={{ fontFamily: homeWon ? font.bold : font.medium }}>{match.payload.homeTeam.name.trim()}</Text> {match.home_score}–{match.away_score} <Text style={{ fontFamily: homeWon ? font.medium : font.bold }}>{match.payload.awayTeam.name.trim()}</Text></Text>
-      <Text numberOfLines={1} style={[styles.rowMeta, { color: colors.mutedForeground }]}>Favorito: {pick.name.trim()} ({pct(Math.max(home, 1 - home))})</Text>
-    </View>
+    <View style={[styles.mark, { backgroundColor: hit ? colors.positive : colors.destructive }]}><Feather name={hit ? "check" : "x"} size={12} color="#FFFFFF" /></View>
+    <ResultSide team={match.payload.homeTeam} won={homeWon} chance={home} pick={homePick} colors={colors} />
+    {/* The winner's number stays bright and the loser's fades, so the result reads at a glance. */}
+    <Text style={[styles.resultScore, { color: colors.mutedForeground }]}><Text style={homeWon ? { color: colors.foreground } : null}>{match.home_score}</Text> – <Text style={homeWon ? null : { color: colors.foreground }}>{match.away_score}</Text></Text>
+    <ResultSide team={match.payload.awayTeam} won={!homeWon} chance={1 - home} pick={!homePick} colors={colors} away />
   </Pressable>;
+}
+
+// One team in a result: logo, sigla (bold if it won) and the chance the model gave it, purple when it was the pick.
+function ResultSide({ team, won, chance, pick, away = false, colors }: { team: Finished["payload"]["homeTeam"]; won: boolean; chance: number; pick: boolean; away?: boolean; colors: ReturnType<typeof useColors> }) {
+  return <View style={[styles.side, away && styles.sideAway]}>
+    <ResolvedLogo type="team" name={team.name} entityId={team.id} logoUrl={absoluteLogo(team.logoUrl)} size={30} />
+    <View style={[styles.sideCopy, away && { alignItems: "flex-end" }]}>
+      <Text numberOfLines={1} style={[styles.sideName, { color: won ? colors.foreground : colors.mutedForeground, fontFamily: won ? font.bold : font.medium }]}>{team.acronym?.trim() || (team.name.trim().length > 10 ? team.name.trim().slice(0, 3).toUpperCase() : team.name.trim())}</Text>
+      <Text style={[styles.sideChance, { color: pick ? colors.primary : colors.mutedForeground, fontFamily: pick ? font.bold : font.medium }]}>{pct(chance)}</Text>
+    </View>
+  </View>;
 }
 
 function Metric({ label, value, highlight = false, colors }: { label: string; value: string; highlight?: boolean; colors: ReturnType<typeof useColors> }) {
@@ -159,9 +174,17 @@ const styles = StyleSheet.create({
   whyBody: { paddingBottom: 14 },
   more: { minHeight: 44, alignItems: "center", justifyContent: "center" },
   moreText: { fontSize: 13, fontFamily: font.semibold },
-  resultRow: { minHeight: 58, paddingVertical: 10, flexDirection: "row", alignItems: "center", gap: 12 },
-  mark: { width: 24, height: 24, borderRadius: 12, alignItems: "center", justifyContent: "center" },
-  resultTeams: { fontSize: 13, fontFamily: font.medium, fontVariant: ["tabular-nums"] },
+  resultRow: { minHeight: 64, paddingVertical: 10, flexDirection: "row", alignItems: "center", gap: 10 },
+  mark: { width: 20, height: 20, borderRadius: 10, alignItems: "center", justifyContent: "center" },
+  side: { flex: 1, minWidth: 0, flexDirection: "row", alignItems: "center", gap: 8 },
+  sideAway: { flexDirection: "row-reverse" },
+  sideCopy: { flex: 1, minWidth: 0 },
+  sideName: { fontSize: 14 },
+  sideChance: { fontSize: 11, fontVariant: ["tabular-nums"], marginTop: 1 },
+  resultScore: { minWidth: 52, textAlign: "center", fontSize: 16, fontFamily: font.bold, fontVariant: ["tabular-nums"] },
+  scoreHead: { flexDirection: "row", alignItems: "center", gap: 12 },
+  scoreBig: { fontSize: 30, fontFamily: font.bold, fontVariant: ["tabular-nums"] },
+  hitBar: { height: 6, borderRadius: 3, overflow: "hidden", flexDirection: "row", marginTop: 10, marginBottom: 6 },
   rank: { flexDirection: "row", alignItems: "center", gap: 10, minHeight: 40 },
   position: { width: 18, fontSize: 13, fontFamily: font.bold, textAlign: "right" },
   rankName: { flex: 1, fontSize: 14, fontFamily: font.semibold },

@@ -21,7 +21,7 @@ export const queryClient = new QueryClient({
 });
 
 // The app opens with the last lists it showed, then refreshes them in the background.
-const saved = new Set(["matches", "competitions", "insights", "team-overview", "upcoming"]);
+const saved = new Set(["matches", "competitions", "insights", "team-overview", "team-news", "upcoming", "recent", "competition", "competition-matches", "match-preview", "match-details"]);
 export const persistOptions = {
   persister: createAsyncStoragePersister({ storage: AsyncStorage, key: "vant-cache" }),
   maxAge: DAY,

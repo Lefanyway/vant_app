@@ -136,7 +136,7 @@ router.get("/teams/:id/overview", async (req, res, next) => {
     // The match lists only need the id, so they load alongside the team instead of after it.
     const matchLists = Promise.allSettled([
       selected.getTeamMatches ? cached(`team-matches:${req.params.id}:overview-past`, ESPORTS_CACHE_TTL.teamMatches, () => selected.getTeamMatches!(req.params.id, 'finished', 1, 5)) : Promise.reject(new Error('Unavailable')),
-      selected.getTeamMatches ? cached(`team-matches:${req.params.id}:overview-upcoming`, ESPORTS_CACHE_TTL.live, () => selected.getTeamMatches!(req.params.id, 'upcoming', 1, 5)) : Promise.reject(new Error('Unavailable')),
+      selected.getTeamMatches ? cached(`team-matches:${req.params.id}:overview-upcoming`, ESPORTS_CACHE_TTL.matchesToday, () => selected.getTeamMatches!(req.params.id, 'upcoming', 1, 5)) : Promise.reject(new Error('Unavailable')),
     ]);
     const team = await cached(`team-details:${req.params.id}`, ESPORTS_CACHE_TTL.teams, () => selected.getTeamDetails?.(req.params.id) ?? selected.getTeam(req.params.id).then((value) => value ? { ...value, roster: [] } : null));
     if (!team) return res.status(404).json({ error: "Team not found" });

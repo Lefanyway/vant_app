@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { queryClient } from "@/lib/queryClient";
 import { useLocalSearchParams } from "expo-router";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -8,7 +9,7 @@ import { MatchCard } from "@/components/MatchCard";
 import { UpcomingCard } from "@/components/UpcomingCard";
 import { ResolvedLogo } from "@/components/ResolvedLogo";
 import { useColors } from "@/hooks/useColors";
-import { ApiError, errorMessage, fetchCompetition, fetchCompetitionMatches, toMatch } from "@/lib/api";
+import { ApiError, errorMessage, fetchCompetition, type ApiCompetition, fetchCompetitionMatches, toMatch } from "@/lib/api";
 import { goBackOrHome, openMatch } from "@/lib/navigation";
 
 export default function CompetitionDetail() {
@@ -16,9 +17,10 @@ export default function CompetitionDetail() {
   const competitionId = String(id ?? "");
   const colors = useColors();
   const insets = useSafeAreaInsets();
-  const competition = useQuery({ queryKey: ["competition", competitionId], queryFn: () => fetchCompetition(competitionId), enabled: Boolean(competitionId) });
-  const upcoming = useQuery({ queryKey: ["competition-matches", competitionId, "upcoming"], queryFn: () => fetchCompetitionMatches(competitionId, "upcoming"), enabled: Boolean(competitionId) });
-  const finished = useQuery({ queryKey: ["competition-matches", competitionId, "finished"], queryFn: () => fetchCompetitionMatches(competitionId, "finished"), enabled: Boolean(competitionId) });
+  // The competitions list already has this one, so the header shows at once while its matches load.
+  const competition = useQuery({ queryKey: ["competition", competitionId], queryFn: () => fetchCompetition(competitionId), enabled: Boolean(competitionId), staleTime: 6 * 60 * 60_000, initialData: () => queryClient.getQueryData<ApiCompetition[]>(["competitions", "valorant"])?.find((row) => row.id === competitionId), initialDataUpdatedAt: 0 });
+  const upcoming = useQuery({ queryKey: ["competition-matches", competitionId, "upcoming"], queryFn: () => fetchCompetitionMatches(competitionId, "upcoming"), enabled: Boolean(competitionId), staleTime: 2 * 60_000 });
+  const finished = useQuery({ queryKey: ["competition-matches", competitionId, "finished"], queryFn: () => fetchCompetitionMatches(competitionId, "finished"), enabled: Boolean(competitionId), staleTime: 10 * 60_000 });
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
     <View style={[styles.nav, { paddingTop: Math.max(insets.top, 8), paddingHorizontal: 8 }]}><BackButton /><View style={styles.navSpacer} /></View>

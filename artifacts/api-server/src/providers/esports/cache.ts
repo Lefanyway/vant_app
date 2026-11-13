@@ -15,7 +15,8 @@ export const ESPORTS_CACHE_TTL = {
   teamNews: 15 * 60_000,
 } as const;
 
-// An expired entry is still served for one more TTL while a background request refreshes it.
+// An expired entry is still served while a background request refreshes it: for one more TTL on live data,
+// up to 15 minutes on slower lists, so a page opened a few minutes later never waits on the provider.
 type Entry = { value: unknown; expiresAt: number; staleUntil: number };
 
 export class TtlCache {
@@ -25,8 +26,8 @@ export class TtlCache {
   set(key: string, value: unknown, ttl: number) {
     const now = Date.now();
     this.entries.delete(key);
-    this.entries.set(key, { value, expiresAt: now + ttl, staleUntil: now + 2 * ttl });
-    if (this.entries.size > 500) {
+    this.entries.set(key, { value, expiresAt: now + ttl, staleUntil: now + ttl + (ttl >= 60_000 ? Math.max(ttl, 15 * 60_000) : ttl) });
+    if (this.entries.size > 2000) {
       const oldest = this.entries.keys().next().value;
       if (oldest) this.entries.delete(oldest);
     }

@@ -32,3 +32,16 @@ test("waits for a new value once the entry is too old to serve", async (t) => {
   t.mock.timers.tick(2_500);
   assert.equal(await cache.remember("key", 1_000, async () => "new"), "new");
 });
+
+test("keeps serving a slower list for up to 15 minutes while it refreshes", async (t) => {
+  t.mock.timers.enable({ apis: ["Date"], now: 0 });
+  const cache = new TtlCache();
+  await cache.remember("list", 120_000, async () => "old");
+  t.mock.timers.tick(10 * 60_000);
+  assert.equal(await cache.remember("list", 120_000, async () => "new"), "old");
+  t.mock.timers.tick(20 * 60_000);
+  const cold = new TtlCache();
+  await cold.remember("list", 120_000, async () => "old");
+  t.mock.timers.tick(18 * 60_000);
+  assert.equal(await cold.remember("list", 120_000, async () => "new"), "new");
+});
