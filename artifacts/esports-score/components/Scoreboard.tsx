@@ -3,21 +3,24 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import { FlatList, Modal, Pressable, RefreshControl, StyleSheet, Text, TextInput, View } from "react-native";
 import { CompetitionCard } from "@/components/CompetitionCard";
+import { MatchCard } from "@/components/MatchCard";
 import { EmptyState } from "@/components/EmptyState";
+import { Flag } from "@/components/Flag";
 import { ListSkeleton } from "@/components/MobileChrome";
 import { GameIdentity } from "@/components/GameTabs";
 import { font } from "@/constants/type";
 import { useActiveScreen } from "@/hooks/useActiveScreen";
 import { useColors } from "@/hooks/useColors";
-import { errorMessage, fetchLiveMatches, fetchMatches, localDateKey } from "@/lib/api";
+import { errorMessage, fetchLiveMatches, fetchMatches, fetchRecentMatches, fetchUpcomingMatches, localDateKey } from "@/lib/api";
 import type { Match } from "@/lib/data";
 import { groupMatches } from "@/lib/matches";
 import { openCompetition, openMatch } from "@/lib/navigation";
 
-type StatusFilter = "all" | "live" | "finished";
+type StatusFilter = "all" | "brazil" | "live" | "finished";
 
 const filters: { id: StatusFilter; label: string }[] = [
   { id: "all", label: "Todas" },
+  { id: "brazil", label: "Brasil" },
   { id: "live", label: "Ao vivo" },
   { id: "finished", label: "Finalizadas" },
 ];
@@ -27,6 +30,10 @@ function shiftKey(key: string, days: number) {
   next.setDate(next.getDate() + days);
   return localDateKey(next);
 }
+
+// Brazilian teams and leagues lead the list; VCT Americas comes right after them.
+const brazilian = (match: Match) => match.teamA.country === "BR" || match.teamB.country === "BR" || /bra[sz]il/i.test(match.tournament);
+const priority = (match: Match) => brazilian(match) ? 0 : /americas/i.test(match.tournament) ? 1 : 2;
 
 function dayLabel(key: string, todayKey: string) {
   const offset = Math.round((Date.parse(`${key}T12:00:00`) - Date.parse(`${todayKey}T12:00:00`)) / 86_400_000);
@@ -75,11 +82,24 @@ export function Scoreboard({ showSearch = true, showIdentity = true }: { showSea
     const needle = query.trim().toLowerCase();
     return source.filter((match) => {
       if (status === "finished" && match.status !== "Finished") return false;
+      if (status === "brazil" && !brazilian(match)) return false;
       if (!needle) return true;
       return `${match.teamA.name} ${match.teamB.name} ${match.tournament}`.toLowerCase().includes(needle);
     });
   }, [liveQuery.data, matchesQuery.data, query, status]);
-  const grouped = groupMatches(rows);
+  const grouped = groupMatches(rows).sort((a, b) => Math.min(...a.matches.map(priority)) - Math.min(...b.matches.map(priority)));
+  // An empty day points to the next match instead of a dead end.
+  const lookAhead = !query.trim() && (status === "all" || status === "brazil") && selectedDate >= todayKey && matchesQuery.isSuccess && rows.length === 0;
+  const upcomingQuery = useQuery({ queryKey: ["upcoming", "valorant"], queryFn: () => fetchUpcomingMatches("valorant"), enabled: lookAhead, staleTime: 5 * 60_000 });
+  // Skips matches whose teams are still "TBD", which tell the user nothing.
+  const next = lookAhead ? upcomingQuery.data?.find((match) => match.startTime && localDateKey(new Date(match.scheduledTime ?? match.startTime)) > selectedDate && (status !== "brazil" || brazilian(match)) && ![match.teamA, match.teamB].some((team) => team.id.startsWith("tbd:") || /^tbd$/i.test(team.name))) : undefined;
+  const nextDay = next ? localDateKey(new Date(next.scheduledTime ?? next.startTime!)) : null;
+  // The Brazil filter always ends with the latest Brazilian results, so it is never empty off-season.
+  const recentQuery = useQuery({ queryKey: ["recent", "BR"], queryFn: () => fetchRecentMatches("BR"), enabled: status === "brazil", staleTime: 5 * 60_000 });
+  const recentBrazil = status === "brazil" && recentQuery.data?.length ? <View>
+    <Text style={[styles.section, { color: colors.mutedForeground, fontFamily: font.semibold }]}>Últimos jogos brasileiros</Text>
+    <View style={[styles.recent, { backgroundColor: colors.card }]}>{recentQuery.data.map((match) => <MatchCard key={match.id} match={match} showDay onPress={() => openMatch(match.id, match)} />)}</View>
+  </View> : undefined;
   const waiting = status === "live" ? liveQuery.isLoading && !liveQuery.data && !(matchesQuery.data ?? []).some((match) => match.status === "Live") : matchesQuery.isLoading && !matchesQuery.data;
   const failed = status === "live" ? liveQuery.isError && !liveQuery.data : matchesQuery.isError && !matchesQuery.data;
   const stale = status === "live" ? liveQuery.isError && Boolean(liveQuery.data) : matchesQuery.isError && Boolean(matchesQuery.data);
@@ -115,9 +135,9 @@ export function Scoreboard({ showSearch = true, showIdentity = true }: { showSea
           const background = selected ? (live ? colors.live : colors.foreground) : colors.secondary;
           const text = selected ? (live ? "#FFFFFF" : colors.background) : colors.foreground;
           return (
-            <Pressable key={filter.id} accessibilityRole="button" accessibilityState={{ selected }} onPress={() => setStatus(filter.id)} hitSlop={6} style={[styles.chip, { backgroundColor: background }]}>
+            <Pressable key={filter.id} accessibilityRole="button" accessibilityLabel={filter.label} accessibilityState={{ selected }} onPress={() => setStatus(filter.id)} hitSlop={6} style={[styles.chip, { backgroundColor: background }]}>
               {live ? <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: selected ? "#FFFFFF" : colors.live }} /> : null}
-              <Text numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.8} maxFontSizeMultiplier={1.15} style={[styles.chipText, { color: text, fontFamily: font.semibold }]}>{filter.label}</Text>
+              {filter.id === "brazil" ? <Flag code="BR" width={24} /> : <Text numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.8} maxFontSizeMultiplier={1.15} style={[styles.chipText, { color: text, fontFamily: font.semibold }]}>{filter.label}</Text>}
             </Pressable>
           );
         })}
@@ -139,7 +159,9 @@ export function Scoreboard({ showSearch = true, showIdentity = true }: { showSea
               onOpen={item.id && !item.id.startsWith("unknown:") ? () => openCompetition(item.id!) : undefined}
             />
           )}
-          ListEmptyComponent={<EmptyState title={status === "live" ? "Nenhuma partida ao vivo." : query.trim() ? "Nenhuma partida encontrada." : "Nenhuma partida neste dia."} />}
+          ListFooterComponent={recentBrazil}
+          ListEmptyComponent={next && nextDay ? <EmptyState title={`${status === "brazil" ? "Nenhum time brasileiro joga neste dia." : "Nenhuma partida neste dia."}
+Próximo jogo: ${dayLabel(nextDay, todayKey).toLowerCase()} às ${next.time} · ${next.teamA.name} x ${next.teamB.name}`} action={`Ver ${dayLabel(nextDay, todayKey).toLowerCase()}`} onAction={() => setSelectedDate(nextDay)} /> : <EmptyState title={status === "live" ? "Nenhuma partida ao vivo." : query.trim() ? "Nenhuma partida encontrada." : status === "brazil" ? "Nenhum time brasileiro joga neste dia." : "Nenhuma partida neste dia."} />}
           contentContainerStyle={styles.list}
           keyboardShouldPersistTaps="handled"
           initialNumToRender={8}
@@ -210,6 +232,8 @@ const styles = StyleSheet.create({
   chip: { flex: 1, minHeight: 32, borderRadius: 16, alignItems: "center", justifyContent: "center", paddingHorizontal: 4, flexDirection: "row", gap: 4 },
   chipText: { fontSize: 12 },
   stale: { fontSize: 12, marginBottom: 8 },
+  section: { fontSize: 15, marginTop: 8, marginBottom: 9, marginHorizontal: 4 },
+  recent: { borderRadius: 24, overflow: "hidden" },
   list: { paddingBottom: 8 },
   backdrop: { flex: 1, backgroundColor: "rgba(0,0,0,0.45)", justifyContent: "flex-end" },
   sheet: { borderTopLeftRadius: 18, borderTopRightRadius: 18, padding: 16, paddingBottom: 28 },

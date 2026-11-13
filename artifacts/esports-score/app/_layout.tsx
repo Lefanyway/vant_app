@@ -1,7 +1,7 @@
 import { AppLoading } from "@/components/AppLoading";
 import React, { useEffect } from 'react';
-import { QueryClientProvider } from '@tanstack/react-query';
-import { queryClient } from '@/lib/queryClient';
+import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
+import { persistOptions, queryClient } from '@/lib/queryClient';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -67,13 +67,13 @@ export default function RootLayout() {
   return (
     <SafeAreaProvider>
       <ErrorBoundary>
-        <QueryClientProvider client={queryClient}>
+        <PersistQueryClientProvider client={queryClient} persistOptions={persistOptions}>
           <GestureHandlerRootView>
             <KeyboardProvider>
               <AuthProvider><NotificationsProvider><AppProvider><StatusBar style="light" /><RootLayoutNav /></AppProvider></NotificationsProvider></AuthProvider>
             </KeyboardProvider>
           </GestureHandlerRootView>
-        </QueryClientProvider>
+        </PersistQueryClientProvider>
       </ErrorBoundary>
     </SafeAreaProvider>
   );

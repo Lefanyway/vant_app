@@ -49,6 +49,13 @@ export class SupabaseStore {
     return result;
   }
 
+  // Latest results with a team from one country (ISO code, such as "BR"), newest first.
+  async recentByCountry(country: string, limit = 10): Promise<Match[]> {
+    const code = encodeURIComponent(country.toUpperCase());
+    const rows = await this.rest<{ payload: Match }[]>(`matches?select=payload&status=eq.finished&or=(payload->homeTeam->>country.eq.${code},payload->awayTeam->>country.eq.${code})&order=start_time.desc&limit=${limit}`);
+    return rows.map(row => row.payload);
+  }
+
   async matchesBetween(start: string, end: string): Promise<Match[]> {
     const params = new URLSearchParams({ select: 'payload', order: 'start_time.asc', limit: '1000' });
     params.append('start_time', `gte.${start}`);

@@ -135,6 +135,20 @@ export async function fetchLiveMatches(game = "valorant", signal?: AbortSignal) 
   return (await request<ApiMatch[]>(`/matches/live?game=${encodeURIComponent(game)}`, signal)).map(toMatch);
 }
 
+export async function fetchRecentMatches(country: string) {
+  return (await request<ApiMatch[]>(`/matches/recent?country=${encodeURIComponent(country)}`)).map(toMatch);
+}
+
+export async function fetchUpcomingMatches(game = "valorant") {
+  return (await request<ApiMatch[]>(`/matches/upcoming?game=${encodeURIComponent(game)}`)).map(toMatch);
+}
+
+// Calendar feed of a team's next matches; on iPhone webcal:// subscribes, so new matches keep arriving.
+export function teamCalendarUrl(id: string, subscribe: boolean) {
+  const url = `${baseUrl}/api/teams/${encodeURIComponent(id)}/calendar.ics`;
+  return subscribe ? url.replace(/^https?:/, "webcal:") : url;
+}
+
 export async function fetchTeams(game = "valorant") {
   return (await request<ApiTeam[]>(`/teams?game=${encodeURIComponent(game)}`)).map(toTeam);
 }

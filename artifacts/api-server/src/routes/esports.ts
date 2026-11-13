@@ -5,6 +5,7 @@ import { ESPORTS_CACHE_TTL, TtlCache } from "../providers/esports/cache";
 import type { GameId, Match, TeamMatchFilter, TeamOverview } from "../providers/esports/types";
 import { isCalendarDate, isTimezone } from '../providers/esports/date';
 import { redisCache } from "../lib/redis";
+import { teamCalendar } from "../providers/esports/calendar";
 
 const router = Router();
 const games = [{ id: "valorant", name: "VALORANT", shortName: "VALORANT" }, { id: "cs2", name: "Counter-Strike 2", shortName: "CS2" }, { id: "lol", name: "League of Legends", shortName: "LoL" }];
@@ -71,7 +72,14 @@ router.get('/catalog', async (req, res, next) => {
   try { return res.json(await cached('catalog:' + type + ':' + page + ':' + q.toLowerCase(), ttl, () => selected.getCatalogPage!(type, page, q))); } catch (error) { return next(error); }
 });
 router.get("/games", async (_req, res, next) => { const selected = getConfiguredProvider(); if (!selected.provider) return res.json(games); try { return res.json(await cached("games", ESPORTS_CACHE_TTL.games, () => selected.provider!.getGames())); } catch (error) { return next(error); } });
-router.get("/matches/live", async (req, res, next) => { if (outsidePhase(req.query.game)) return res.json([]); const selected = providerRequired(res); if (!selected) return; try { return res.json(await cached(`live:${req.query.game ?? "valorant"}`, ESPORTS_CACHE_TTL.live, () => selected.getLiveMatches(game(req.query.game) ?? "valorant"))); } catch (error) { return next(error); } });
+router.get("/matches/recent", async (req, res, next) => {
+  const country = typeof req.query.country === "string" && /^[a-z]{2}$/i.test(req.query.country) ? req.query.country.toUpperCase() : null;
+  if (!country) return res.status(400).json({ error: "Invalid country", code: 'INVALID_QUERY', retryable: false });
+  const selected = getConfiguredProvider().provider;
+  if (!selected?.getRecentByCountry) return res.json([]);
+  try { return res.json(await cached(`recent:${country}`, ESPORTS_CACHE_TTL.matchesToday, () => selected.getRecentByCountry!(country))); } catch (error) { return next(error); }
+});
+router.get("/matches/live",async (req, res, next) => { if (outsidePhase(req.query.game)) return res.json([]); const selected = providerRequired(res); if (!selected) return; try { return res.json(await cached(`live:${req.query.game ?? "valorant"}`, ESPORTS_CACHE_TTL.live, () => selected.getLiveMatches(game(req.query.game) ?? "valorant"))); } catch (error) { return next(error); } });
 router.get("/matches/upcoming", async (req, res, next) => { if (outsidePhase(req.query.game)) return res.json([]); const selected = providerRequired(res); if (!selected) return; try { return res.json(await cached(`upcoming:${req.query.game ?? "valorant"}`, ESPORTS_CACHE_TTL.matchesFuture, () => selected.getUpcomingMatches(game(req.query.game) ?? "valorant"))); } catch (error) { return next(error); } });
 router.get("/matches/:id/details", async (req, res, next) => { const selected = providerRequired(res); if (!selected) return; try { if (!selected.getMatchDetails) return res.status(404).json({ error: "Match details unavailable" }); const details = await cached(`match-details:${req.params.id}`, ESPORTS_CACHE_TTL.matchDetail, () => selected.getMatchDetails!(req.params.id)); if (!details) return res.status(404).json({ error: "Match not found" }); return res.json(details); } catch (error) { return next(error); } });
 router.get("/matches/:id/stats", async (req, res, next) => {
@@ -154,6 +162,18 @@ router.get("/teams/:id/matches", async (req, res, next) => {
   const filter = (["all", "upcoming", "finished"].includes(String(req.query.filter)) ? String(req.query.filter) : "all") as TeamMatchFilter;
   const page = Math.max(1, Number(req.query.page) || 1); const perPage = Math.min(20, Math.max(1, Number(req.query.per_page) || 20));
   try { return res.json(await cached(`team-matches:${req.params.id}:${filter}:${page}:${perPage}`, ESPORTS_CACHE_TTL.teamMatches, () => selected.getTeamMatches!(req.params.id, filter, page, perPage))); } catch (error) { return next(error); }
+});
+router.get("/teams/:id/calendar.ics", async (req, res, next) => {
+  const selected = providerRequired(res); if (!selected) return;
+  if (!selected.getTeamMatches) return res.status(503).json({ error: "Team matches unavailable" });
+  try {
+    const { matches } = await cached(`team-matches:${req.params.id}:upcoming:1:20`, ESPORTS_CACHE_TTL.teamMatches, () => selected.getTeamMatches!(req.params.id, 'upcoming', 1, 20));
+    const team = matches.flatMap((match) => [match.homeTeam, match.awayTeam]).find((item) => item.id === req.params.id)
+      ?? await cached(`team:${req.params.id}`, ESPORTS_CACHE_TTL.teams, () => selected.getTeam(req.params.id));
+    if (!team) return res.status(404).json({ error: "Team not found" });
+    res.set({ 'Content-Type': 'text/calendar; charset=utf-8', 'Content-Disposition': 'inline; filename="vant-agenda.ics"', 'Cache-Control': 'public, max-age=3600' });
+    return res.send(teamCalendar(team.name, matches));
+  } catch (error) { return next(error); }
 });
 router.get("/teams/:id/roster", async (req, res, next) => {
   const selected = providerRequired(res); if (!selected) return;

@@ -39,7 +39,8 @@ export function TeamBadge({ name, game, logoUrl, id, size = logoSlot.list.size }
   return <ResolvedLogo type="team" name={name} game={game} logoUrl={logoUrl} entityId={id} size={size} maxWidth={size > logoSlot.list.size ? size : logoSlot.list.maxWidth} />;
 }
 
-export function MatchCard({ match, onPress }: { match: Match; onPress: () => void }) {
+// showDay: lists that mix several past days show the date instead of "Encerrado".
+export function MatchCard({ match, onPress, showDay = false }: { match: Match; onPress: () => void; showDay?: boolean }) {
   const colors = useColors();
   const live = match.status === "Live";
   const scored = hasScore(match);
@@ -57,7 +58,7 @@ export function MatchCard({ match, onPress }: { match: Match; onPress: () => voi
         <View style={styles.timeColumn}>
           {live ? <LiveDot /> : null}
           <Text numberOfLines={1} adjustsFontSizeToFit maxFontSizeMultiplier={1.25} style={[styles.time, { color: colors.mutedForeground }]}>{match.startTime ? new Date(match.scheduledTime ?? match.startTime).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit", hour12: false }) : "—"}</Text>
-          <Text maxFontSizeMultiplier={1.25} style={[styles.subStatus, { color: live ? colors.live : colors.mutedForeground }]}>{match.status === "Upcoming" ? matchDayLabel(match) : status}</Text>
+          <Text maxFontSizeMultiplier={1.25} style={[styles.subStatus, { color: live ? colors.live : colors.mutedForeground }]}>{match.status === "Upcoming" || (showDay && !live) ? matchDayLabel(match) : status}</Text>
         </View>
         <View style={styles.teams}>
           <TeamLine team={match.teamA} score={scored ? match.scoreA : undefined} emphasize={scored && (match.scoreA ?? 0) > (match.scoreB ?? 0)} live={live} />

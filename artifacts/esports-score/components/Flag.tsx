@@ -1,10 +1,17 @@
 import { Image } from "expo-image";
-import { Text } from "react-native";
+import { View } from "react-native";
 import { useColors } from "@/hooks/useColors";
+import { flags } from "@/lib/flags";
 
-// Countries arrive as ISO codes ("BR"); flagcdn serves each flag as an SVG, which draws the same on every platform.
-export function Flag({ code, width = 24 }: { code: string; width?: number }) {
+// Countries arrive as ISO codes ("BR"). The flags ship with the app, so they show offline and all share one 4:3 shape.
+const aliases: Record<string, string> = { uk: "gb", en: "gb-eng" };
+
+export function Flag({ code, width = 24 }: { code?: string | null; width?: number }) {
   const colors = useColors();
-  if (!/^[a-z]{2}$/i.test(code)) return <Text style={{ fontSize: 12, color: colors.mutedForeground }}>{code}</Text>;
-  return <Image source={{ uri: `https://flagcdn.com/${code.toLowerCase()}.svg` }} contentFit="cover" accessibilityLabel={code.toUpperCase()} style={{ width, height: Math.round(width * 0.75), borderRadius: 3 }} />;
+  const key = code?.trim().toLowerCase() ?? "";
+  const source = flags[aliases[key] ?? key];
+  const shape = { width, height: Math.round(width * 0.75), borderRadius: 3 };
+  // Unknown country: an empty slot of the same size keeps the rows aligned.
+  if (!source) return <View accessibilityLabel="País não informado" style={[shape, { backgroundColor: colors.secondary }]} />;
+  return <Image source={source} contentFit="cover" accessibilityLabel={key.toUpperCase()} style={shape} />;
 }

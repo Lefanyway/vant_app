@@ -95,6 +95,7 @@ export type EsportsDataProvider = {
   getTeamDetails?(id: string): Promise<TeamDetails | null>;
   getTeamMatches?(id: string, filter: TeamMatchFilter, page?: number, perPage?: number): Promise<{ matches: Match[]; hasMore: boolean }>;
   getTeamStats?(id: string, period?: "30d"): Promise<TeamStats | null>;
+  getRecentByCountry?(country: string): Promise<Match[]>;
   getTeamNews?(id: string, limit?: number): Promise<TeamNewsArticle[]>;
   search(query: string): Promise<SearchResult[]>;
 };

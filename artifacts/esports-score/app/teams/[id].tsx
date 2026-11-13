@@ -8,7 +8,7 @@ import { Feather } from "@expo/vector-icons";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { useLocalSearchParams } from "expo-router";
 import { useState } from "react";
-import { Linking, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Linking, Platform, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { ListSkeleton, Pulse } from "@/components/MobileChrome";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { BackButton } from "@/components/BackButton";
@@ -16,7 +16,7 @@ import { ResolvedLogo } from "@/components/ResolvedLogo";
 import { TeamLink } from "@/components/TeamLink";
 import { useApp } from "@/context/AppContext";
 import { useColors } from "@/hooks/useColors";
-import { ApiError, errorMessage, fetchTeamMatches, fetchTeamNews, fetchTeamOverview, fetchTeamRoster, fetchTeamStats, toApiTeam, toMatch, type ApiPlayer, type TeamNewsArticle } from "@/lib/api";
+import { ApiError, errorMessage, fetchTeamMatches, fetchTeamNews, fetchTeamOverview, fetchTeamRoster, fetchTeamStats, teamCalendarUrl, toApiTeam, toMatch, type ApiPlayer, type TeamNewsArticle } from "@/lib/api";
 import { goBackOrHome, openCompetition, openMatch } from "@/lib/navigation";
 import type { Match, Team } from "@/lib/data";
 import { matchDayLabel } from "@/lib/matches";
@@ -59,8 +59,12 @@ function TeamHeader({ team, colors }: { team: NonNullable<Awaited<ReturnType<typ
   const { favoriteTeams, toggleFavorite } = useApp();
   const followed = favoriteTeams.includes(team.id);
   return <View style={[styles.header, { backgroundColor: colors.card, borderColor: colors.border }]}>
-    <View style={styles.identity}><ResolvedLogo type="team" name={team.name} entityId={team.id} game={team.gameId} logoUrl={team.logoUrl} size={86} /><View style={styles.copy}><Text style={[styles.teamName, { color: colors.foreground }]}>{team.name}</Text>{team.acronym ? <Text style={[styles.acronym, { color: colors.mutedForeground }]}>{team.acronym}</Text> : null}<Text style={[styles.meta, { color: colors.mutedForeground }]}>{team.gameId === "cs2" ? "CS2" : team.gameId === "lol" ? "League of Legends" : "Valorant"}{team.country ? ` · ${team.country}` : ""}</Text></View></View>
-    <Pressable accessibilityRole="button" onPress={() => toggleFavorite(team.id)} style={[styles.follow, { borderColor: followed ? colors.primary : colors.border, backgroundColor: followed ? colors.accent : colors.secondary }]}><Feather name={followed ? "check" : "plus"} size={14} color={followed ? colors.primary : colors.foreground} /><Text style={[styles.followText, { color: followed ? colors.primary : colors.foreground }]}>{followed ? "Seguindo" : "Seguir"}</Text></Pressable>
+    <View style={styles.identity}><ResolvedLogo type="team" name={team.name} entityId={team.id} game={team.gameId} logoUrl={team.logoUrl} size={86} /><View style={styles.copy}><Text style={[styles.teamName, { color: colors.foreground }]}>{team.name}</Text>{team.acronym ? <Text style={[styles.acronym, { color: colors.mutedForeground }]}>{team.acronym}</Text> : null}<View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}><Text style={[styles.meta, { color: colors.mutedForeground }]}>{team.gameId === "cs2" ? "CS2" : team.gameId === "lol" ? "League of Legends" : "Valorant"}</Text>{team.country ? <View style={{ marginTop: 4 }}><Flag code={team.country} width={20} /></View> : null}</View></View></View>
+    <View style={{ flexDirection: "row", gap: 8 }}>
+      <Pressable accessibilityRole="button" onPress={() => toggleFavorite(team.id)} style={[styles.follow, { borderColor: followed ? colors.primary : colors.border, backgroundColor: followed ? colors.accent : colors.secondary }]}><Feather name={followed ? "check" : "plus"} size={14} color={followed ? colors.primary : colors.foreground} /><Text style={[styles.followText, { color: followed ? colors.primary : colors.foreground }]}>{followed ? "Seguindo" : "Seguir"}</Text></Pressable>
+      {/* Puts the team's next matches in the phone calendar, with a reminder 15 minutes before each. */}
+      <Pressable accessibilityRole="button" accessibilityLabel={`Adicionar os próximos jogos de ${team.name} à agenda`} onPress={() => void Linking.openURL(teamCalendarUrl(team.id, Platform.OS === "ios"))} style={[styles.follow, { borderColor: colors.border, backgroundColor: colors.secondary }]}><Feather name="calendar" size={14} color={colors.foreground} /><Text style={[styles.followText, { color: colors.foreground }]}>Agenda</Text></Pressable>
+    </View>
   </View>;
 }
 

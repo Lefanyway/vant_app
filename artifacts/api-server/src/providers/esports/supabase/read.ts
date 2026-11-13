@@ -58,5 +58,5 @@ export function withSupabaseStore(provider: EsportsDataProvider, services: { sto
     const details = await store.matchDetails(matchId).catch(() => null);
     return details && details.match.status !== 'live' ? details.match : provider.getMatch(matchId);
   };
-  return Object.assign(Object.create(provider) as EsportsDataProvider, { getMatches, getTeamStats, getMatchDetails, getMatch });
+  return Object.assign(Object.create(provider) as EsportsDataProvider, { getMatches, getTeamStats, getMatchDetails, getMatch, getRecentByCountry: (country: string) => store.recentByCountry(country, 10) });
 }
