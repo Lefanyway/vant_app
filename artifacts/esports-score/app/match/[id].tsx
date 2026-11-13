@@ -17,6 +17,7 @@ import { TeamLink } from "@/components/TeamLink";
 import { useActiveScreen } from "@/hooks/useActiveScreen";
 import { WinProbability } from "@/components/WinProbability";
 import { ResultList } from "@/components/ResultRow";
+import { RecentByTeam } from "@/components/RecentByTeam";
 import { ShareButton } from "@/components/ShareButton";
 import { WatchOptions } from "@/components/WatchOptions";
 
@@ -98,8 +99,9 @@ function H2H({ details, colors }: { details: MatchDetails; colors: ReturnType<ty
   return <View><SectionTitle title="Confrontos anteriores" colors={colors} />{details.headToHead.length === 0 ? <Unavailable text="Ainda não há confrontos anteriores disponíveis." colors={colors} /> : <ResultList matches={details.headToHead.slice(0, 5)} />}</View>;
 }
 
-function RecentMatches({ details, colors }: { details: MatchDetails; colors: ReturnType<typeof useColors> }) {
-  return <>{details.recentMatches.filter(group => group.matches.length > 0).map((group) => <View key={group.teamId}><SectionTitle title={`Últimas partidas · ${group.matches[0]?.teamA.id === group.teamId ? group.matches[0].teamA.name : group.matches[0]?.teamB.name ?? "Equipe"}`} colors={colors} />{group.matches.length === 0 ? <Unavailable text="Nenhuma partida recente disponível." colors={colors} /> : <ResultList matches={group.matches} focusTeamId={group.teamId} />}</View>)}</>;
+function RecentMatches({ details }: { details: MatchDetails; colors: ReturnType<typeof useColors> }) {
+  const matchesByTeam = Object.fromEntries(details.recentMatches.map((group) => [group.teamId, group.matches]));
+  return <RecentByTeam teams={[details.match.teamA, details.match.teamB]} matchesByTeam={matchesByTeam} />;
 }
 
 function TeamColumn({ team, colors }: { team: Match["teamA"]; colors: ReturnType<typeof useColors> }) { return <TeamLink team={team} fill><View style={styles.teamColumn}><TeamBadge {...team} size={62} /><Text numberOfLines={2} style={[styles.teamName, { color: colors.foreground }]}>{team.name}</Text></View></TeamLink>; }
