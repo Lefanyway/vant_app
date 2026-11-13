@@ -10,8 +10,6 @@ import { openMatch } from "@/lib/navigation";
 import { fetchInsights, type Upcoming } from "@/lib/insights";
 
 const pct = (value: number) => `${Math.round(value * 100)}%`;
-// Logos alone do not say who plays when a team has no logo, so the sigla goes beside it.
-const short = (team: { name: string; acronym?: string }) => team.acronym?.trim() || team.name.trim();
 
 export default function Insights() {
   const colors = useColors();
@@ -34,23 +32,10 @@ export default function Insights() {
         </View> : null}
 
         {section("Próximas partidas")}
-        {data.upcoming.length ? data.upcoming.map((match) => {
-          const home = match.predictions?.home_win_prob;
-          const favorite = home === undefined ? null : home >= 0.5 ? match.payload.homeTeam : match.payload.awayTeam;
-          return <Pressable key={match.id} accessibilityRole="button" onPress={() => openMatch(match.id)} style={({ pressed }) => [styles.row, { backgroundColor: colors.card, opacity: pressed ? 0.75 : 1 }]}>
-            <View style={styles.rowCopy}>
-              <View accessibilityLabel={`${match.payload.homeTeam.name} contra ${match.payload.awayTeam.name}`} style={styles.logos}>
-                <ResolvedLogo type="team" name={match.payload.homeTeam.name} entityId={match.payload.homeTeam.id} logoUrl={absoluteLogo(match.payload.homeTeam.logoUrl)} size={30} />
-                <Text numberOfLines={1} style={[styles.teamShort, { color: colors.foreground }]}>{short(match.payload.homeTeam)}</Text>
-                <Text style={[styles.rowMeta, { color: colors.mutedForeground }]}>vs</Text>
-                <ResolvedLogo type="team" name={match.payload.awayTeam.name} entityId={match.payload.awayTeam.id} logoUrl={absoluteLogo(match.payload.awayTeam.logoUrl)} size={30} />
-                <Text numberOfLines={1} style={[styles.teamShort, { color: colors.foreground }]}>{short(match.payload.awayTeam)}</Text>
-              </View>
-              <Text numberOfLines={1} style={[styles.rowMeta, { color: colors.mutedForeground }]}>{new Date(match.start_time).toLocaleString("pt-BR", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })} · {match.payload.competition.name}</Text>
-            </View>
-            {favorite && home !== undefined ? <View style={styles.pick}><Text style={[styles.pickValue, { color: colors.primary }]}>{pct(Math.max(home, 1 - home))}</Text><Text numberOfLines={1} style={[styles.rowMeta, { color: colors.foreground }]}>{short(favorite)}</Text></View> : <Text style={[styles.rowMeta, { color: colors.mutedForeground }]}>Sem previsão</Text>}
-          </Pressable>;
-        }) : <EmptyState title="Nenhuma partida agendada" />}
+        {data.upcoming.length ? byDay(data.upcoming).map(([day, matches]) => <View key={day} style={[styles.dayCard, { backgroundColor: colors.card }]}>
+          <Text style={[styles.dayTitle, { color: colors.foreground }]}>{day}</Text>
+          {matches.map((match, index) => <PredictionRow key={match.id} match={match} first={index === 0} colors={colors} />)}
+        </View>) : <EmptyState title="Nenhuma partida agendada" />}
 
         {section("Ranking Elo")}
         <View style={[styles.card, { backgroundColor: colors.card }]}>
@@ -66,6 +51,39 @@ export default function Insights() {
   );
 }
 
+// One card per day, in start order, so the list reads like a schedule.
+function byDay(matches: Upcoming[]) {
+  const days = new Map<string, Upcoming[]>();
+  for (const match of [...matches].sort((a, b) => Date.parse(a.start_time) - Date.parse(b.start_time))) {
+    const date = new Date(match.start_time);
+    const label = `${date.toLocaleDateString("pt-BR", { weekday: "short" })} · ${date.toLocaleDateString("pt-BR", { day: "numeric", month: "short" })}`;
+    days.set(label, [...(days.get(label) ?? []), match]);
+  }
+  return [...days.entries()];
+}
+
+// Time on the left, both teams stacked, and each team's chance lined up on the right.
+function PredictionRow({ match, first, colors }: { match: Upcoming; first: boolean; colors: ReturnType<typeof useColors> }) {
+  const home = match.predictions?.home_win_prob;
+  const sides = [{ team: match.payload.homeTeam, chance: home }, { team: match.payload.awayTeam, chance: home === undefined ? undefined : 1 - home }];
+  return <Pressable accessibilityRole="button" accessibilityLabel={`${match.payload.homeTeam.name} contra ${match.payload.awayTeam.name}${home === undefined ? ", sem previsão" : `, ${pct(home)} a ${pct(1 - home)}`}`} onPress={() => openMatch(match.id)} style={({ pressed }) => [styles.row, !first && { borderTopWidth: 1, borderTopColor: colors.border }, { opacity: pressed ? 0.75 : 1 }]}>
+    <View style={styles.when}>
+      <Text style={[styles.time, { color: colors.foreground }]}>{new Date(match.start_time).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}</Text>
+      <Text numberOfLines={2} style={[styles.rowMeta, { color: colors.mutedForeground }]}>{match.payload.competition.name}</Text>
+    </View>
+    <View style={styles.teams}>
+      {sides.map(({ team, chance }) => {
+        const favorite = chance !== undefined && chance >= 0.5;
+        return <View key={team.id} style={styles.teamLine}>
+          <ResolvedLogo type="team" name={team.name} entityId={team.id} logoUrl={absoluteLogo(team.logoUrl)} size={24} />
+          <Text numberOfLines={1} style={[styles.teamName, { color: colors.foreground }]}>{team.name.trim()}</Text>
+          <Text style={[styles.chance, { color: favorite ? colors.primary : colors.mutedForeground, fontFamily: favorite ? font.bold : font.medium }]}>{chance === undefined ? "—" : pct(chance)}</Text>
+        </View>;
+      })}
+    </View>
+  </Pressable>;
+}
+
 function Metric({ label, value, highlight = false, colors }: { label: string; value: string; highlight?: boolean; colors: ReturnType<typeof useColors> }) {
   return <View style={styles.metric}><Text style={[styles.metricValue, { color: highlight ? colors.primary : colors.foreground }]}>{value}</Text><Text style={[styles.rowMeta, { color: colors.mutedForeground }]}>{label}</Text></View>;
 }
@@ -79,13 +97,16 @@ const styles = StyleSheet.create({
   metric: { flex: 1, alignItems: "center", gap: 2 },
   metricValue: { fontSize: 24, fontFamily: font.bold, fontVariant: ["tabular-nums"] },
   note: { fontSize: 12, lineHeight: 17, fontFamily: font.medium, textAlign: "center" },
-  row: { borderRadius: 16, padding: 14, marginBottom: 8, flexDirection: "row", alignItems: "center", gap: 12 },
-  rowCopy: { flex: 1, minWidth: 0, gap: 3 },
+  dayCard: { borderRadius: 22, paddingHorizontal: 14, paddingTop: 14, paddingBottom: 4, marginBottom: 12 },
+  dayTitle: { fontSize: 15, fontFamily: font.bold, marginBottom: 2 },
+  row: { minHeight: 72, paddingVertical: 12, flexDirection: "row", alignItems: "center", gap: 12 },
+  when: { width: 74, gap: 3 },
+  time: { fontSize: 14, fontFamily: font.semibold, fontVariant: ["tabular-nums"] },
   rowMeta: { fontSize: 11, fontFamily: font.medium },
-  pick: { alignItems: "flex-end", maxWidth: 130 },
-  logos: { flexDirection: "row", alignItems: "center", gap: 6 },
-  teamShort: { flexShrink: 1, fontSize: 13, fontFamily: font.semibold },
-  pickValue: { fontSize: 18, fontFamily: font.bold, fontVariant: ["tabular-nums"] },
+  teams: { flex: 1, minWidth: 0, gap: 8 },
+  teamLine: { flexDirection: "row", alignItems: "center", gap: 8 },
+  teamName: { flex: 1, minWidth: 0, fontSize: 14, fontFamily: font.semibold },
+  chance: { width: 44, textAlign: "right", fontSize: 14, fontVariant: ["tabular-nums"] },
   rank: { flexDirection: "row", alignItems: "center", gap: 10, minHeight: 40 },
   position: { width: 18, fontSize: 13, fontFamily: font.bold, textAlign: "right" },
   rankName: { flex: 1, fontSize: 14, fontFamily: font.semibold },

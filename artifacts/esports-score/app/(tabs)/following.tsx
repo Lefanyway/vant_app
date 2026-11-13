@@ -8,7 +8,6 @@ import { MobileHeader, ScreenTabs, ListSkeleton } from "@/components/MobileChrom
 import { SwipeTabs } from "@/components/SwipeTabs";
 import { FavoritesDiscover } from "@/components/FavoritesDiscover";
 import { FollowedMatches } from "@/components/FollowedMatches";
-import { TeamFocus } from "@/components/TeamFocus";
 import { ResolvedLogo } from "@/components/ResolvedLogo";
 import { useApp } from "@/context/AppContext";
 import { useColors } from "@/hooks/useColors";
@@ -59,12 +58,10 @@ export default function Following() {
             <Text style={[styles.chipName, { color: colors.primary }]}>Adicionar</Text>
           </Pressable>
         </ScrollView>
-        {tab === "teams" && picked && followed.find(item => item.id === picked) ? <TeamFocus teamId={picked} onSeeAll={() => followed.find(item => item.id === picked)?.open()} /> : <>
         {picked && followed.some(item => item.id === picked) ? <Pressable testID={`${kind}-link-${picked}`} accessibilityRole="link" onPress={() => followed.find(item => item.id === picked)?.open()} style={styles.openLink}><Text style={[styles.openText, { color: colors.primary }]}>Ver página de {followed.find(item => item.id === picked)?.name}</Text></Pressable> : null}
         <Text style={[styles.section, { color: colors.mutedForeground }]}>Próximas partidas</Text>
         {ids.length ? <FollowedMatches kind={kind} ids={ids} /> : <Text style={[styles.empty, { color: colors.mutedForeground }]}>{tab === "teams" ? "Você ainda não segue nenhuma equipe." : "Você ainda não segue nenhuma competição."}</Text>}
         {ids.length ? <><Text style={[styles.section, { color: colors.mutedForeground }]}>Últimas partidas</Text><FollowedMatches kind={kind} ids={ids} filter="finished" /></> : null}
-        </>}
       </>}
     </ScrollView>
     </SwipeTabs>
