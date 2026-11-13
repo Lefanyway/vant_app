@@ -3,6 +3,7 @@ import { useLocalSearchParams } from "expo-router";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { BackButton } from "@/components/BackButton";
+import { ListSkeleton } from "@/components/MobileChrome";
 import { MatchCard } from "@/components/MatchCard";
 import { ResolvedLogo } from "@/components/ResolvedLogo";
 import { useColors } from "@/hooks/useColors";
@@ -22,7 +23,7 @@ export default function CompetitionDetail() {
     <View style={{ flex: 1, backgroundColor: colors.background }}>
     <View style={[styles.nav, { paddingTop: Math.max(insets.top, 14), paddingHorizontal: 16 }]}><BackButton /><View style={styles.navSpacer} /></View>
     <ScrollView style={styles.screen} contentContainerStyle={{ paddingBottom: 48 }}>
-      {competition.isLoading && !competition.data ? <Text style={[styles.message, { color: colors.mutedForeground }]}>Carregando competição…</Text>
+      {competition.isLoading && !competition.data ? <ListSkeleton />
         : competition.isError || !competition.data ? (
           <View style={styles.center}>
             <Text style={[styles.message, { color: colors.mutedForeground }]}>{competition.isError ? errorMessage(competition.error, "Não foi possível carregar a competição.") : "Competição não encontrada."}</Text>
@@ -51,7 +52,7 @@ function MatchSection({ title, query, colors, empty }: { title: string; query: {
   return (
     <View>
       <Text style={[styles.section, { color: colors.mutedForeground }]}>{title}</Text>
-      {query.isLoading && !query.data ? <Text style={[styles.message, { color: colors.mutedForeground }]}>Carregando partidas…</Text>
+      {query.isLoading && !query.data ? <ListSkeleton count={2} />
         : query.isError && !query.data ? <View><Text style={[styles.message, { color: colors.mutedForeground }]}>{errorMessage(query.error, "Não foi possível carregar as partidas.")}</Text><Pressable accessibilityRole="button" onPress={() => query.refetch()}><Text style={[styles.retry, { color: colors.primary }]}>Tentar de novo</Text></Pressable></View>
           : matches.length === 0 ? <Text style={[styles.message, { color: colors.mutedForeground }]}>{empty}</Text>
             : matches.map((match) => <MatchCard key={match.id} match={match} onPress={() => openMatch(match.id, match)} />)}

@@ -1,6 +1,7 @@
 import { Feather } from '@expo/vector-icons';
+import { useEffect, useRef, type ReactNode } from 'react';
 import { router } from 'expo-router';
-import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Animated, Image, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNotifications } from '@/context/NotificationsContext';
 import { useColors } from '@/hooks/useColors';
@@ -37,9 +38,21 @@ export function EmptyState({ title, description, onRetry }: { title: string; des
   return <View style={styles.empty}><Feather name={onRetry ? 'wifi-off' : 'calendar'} size={28} color={colors.mutedForeground} /><Text style={[styles.emptyTitle, { color: colors.foreground }]}>{title}</Text>{description ? <Text style={[styles.emptyCopy, { color: colors.mutedForeground }]}>{description}</Text> : null}{onRetry ? <Pressable onPress={onRetry} style={[styles.retry, { backgroundColor: colors.accent }]}><Text style={{ color: colors.primary, fontWeight: '600' }}>Tentar novamente</Text></Pressable> : null}</View>;
 }
 
-export function ListSkeleton() {
+// Every loading placeholder pulses the same way, so a slow network never looks frozen.
+export function Pulse({ label = 'Carregando', children }: { label?: string; children: ReactNode }) {
+  const opacity = useRef(new Animated.Value(0.45)).current;
+  useEffect(() => {
+    const native = Platform.OS !== 'web';
+    const loop = Animated.loop(Animated.sequence([Animated.timing(opacity, { toValue: 1, duration: 650, useNativeDriver: native }), Animated.timing(opacity, { toValue: 0.45, duration: 650, useNativeDriver: native })]));
+    loop.start();
+    return () => loop.stop();
+  }, [opacity]);
+  return <Animated.View accessibilityLabel={label} style={{ opacity }}>{children}</Animated.View>;
+}
+
+export function ListSkeleton({ count = 3 }: { count?: number }) {
   const colors = useColors();
-  return <View accessibilityLabel="Carregando partidas">{[0, 1, 2].map(n => <View key={n} style={[styles.skeleton, { backgroundColor: colors.card }]}><View style={[styles.skeletonTitle, { backgroundColor: colors.secondary }]} />{[0, 1].map(row => <View key={row} style={styles.skeletonRow}><View style={[styles.skeletonLogo, { backgroundColor: colors.secondary }]} /><View style={[styles.skeletonLine, { backgroundColor: colors.secondary }]} /></View>)}</View>)}</View>;
+  return <Pulse>{Array.from({ length: count }, (_, n) => <View key={n} style={[styles.skeleton, { backgroundColor: colors.card }]}><View style={[styles.skeletonTitle, { backgroundColor: colors.secondary }]} />{[0, 1].map(row => <View key={row} style={styles.skeletonRow}><View style={[styles.skeletonLogo, { backgroundColor: colors.secondary }]} /><View style={[styles.skeletonLine, { backgroundColor: colors.secondary }]} /></View>)}</View>)}</Pulse>;
 }
 const styles = StyleSheet.create({
   header: { paddingHorizontal: 12 }, top: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingBottom: 10 },

@@ -1,11 +1,12 @@
 import { ResolvedLogo } from "@/components/ResolvedLogo";
 import { Feather } from "@expo/vector-icons";
 import { useLocalSearchParams } from "expo-router";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Animated, Platform, Pressable, ScrollView, Share, StyleSheet, Text, View } from "react-native";
+import { Pressable, ScrollView, Share, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { BackButton } from "@/components/BackButton";
+import { Pulse } from "@/components/MobileChrome";
 import { applyMatchStats, errorMessage, fetchMatch, fetchMatchDetails, fetchMatchStats, type MatchDetails } from "@/lib/api";
 import type { Match } from "@/lib/data";
 import { hasScore } from "@/lib/matches";
@@ -116,15 +117,8 @@ function SectionTitle({ title, colors }: { title: string; colors: ReturnType<typ
 function InfoRow({ label, value, colors, last = false }: { label: string; value: string; colors: ReturnType<typeof useColors>; last?: boolean }) { return <View style={[styles.infoRow, last && styles.infoRowLast, { borderBottomColor: colors.border }]}><Text style={[styles.infoLabel, { color: colors.mutedForeground }]}>{label}</Text><Text style={[styles.infoValue, { color: colors.foreground }]}>{value}</Text></View>; }
 function Stat({ label, value, colors }: { label: string; value?: number | string; colors: ReturnType<typeof useColors> }) { return <View style={styles.stat}><Text style={[styles.statLabel, { color: colors.mutedForeground }]}>{label}</Text><Text style={[styles.statValue, { color: colors.foreground }]}>{value ?? "—"}</Text></View>; }
 function Unavailable({ text, colors }: { text: string; colors: ReturnType<typeof useColors> }) { return <View style={[styles.unavailable, { backgroundColor: colors.card, borderColor: colors.border }]}><Text style={[styles.unavailableTitle, { color: colors.mutedForeground }]}>Dados indisponíveis</Text><Text style={[styles.unavailableText, { color: colors.mutedForeground }]}>{text}</Text></View>; }
-// The placeholder pulses so a slow network never looks like a frozen screen.
 function DetailSkeleton({ colors }: { colors: ReturnType<typeof useColors> }) {
-  const opacity = useRef(new Animated.Value(0.45)).current;
-  useEffect(() => {
-    const pulse = Animated.loop(Animated.sequence([Animated.timing(opacity, { toValue: 1, duration: 650, useNativeDriver: Platform.OS !== "web" }), Animated.timing(opacity, { toValue: 0.45, duration: 650, useNativeDriver: Platform.OS !== "web" })]));
-    pulse.start();
-    return () => pulse.stop();
-  }, [opacity]);
-  return <Animated.View accessibilityLabel="Carregando partida" style={{ opacity }}><View style={[styles.skeleton, { backgroundColor: colors.card }]} /><View style={[styles.skeletonWide, { backgroundColor: colors.card }]} /><View style={[styles.skeleton, { backgroundColor: colors.card }]} /></Animated.View>;
+  return <Pulse label="Carregando partida"><View style={[styles.skeleton, { backgroundColor: colors.card }]} /><View style={[styles.skeletonWide, { backgroundColor: colors.card }]} /><View style={[styles.skeleton, { backgroundColor: colors.card }]} /></Pulse>;
 }
 
 const styles = StyleSheet.create({

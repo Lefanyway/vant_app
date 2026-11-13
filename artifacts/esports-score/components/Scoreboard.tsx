@@ -1,10 +1,10 @@
-import { AppLoading } from "@/components/AppLoading";
 import { Feather } from "@expo/vector-icons";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import { FlatList, Modal, Pressable, RefreshControl, StyleSheet, Text, TextInput, View } from "react-native";
 import { CompetitionCard } from "@/components/CompetitionCard";
 import { EmptyState } from "@/components/EmptyState";
+import { ListSkeleton } from "@/components/MobileChrome";
 import { GameIdentity } from "@/components/GameTabs";
 import { font } from "@/constants/type";
 import { useActiveScreen } from "@/hooks/useActiveScreen";
@@ -123,7 +123,7 @@ export function Scoreboard({ showSearch = true, showIdentity = true }: { showSea
         })}
       </View>
       {stale ? <Text style={[styles.stale, { color: colors.mutedForeground, fontFamily: font.medium }]}>Não foi possível atualizar. Mostrando dados salvos.</Text> : null}
-      {waiting ? <AppLoading /> : failed ? (
+      {waiting ? <ListSkeleton /> : failed ? (
         <EmptyState title={errorMessage(status === "live" ? liveQuery.error : matchesQuery.error, "Não foi possível carregar as partidas.")} action="Tentar de novo" onAction={() => { void refresh(); }} />
       ) : (
         <FlatList

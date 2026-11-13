@@ -1,6 +1,7 @@
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Pressable, StyleSheet, Text, View } from "react-native";
+import { ListSkeleton } from "@/components/MobileChrome";
 import { ResolvedLogo } from "@/components/ResolvedLogo";
 import { font } from "@/constants/type";
 import { useApp } from "@/context/AppContext";
@@ -37,7 +38,7 @@ export function FollowingSettings() {
   const rows = query.data ?? [];
   return (
     <View style={[styles.panel, { backgroundColor: colors.card }]}>
-      {query.isLoading ? <Text style={[styles.empty, { color: colors.mutedForeground }]}>Carregando…</Text>
+      {query.isLoading ? <ListSkeleton count={1} />
         : query.isError ? <Text style={[styles.empty, { color: colors.mutedForeground }]}>Não foi possível carregar seus favoritos.</Text>
         : !rows.length ? <Text style={[styles.empty, { color: colors.mutedForeground }]}>Siga equipes e competições pela busca para recebê-las aqui.</Text>
         : rows.map((item, index) => (
