@@ -46,5 +46,16 @@ export function withSupabaseStore(provider: EsportsDataProvider, services: { sto
       return fromProviderStats ? fromProviderStats(teamId, period) : null;
     }
   };
-  return Object.assign(Object.create(provider) as EsportsDataProvider, { getMatches, getTeamStats });
+  // A match page reads the stored match and both teams' history from Supabase; a live match still asks the provider for the current score.
+  const fromProviderDetails = provider.getMatchDetails?.bind(provider);
+  const getMatchDetails = async (matchId: string) => {
+    const details = await store.matchDetails(matchId).catch(() => null);
+    if (details && details.match.status !== 'live') return details;
+    return fromProviderDetails ? fromProviderDetails(matchId) : details;
+  };
+  const getMatch = async (matchId: string) => {
+    const details = await store.matchDetails(matchId).catch(() => null);
+    return details && details.match.status !== 'live' ? details.match : provider.getMatch(matchId);
+  };
+  return Object.assign(Object.create(provider) as EsportsDataProvider, { getMatches, getTeamStats, getMatchDetails, getMatch });
 }

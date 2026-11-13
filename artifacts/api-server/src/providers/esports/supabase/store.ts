@@ -1,4 +1,4 @@
-import type { Match, TeamStats } from '../types';
+import type { Match, MatchDetails, TeamStats } from '../types';
 
 export type IngestCompetition = { id: string; name: string; slug?: string; logo_url?: string; region?: string; game_id: string };
 export type IngestTeam = { id: string; name: string; acronym?: string; logo_url?: string; country?: string; game_id: string };
@@ -55,6 +55,26 @@ export class SupabaseStore {
     params.append('start_time', `lt.${end}`);
     const rows = await this.rest<{ payload: Match }[]>(`matches?${params.toString()}`);
     return rows.map(row => row.payload);
+  }
+
+  // A stored match with each team's last five results and their meetings, in one round of parallel queries.
+  async matchDetails(matchId: string): Promise<MatchDetails | null> {
+    const id = encodeURIComponent(matchId);
+    const [row] = await this.rest<{ payload: Match; home_team_id: string | null; away_team_id: string | null }[]>(`matches?select=payload,home_team_id,away_team_id&id=eq.${id}`);
+    if (!row) return null;
+    const finished = (filter: string) => this.rest<{ payload: Match }[]>(`matches?select=payload&status=eq.finished&id=neq.${id}&or=${encodeURIComponent(filter)}&order=start_time.desc&limit=5`).then((rows) => rows.map((item) => item.payload));
+    const team = (teamId: string) => `(home_team_id.eq."${teamId}",away_team_id.eq."${teamId}")`;
+    const { home_team_id: home, away_team_id: away } = row;
+    const [homeRecent, awayRecent, headToHead] = await Promise.all([
+      home ? finished(team(home)) : [],
+      away ? finished(team(away)) : [],
+      home && away ? finished(`(and(home_team_id.eq."${home}",away_team_id.eq."${away}"),and(home_team_id.eq."${away}",away_team_id.eq."${home}"))`) : [],
+    ]);
+    return {
+      match: row.payload, maps: [], playerStats: [], economy: null, veto: null, headToHead,
+      recentMatches: [home ? { teamId: home, matches: homeRecent } : null, away ? { teamId: away, matches: awayRecent } : null].filter((group) => group !== null),
+      capabilities: { maps: false, playerStats: false, economy: false, veto: false, headToHead: Boolean(home && away), recentMatches: Boolean(home || away) },
+    };
   }
 
   // Results over the last days straight from stored matches, plus the model's current Elo for the team.
