@@ -33,3 +33,8 @@ test("names countries in Portuguese", () => {
   assert.equal(countryName("BR"), "Brasil");
   assert.equal(countryName(""), undefined);
 });
+
+test("among equally good matches, the stronger team (higher Elo) comes first", () => {
+  const ranked = rankResults([team("Cloud9 White"), team("Cloud9 GC"), team("Cloud9")], "cloud9 ", 30, new Map([["Cloud9 GC", 1700], ["Cloud9 White", 1500]]));
+  assert.deepEqual(ranked.map((item) => item.name), ["Cloud9", "Cloud9 GC", "Cloud9 White"]);
+});

@@ -1,5 +1,6 @@
 import { logger } from '../../../lib/logger';
 import { localDayBounds } from '../date';
+import { rankResults } from '../search-rank';
 import type { EsportsDataProvider, Match, MatchQuery } from '../types';
 import { SupabaseStore } from './store';
 import { SupabaseSync } from './sync';
@@ -58,5 +59,17 @@ export function withSupabaseStore(provider: EsportsDataProvider, services: { sto
     const details = await store.matchDetails(matchId).catch(() => null);
     return details && details.match.status !== 'live' ? details.match : provider.getMatch(matchId);
   };
-  return Object.assign(Object.create(provider) as EsportsDataProvider, { getMatches, getTeamStats, getMatchDetails, getMatch, getRecentByCountry: (country: string) => store.recentByCountry(country, 10) });
+  // Typed searches read the stored catalog first (about 0.15 s instead of up to 1 s) and rank by text, then Elo.
+  // Few hits (accents typed without them, seasons like "Game Changers") still go to the provider.
+  const fromProviderCatalog = provider.getCatalogPage?.bind(provider);
+  const getCatalogPage = async (type: 'team' | 'competition' | 'all', page: number, query: string) => {
+    const q = query.trim();
+    if (q.length >= 2 && page === 1) {
+      const stored = await store.searchCatalog(type, q).catch(() => null);
+      if (stored && stored.items.length >= 3) return { items: rankResults(stored.items, q, 30, stored.popularity), hasMore: false };
+    }
+    if (!fromProviderCatalog) return { items: [], hasMore: false };
+    return fromProviderCatalog(type, page, query);
+  };
+  return Object.assign(Object.create(provider) as EsportsDataProvider, { getMatches, getTeamStats, getMatchDetails, getMatch, getCatalogPage, getRecentByCountry: (country: string) => store.recentByCountry(country, 10) });
 }

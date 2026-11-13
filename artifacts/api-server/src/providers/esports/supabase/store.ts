@@ -1,4 +1,5 @@
-import type { Match, MatchDetails, TeamStats } from '../types';
+import type { Match, MatchDetails, SearchResult, TeamStats } from '../types';
+import { countryName } from '../search-rank';
 
 export type IngestCompetition = { id: string; name: string; slug?: string; logo_url?: string; region?: string; game_id: string };
 export type IngestTeam = { id: string; name: string; acronym?: string; logo_url?: string; country?: string; game_id: string };
@@ -47,6 +48,27 @@ export class SupabaseStore {
     });
     if (batch.kind !== 'live') this.coverageCache = null;
     return result;
+  }
+
+  // Name search over the stored catalog, with each team's Elo for ranking. Much faster than asking the provider.
+  async searchCatalog(type: 'team' | 'competition' | 'all', query: string): Promise<{ items: SearchResult[]; popularity: Map<string, number> }> {
+    // PostgREST filter syntax uses these characters; a name search never needs them.
+    const q = encodeURIComponent(query.replace(/[,()*%:"\\]/g, ' ').trim());
+    if (!q) return { items: [], popularity: new Map() };
+    const [teams, competitions] = await Promise.all([
+      type === 'competition' ? [] : this.rest<{ id: string; name: string; acronym: string | null; logo_url: string | null; country: string | null }[]>(`teams?select=id,name,acronym,logo_url,country&or=(name.ilike.*${q}*,acronym.ilike.${q}*)&limit=80`),
+      type === 'team' ? [] : this.rest<{ id: string; name: string; logo_url: string | null; region: string | null }[]>(`competitions?select=id,name,logo_url,region&name=ilike.*${q}*&limit=40`),
+    ]);
+    const ids = teams.map(row => encodeURIComponent(row.id));
+    const elo = ids.length ? await this.rest<{ team_id: string; elo: number }[]>(`team_elo?select=team_id,elo&team_id=in.(${ids.join(',')})`).catch(() => []) : [];
+    const logo = (url: string | null) => url ? `/api/esports/assets/logo?url=${encodeURIComponent(url)}` : undefined;
+    return {
+      items: [
+        ...teams.map((row): SearchResult => ({ type: 'team', id: row.id, name: row.name.trim(), gameId: 'valorant', logoUrl: logo(row.logo_url), acronym: row.acronym || undefined, country: row.country || undefined, countryName: countryName(row.country || undefined) })),
+        ...competitions.map((row): SearchResult => ({ type: 'competition', id: row.id, name: row.name.trim(), gameId: 'valorant', logoUrl: logo(row.logo_url) })),
+      ],
+      popularity: new Map(elo.map(row => [row.team_id, row.elo])),
+    };
   }
 
   // Latest results with a team from one country (ISO code, such as "BR"), newest first.

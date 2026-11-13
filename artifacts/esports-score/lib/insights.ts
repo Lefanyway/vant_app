@@ -4,7 +4,7 @@ export type Score = { accuracy: number; brier: number };
 export type InsightTeam = { id: string; name: string; acronym?: string; logoUrl?: string };
 export type Features = Record<string, number>;
 export type Coefficients = Record<string, number>;
-export type Upcoming = { id: string; start_time: string; payload: { homeTeam: InsightTeam; awayTeam: InsightTeam; competition: { name: string } }; predictions: { home_win_prob: number; features: Features | null } | null };
+export type Upcoming = { id: string; start_time: string; payload: { homeTeam: InsightTeam; awayTeam: InsightTeam; competition: { id?: string; name: string; logoUrl?: string } }; predictions: { home_win_prob: number; features: Features | null } | null };
 export type Finished = Upcoming & { home_score: number | null; away_score: number | null };
 export type Ranked = { team_id: string; elo: number; name: string; logo_url?: string };
 

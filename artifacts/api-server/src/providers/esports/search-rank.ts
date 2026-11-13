@@ -35,14 +35,15 @@ function score(item: SearchResult, query: string): number {
   return 4;
 }
 
-// Best match first; among equals the shorter name, so "Team Liquid" comes before "Team Liquid Academy".
-export function rankResults(items: SearchResult[], rawQuery: string, limit = 30): SearchResult[] {
+// Best match first; among equals the more popular one (higher Elo), then the shorter name,
+// so "Team Liquid" comes before "Team Liquid Academy".
+export function rankResults(items: SearchResult[], rawQuery: string, limit = 30, popularity: ReadonlyMap<string, number> = new Map()): SearchResult[] {
   const query = normalize(rawQuery);
   // The first copy wins: lookups come newest season first.
   const unique = [...items.reduce((seen, item) => seen.has(`${item.type}:${item.id}`) ? seen : seen.set(`${item.type}:${item.id}`, item), new Map<string, SearchResult>()).values()];
   return unique
     .map((item) => ({ item, score: score(item, query) }))
-    .sort((a, b) => a.score - b.score || a.item.name.length - b.item.name.length || a.item.name.localeCompare(b.item.name))
+    .sort((a, b) => a.score - b.score || (popularity.get(b.item.id) ?? 0) - (popularity.get(a.item.id) ?? 0) || a.item.name.length - b.item.name.length || a.item.name.localeCompare(b.item.name))
     .slice(0, limit)
     .map(({ item }) => item);
 }

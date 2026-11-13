@@ -4,6 +4,7 @@ import { MatchCard } from "@/components/MatchCard";
 import { ResolvedLogo } from "@/components/ResolvedLogo";
 import { useColors } from "@/hooks/useColors";
 import type { Match } from "@/lib/data";
+import { listTeamLabel } from "@/lib/matches";
 import { openMatch } from "@/lib/navigation";
 
 type Team = Match["teamA"];
@@ -13,8 +14,6 @@ export function RecentByTeam({ teams, matchesByTeam }: { teams: [Team, Team]; ma
   const colors = useColors();
   const [selected, setSelected] = useState(teams[0].id);
   const matches = matchesByTeam[selected] ?? [];
-  const groups = new Map<string, Match[]>();
-  for (const match of matches) groups.set(match.tournament, [...(groups.get(match.tournament) ?? []), match]);
   return <View>
     <Text style={[styles.title, { color: colors.mutedForeground }]}>Últimas partidas</Text>
     <View accessibilityRole="tablist" style={[styles.segment, { backgroundColor: colors.card }]}>
@@ -22,12 +21,21 @@ export function RecentByTeam({ teams, matchesByTeam }: { teams: [Team, Team]; ma
         const on = team.id === selected;
         return <Pressable key={team.id} accessibilityRole="tab" accessibilityState={{ selected: on }} accessibilityLabel={`Últimas partidas de ${team.name}`} onPress={() => setSelected(team.id)} style={[styles.option, on && { backgroundColor: colors.secondary }]}>
           <ResolvedLogo type="team" name={team.name} entityId={team.id} logoUrl={team.logoUrl} size={22} />
-          <Text numberOfLines={1} style={[styles.optionText, { color: on ? colors.foreground : colors.mutedForeground }]}>{team.name}</Text>
+          <Text numberOfLines={1} style={[styles.optionText, { color: on ? colors.foreground : colors.mutedForeground }]}>{listTeamLabel(team, 12)}</Text>
         </Pressable>;
       })}
     </View>
-    {!matches.length ? <Text style={[styles.empty, { color: colors.mutedForeground }]}>Nenhuma partida recente disponível.</Text>
-      : [...groups.entries()].map(([name, group]) => <View key={name} style={[styles.card, { backgroundColor: colors.card }]}>
+    {!matches.length ? <Text style={[styles.empty, { color: colors.mutedForeground }]}>Nenhuma partida recente disponível.</Text> : <CompetitionGroups matches={matches} />}
+  </View>;
+}
+
+// Past matches in one card per competition, each match with its date: the standard for results lists.
+export function CompetitionGroups({ matches }: { matches: Match[] }) {
+  const colors = useColors();
+  const groups = new Map<string, Match[]>();
+  for (const match of matches) groups.set(match.tournament, [...(groups.get(match.tournament) ?? []), match]);
+  return <View>
+    {[...groups.entries()].map(([name, group]) => <View key={name} style={[styles.card, { backgroundColor: colors.card }]}>
         <View style={styles.header}>
           <ResolvedLogo type="competition" name={name} entityId={group[0].competitionId} logoUrl={group[0].competitionLogoUrl} size={34} />
           <View style={styles.copy}>

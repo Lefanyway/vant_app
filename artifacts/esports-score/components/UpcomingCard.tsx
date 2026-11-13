@@ -2,6 +2,7 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 import { ResolvedLogo } from "@/components/ResolvedLogo";
 import { useColors } from "@/hooks/useColors";
 import type { Match } from "@/lib/data";
+import { listTeamLabel } from "@/lib/matches";
 import { openMatch } from "@/lib/navigation";
 
 const statusLabel = (match: Match) => match.status === "Live" ? "Ao vivo" : match.status === "Postponed" ? "Adiada" : match.status === "Cancelled" ? "Cancelada" : "Agendada";
@@ -32,7 +33,7 @@ function Side({ team }: { team: Match["teamA"] }) {
   const colors = useColors();
   return <View style={styles.side}>
     <ResolvedLogo type="team" name={team.name} entityId={team.id} logoUrl={team.logoUrl} size={40} />
-    <Text numberOfLines={1} style={[styles.name, { color: colors.foreground }]}>{team.name}</Text>
+    <Text numberOfLines={1} style={[styles.name, { color: colors.foreground }]}>{listTeamLabel(team, 14)}</Text>
   </View>;
 }
 

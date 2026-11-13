@@ -54,7 +54,13 @@ export default function Insights() {
         {section("Próximas partidas")}
         {data.upcoming.length ? byDay(data.upcoming).map(([day, matches]) => <View key={day} style={[styles.dayCard, { backgroundColor: colors.card }]}>
           <Text style={[styles.dayTitle, { color: colors.foreground }]}>{day}</Text>
-          {matches.map((match, index) => <PredictionRow key={match.id} match={match} first={index === 0} coefficients={data.run?.coefficients} colors={colors} />)}
+          {byCompetition(matches).map(([name, group]) => <View key={name}>
+            <View style={styles.compHeader}>
+              <ResolvedLogo type="competition" name={name} entityId={group[0].payload.competition.id} logoUrl={absoluteLogo(group[0].payload.competition.logoUrl)} size={20} />
+              <Text style={[styles.compName, { color: colors.mutedForeground }]}>{name}</Text>
+            </View>
+            {group.map((match, index) => <PredictionRow key={match.id} match={match} first={index === 0} coefficients={data.run?.coefficients} colors={colors} />)}
+          </View>)}
         </View>) : <EmptyState title="Nenhuma partida agendada" />}
 
         {data.run?.coefficients ? <>{section("Simular confronto")}<MatchSimulator coefficients={data.run.coefficients} /></> : null}
@@ -85,6 +91,13 @@ function byDay(matches: Upcoming[]) {
 }
 
 // Time on the left, both teams stacked, and each team's chance lined up on the right.
+// Inside a day, matches sit under their competition's name, written in full on its own line.
+function byCompetition(matches: Upcoming[]) {
+  const groups = new Map<string, Upcoming[]>();
+  for (const match of matches) groups.set(match.payload.competition.name, [...(groups.get(match.payload.competition.name) ?? []), match]);
+  return [...groups.entries()];
+}
+
 function PredictionRow({ match, first, coefficients, colors }: { match: Upcoming; first: boolean; coefficients?: Coefficients; colors: ReturnType<typeof useColors> }) {
   const [open, setOpen] = useState(false);
   const home = match.predictions?.home_win_prob;
@@ -104,7 +117,6 @@ function PredictionLine({ match, home, colors }: { match: Upcoming; home?: numbe
   return <Pressable accessibilityRole="button" accessibilityLabel={`${match.payload.homeTeam.name} contra ${match.payload.awayTeam.name}${home === undefined ? ", sem previsão" : `, ${pct(home)} a ${pct(1 - home)}`}`} onPress={() => openMatch(match.id)} style={({ pressed }) => [styles.row, { opacity: pressed ? 0.75 : 1 }]}>
     <View style={styles.when}>
       <Text style={[styles.time, { color: colors.foreground }]}>{new Date(match.start_time).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}</Text>
-      <Text numberOfLines={2} style={[styles.rowMeta, { color: colors.mutedForeground }]}>{match.payload.competition.name}</Text>
     </View>
     <View style={styles.teams}>
       {sides.map(({ team, chance }) => {
@@ -159,9 +171,11 @@ const styles = StyleSheet.create({
   metricValue: { fontSize: 24, fontFamily: font.bold, fontVariant: ["tabular-nums"] },
   note: { fontSize: 12, lineHeight: 17, fontFamily: font.medium, textAlign: "center" },
   dayCard: { borderRadius: 22, paddingHorizontal: 14, paddingTop: 14, paddingBottom: 4, marginBottom: 12 },
+  compHeader: { flexDirection: "row", alignItems: "center", gap: 8, paddingTop: 10, paddingBottom: 2 },
+  compName: { flex: 1, fontSize: 12, fontFamily: font.semibold },
   dayTitle: { fontSize: 15, fontFamily: font.bold, marginBottom: 2 },
   row: { minHeight: 72, paddingVertical: 12, flexDirection: "row", alignItems: "center", gap: 12 },
-  when: { width: 74, gap: 3 },
+  when: { width: 52, gap: 3 },
   time: { fontSize: 14, fontFamily: font.semibold, fontVariant: ["tabular-nums"] },
   rowMeta: { fontSize: 11, fontFamily: font.medium },
   teams: { flex: 1, minWidth: 0, gap: 8 },

@@ -14,9 +14,10 @@ export function groupMatches(matches: Match[]): MatchGroup[] {
   return groups;
 }
 
-export function listTeamLabel(team: { name: string; short?: string }) {
+// Long names fall back to the official acronym (TLG, ALG, QXG) where space is tight.
+export function listTeamLabel(team: { name: string; short?: string }, max = 22) {
   const name = team.name.trim();
-  if (name.length <= 22) return name;
+  if (name.length <= max) return name;
   const short = team.short?.trim();
   if (short && short.length >= 2 && short.length <= 10) return short;
   return name;

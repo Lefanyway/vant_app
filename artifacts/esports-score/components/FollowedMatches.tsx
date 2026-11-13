@@ -3,6 +3,7 @@ import { StyleSheet, Text, View } from "react-native";
 import { EmptyState, ListSkeleton } from "@/components/MobileChrome";
 import { MatchCard } from "@/components/MatchCard";
 import { UpcomingCard } from "@/components/UpcomingCard";
+import { CompetitionGroups } from "@/components/RecentByTeam";
 import { ResolvedLogo } from "@/components/ResolvedLogo";
 import { useColors } from "@/hooks/useColors";
 import { fetchCompetitionMatches, fetchTeamMatches, toMatch } from "@/lib/api";
@@ -33,22 +34,7 @@ export function FollowedMatches({ kind, ids, filter = "upcoming" }: { kind: "tea
   if (!days.size) return filter === "upcoming" ? <Text style={[styles.none, { color: colors.mutedForeground }]}>Nenhuma partida marcada por enquanto.</Text> : null;
   // Upcoming matches use the standard card; past results stay grouped by day.
   if (filter === "upcoming") return <View>{(query.data ?? []).map((match) => <UpcomingCard key={match.id} match={match} />)}</View>;
-  return <View>
-    {[...days.values()].map((matches) => {
-      const competitions = new Map<string, Match[]>();
-      for (const match of matches) competitions.set(match.tournament, [...(competitions.get(match.tournament) ?? []), match]);
-      return <View key={dayKey(matches[0].startTime!)} style={[styles.day, { backgroundColor: colors.card }]}>
-        <Text style={[styles.dayTitle, { color: colors.foreground }]}>{dayLabel(matches[0].startTime!)}</Text>
-        {[...competitions.entries()].map(([name, group]) => <View key={name}>
-          <View style={styles.competition}>
-            <ResolvedLogo type="competition" name={name} entityId={group[0].competitionId} logoUrl={group[0].competitionLogoUrl} size={22} />
-            <Text numberOfLines={1} style={[styles.competitionName, { color: colors.mutedForeground }]}>{name}</Text>
-          </View>
-          {group.map((match) => <MatchCard key={match.id} match={match} onPress={() => openMatch(match.id, match)} />)}
-        </View>)}
-      </View>;
-    })}
-  </View>;
+  return <CompetitionGroups matches={query.data ?? []} />;
 }
 
 const styles = StyleSheet.create({
