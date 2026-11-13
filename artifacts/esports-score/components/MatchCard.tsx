@@ -61,8 +61,8 @@ export function MatchCard({ match, onPress, showDay = false }: { match: Match; o
           <Text maxFontSizeMultiplier={1.25} style={[styles.subStatus, { color: live ? colors.live : colors.mutedForeground }]}>{match.status === "Upcoming" || (showDay && !live) ? matchDayLabel(match) : status}</Text>
         </View>
         <View style={styles.teams}>
-          <TeamLine team={match.teamA} score={scored ? match.scoreA : undefined} emphasize={scored && (match.scoreA ?? 0) > (match.scoreB ?? 0)} live={live} />
-          <TeamLine team={match.teamB} score={scored && match.scoreB !== undefined ? match.scoreB : undefined} emphasize={scored && (match.scoreB ?? 0) > (match.scoreA ?? 0)} live={live} />
+          <TeamLine team={match.teamA} score={scored ? match.scoreA : undefined} emphasize={scored && (match.scoreA ?? 0) > (match.scoreB ?? 0)} lost={scored && !live && (match.scoreA ?? 0) < (match.scoreB ?? 0)} live={live} />
+          <TeamLine team={match.teamB} score={scored && match.scoreB !== undefined ? match.scoreB : undefined} emphasize={scored && (match.scoreB ?? 0) > (match.scoreA ?? 0)} lost={scored && !live && (match.scoreB ?? 0) < (match.scoreA ?? 0)} live={live} />
         </View>
       </Pressable>
       <View style={styles.metaColumn}>
@@ -72,7 +72,8 @@ export function MatchCard({ match, onPress, showDay = false }: { match: Match; o
   );
 }
 
-function TeamLine({ team, score, emphasize, live }: { team: Match["teamA"]; score?: number; emphasize: boolean; live: boolean }) {
+// The losing side is dimmed, so the winner stands out at a glance.
+function TeamLine({ team, score, emphasize, lost = false, live }: { team: Match["teamA"]; score?: number; emphasize: boolean; lost?: boolean; live: boolean }) {
   const colors = useColors();
   const label = listTeamLabel(team);
   return (
@@ -85,7 +86,7 @@ function TeamLine({ team, score, emphasize, live }: { team: Match["teamA"]; scor
           numberOfLines={1}
           ellipsizeMode="tail"
           accessibilityLabel={team.name}
-          style={[styles.name, { color: colors.foreground, fontFamily: font.semibold }, singleLine]}
+          style={[styles.name, { color: lost ? colors.mutedForeground : colors.foreground, fontFamily: lost ? font.medium : font.semibold }, singleLine]}
         >
           {label}
         </Text>
