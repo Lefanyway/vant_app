@@ -17,8 +17,8 @@ await Promise.all([
     platform: "node",
     outfile: plainOutputs[index],
     sourcemap: "inline",
-    // The real logger, loaded from node_modules: pino cannot be bundled.
-    external: ["pino", "pino-pretty"],
+    // The real logger and PNG decoder, loaded from node_modules: neither can be bundled.
+    external: ["pino", "pino-pretty", "pngjs"],
   })),
   build({
   entryPoints: ["src/providers/esports/vlr/adapter.test.ts"],

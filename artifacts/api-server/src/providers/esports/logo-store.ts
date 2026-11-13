@@ -42,6 +42,18 @@ export function parseLogoUrl(raw: string): URL | null {
   }
 }
 
+// Fetches logos ahead of time (a few at once) so the first person to open a list does not wait for them.
+// Takes the app's proxied paths ("/api/esports/assets/logo?url=...").
+export async function warmLogos(paths: (string | undefined)[], concurrency = 4) {
+  const urls = [...new Set(paths.flatMap(value => {
+    const raw = value?.startsWith("/api/esports/assets/logo?") ? new URLSearchParams(value.split("?")[1]).get("url") : null;
+    const url = raw ? parseLogoUrl(raw) : null;
+    return url && !memory.has(url.href) ? [url] : [];
+  }))];
+  for (let index = 0; index < urls.length; index += concurrency) await Promise.allSettled(urls.slice(index, index + concurrency).map(getLogo));
+  return urls.length;
+}
+
 export async function getLogo(url: URL): Promise<LogoResult> {
   const hit = memory.get(url.href);
   if (hit) return hit;

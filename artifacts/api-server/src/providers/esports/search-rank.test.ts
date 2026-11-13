@@ -38,3 +38,8 @@ test("among equally good matches, the stronger team (higher Elo) comes first", (
   const ranked = rankResults([team("Cloud9 White"), team("Cloud9 GC"), team("Cloud9")], "cloud9 ", 30, new Map([["Cloud9 GC", 1700], ["Cloud9 White", 1500]]));
   assert.deepEqual(ranked.map((item) => item.name), ["Cloud9", "Cloud9 GC", "Cloud9 White"]);
 });
+
+test("the main roster comes before its academy or women's team", () => {
+  const ranked = rankResults([team("FURIA Academy", "FUR.A"), team("FURIA Esports", "FUR")], "furia", 30, new Map([["FURIA Academy", 1542], ["FURIA Esports", 1481]]));
+  assert.deepEqual(ranked.map((item) => item.name), ["FURIA Esports", "FURIA Academy"]);
+});

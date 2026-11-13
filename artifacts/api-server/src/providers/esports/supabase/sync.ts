@@ -1,3 +1,4 @@
+import { warmLogos } from '../logo-store';
 import { logger } from '../../../lib/logger';
 import { PandaScoreAdapter, mapPlayer, type RawMatch, type RawTeam } from '../pandascore/adapter';
 import { PandaScoreClient } from '../pandascore/client';
@@ -75,6 +76,8 @@ export class SupabaseSync {
       const last = index + 200 >= batch.matches.length;
       await this.store.ingest({ ...batch, matches: batch.matches.slice(index, index + 200), players: index === 0 ? batch.players : [], kind: last ? kind : `${kind}-part`, rangeStart: last ? range?.start : undefined, rangeEnd: last ? range?.end : undefined });
     }
+    // The API keeps prepared logos on disk; warming them now makes the next screen instant. Pointless in a one-off CI run.
+    if (kind !== 'backfill' && !process.env.CI) void warmLogos(matches.flatMap(match => [match.homeTeam.logoUrl, match.awayTeam.logoUrl, match.competition.logoUrl])).catch(() => undefined);
     return matches.length;
   }
 
