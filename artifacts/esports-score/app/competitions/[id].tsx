@@ -19,8 +19,9 @@ export default function CompetitionDetail() {
   const finished = useQuery({ queryKey: ["competition-matches", competitionId, "finished"], queryFn: () => fetchCompetitionMatches(competitionId, "finished"), enabled: Boolean(competitionId) });
   const game = competition.data?.gameId === "cs2" ? "CS2" : competition.data?.gameId === "lol" ? "League of Legends" : competition.data?.gameId === "valorant" ? "Valorant" : "";
   return (
-    <ScrollView style={[styles.screen, { backgroundColor: colors.background }]} contentContainerStyle={{ paddingTop: Math.max(insets.top, 14), paddingBottom: 48 }}>
-      <View style={styles.nav}><BackButton /><View style={styles.navSpacer} /></View>
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
+    <View style={[styles.nav, { paddingTop: Math.max(insets.top, 14), paddingHorizontal: 16 }]}><BackButton /><View style={styles.navSpacer} /></View>
+    <ScrollView style={styles.screen} contentContainerStyle={{ paddingBottom: 48 }}>
       {competition.isLoading && !competition.data ? <Text style={[styles.message, { color: colors.mutedForeground }]}>Carregando competição…</Text>
         : competition.isError || !competition.data ? (
           <View style={styles.center}>
@@ -41,6 +42,7 @@ export default function CompetitionDetail() {
           </>
         )}
     </ScrollView>
+    </View>
   );
 }
 

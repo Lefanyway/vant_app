@@ -3,9 +3,9 @@ import { ResolvedLogo } from "@/components/ResolvedLogo";
 import { useApp } from "@/context/AppContext";
 import { Feather } from "@expo/vector-icons";
 import { useLocalSearchParams } from "expo-router";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Linking, Pressable, ScrollView, Share, StyleSheet, Text, View } from "react-native";
+import { Animated, Linking, Platform, Pressable, ScrollView, Share, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { BackButton } from "@/components/BackButton";
 import { applyMatchStats, errorMessage, fetchMatch, fetchMatchDetails, fetchMatchStats, type MatchDetails } from "@/lib/api";
@@ -31,10 +31,12 @@ export default function MatchDetail() {
   const statsQuery = useQuery({ queryKey: ["match-stats", id], queryFn: ({ signal }) => fetchMatchStats(String(id), signal), enabled: Boolean(id), staleTime: 60_000 });
   const knownMatch = detailsQuery.data?.match ?? previewQuery.data;
   const details = detailsQuery.data ? applyMatchStats(detailsQuery.data, statsQuery.data) : null;
-  return <ScrollView style={[styles.screen, { backgroundColor: colors.background }]} contentContainerStyle={{ paddingTop: Math.max(insets.top, 8), paddingBottom: 50 }}>
-    <View style={styles.nav}><BackButton /></View>
+  return <View style={{ flex: 1, backgroundColor: colors.background }}>
+    <View style={[styles.nav, { paddingTop: Math.max(insets.top, 8), paddingHorizontal: 8 }]}><BackButton /></View>
+    <ScrollView style={styles.screen} contentContainerStyle={{ paddingBottom: 50 }}>
     {knownMatch ? <DetailContent match={knownMatch} details={details} detailsLoading={detailsQuery.isLoading} detailsError={detailsQuery.isError ? errorMessage(detailsQuery.error, "Não foi possível carregar o restante da partida.") : null} onRetry={() => { void detailsQuery.refetch(); void statsQuery.refetch(); }} tab={tab} setTab={setTab} colors={colors} /> : previewQuery.isLoading || detailsQuery.isLoading ? <DetailSkeleton colors={colors} /> : <View style={styles.errorBox}><Text style={[styles.message, { color: colors.mutedForeground }]}>{detailsQuery.isError || previewQuery.isError ? errorMessage(detailsQuery.error ?? previewQuery.error, "Não foi possível carregar a partida.") : "Partida não encontrada."}</Text><Pressable onPress={() => { void previewQuery.refetch(); void detailsQuery.refetch(); }}><Text style={[styles.retry, { color: colors.primary }]}>Tentar de novo</Text></Pressable></View>}
-  </ScrollView>;
+  </ScrollView>
+  </View>;
 }
 
 function DetailContent({ match, details, detailsLoading, detailsError, onRetry, tab, setTab, colors }: { match: Match; details: MatchDetails | null; detailsLoading: boolean; detailsError: string | null; onRetry: () => void; tab: Tab; setTab: (tab: Tab) => void; colors: ReturnType<typeof useColors> }) {
@@ -119,7 +121,16 @@ function SectionTitle({ title, colors }: { title: string; colors: ReturnType<typ
 function InfoRow({ label, value, colors, last = false }: { label: string; value: string; colors: ReturnType<typeof useColors>; last?: boolean }) { return <View style={[styles.infoRow, last && styles.infoRowLast, { borderBottomColor: colors.border }]}><Text style={[styles.infoLabel, { color: colors.mutedForeground }]}>{label}</Text><Text style={[styles.infoValue, { color: colors.foreground }]}>{value}</Text></View>; }
 function Stat({ label, value, colors }: { label: string; value?: number | string; colors: ReturnType<typeof useColors> }) { return <View style={styles.stat}><Text style={[styles.statLabel, { color: colors.mutedForeground }]}>{label}</Text><Text style={[styles.statValue, { color: colors.foreground }]}>{value ?? "—"}</Text></View>; }
 function Unavailable({ text, colors }: { text: string; colors: ReturnType<typeof useColors> }) { return <View style={[styles.unavailable, { backgroundColor: colors.card, borderColor: colors.border }]}><Text style={[styles.unavailableTitle, { color: colors.mutedForeground }]}>Dados indisponíveis</Text><Text style={[styles.unavailableText, { color: colors.mutedForeground }]}>{text}</Text></View>; }
-function DetailSkeleton({ colors }: { colors: ReturnType<typeof useColors> }) { return <View><View style={[styles.skeleton, { backgroundColor: colors.card }]} /><View style={[styles.skeletonWide, { backgroundColor: colors.card }]} /><View style={[styles.skeleton, { backgroundColor: colors.card }]} /></View>; }
+// The placeholder pulses so a slow network never looks like a frozen screen.
+function DetailSkeleton({ colors }: { colors: ReturnType<typeof useColors> }) {
+  const opacity = useRef(new Animated.Value(0.45)).current;
+  useEffect(() => {
+    const pulse = Animated.loop(Animated.sequence([Animated.timing(opacity, { toValue: 1, duration: 650, useNativeDriver: Platform.OS !== "web" }), Animated.timing(opacity, { toValue: 0.45, duration: 650, useNativeDriver: Platform.OS !== "web" })]));
+    pulse.start();
+    return () => pulse.stop();
+  }, [opacity]);
+  return <Animated.View accessibilityLabel="Carregando partida" style={{ opacity }}><View style={[styles.skeleton, { backgroundColor: colors.card }]} /><View style={[styles.skeletonWide, { backgroundColor: colors.card }]} /><View style={[styles.skeleton, { backgroundColor: colors.card }]} /></Animated.View>;
+}
 
 const styles = StyleSheet.create({
  hero: { marginHorizontal: -8, paddingHorizontal: 20, paddingBottom: 22 }, heroActions: { flexDirection: "row", justifyContent: "flex-end", gap: 6 }, heroIcon: { width: 44, height: 44, justifyContent: "center", alignItems: "center" }, competitionRow: { borderRadius: 16, flexDirection: "row", alignItems: "center", gap: 12, padding: 16, marginTop: 10 }, competitionCopy: { flex: 1, fontSize: 13, lineHeight: 20 },

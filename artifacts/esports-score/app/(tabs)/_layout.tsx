@@ -7,8 +7,8 @@ import { font } from "@/constants/type";
 import { useColors } from "@/hooks/useColors";
 
 const valorantMark = require("../../assets/generated/games/valorant-mark.png");
-const labels: Record<string, string> = { index: "Valorant", following: "Favoritos", matches: "Calendário", search: "Buscar" };
-const icons = { following: "star", matches: "calendar", search: "search" } as const;
+const labels: Record<string, string> = { index: "Valorant", following: "Favoritos", insights: "Previsões", search: "Buscar" };
+const icons = { following: "star", insights: "bar-chart-2", search: "search" } as const;
 export default function TabLayout() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
@@ -26,7 +26,7 @@ export default function TabLayout() {
   </View>}>
     <Tabs.Screen name="index" options={{ title: "Valorant" }} />
     <Tabs.Screen name="following" options={{ title: "Favoritos" }} />
-    <Tabs.Screen name="matches" options={{ title: "Calendário" }} />
+    <Tabs.Screen name="insights" options={{ title: "Previsões" }} />
     <Tabs.Screen name="search" options={{ title: "Buscar" }} />
   </Tabs>;
 }

@@ -50,9 +50,10 @@ export default function Profile() {
   };
 
   return (
-    // The name and password fields scroll above the keyboard instead of hiding behind it.
-    <KeyboardAwareScrollViewCompat style={{ flex: 1, backgroundColor: colors.background }} bottomOffset={24} contentContainerStyle={[styles.content, { paddingTop: Math.max(insets.top, 14), paddingBottom: insets.bottom + 40 }]}>
-      <View style={styles.nav}><BackButton /></View>
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
+    <View style={[styles.nav, { paddingTop: Math.max(insets.top, 14), paddingHorizontal: 20 }]}><BackButton /></View>
+    {/* The name and password fields scroll above the keyboard instead of hiding behind it. */}
+    <KeyboardAwareScrollViewCompat style={{ flex: 1 }} bottomOffset={24} contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + 40 }]}>
 
       <View style={styles.identity}>
         <View style={[styles.avatar, { backgroundColor: colors.accent }]}><Text style={[styles.avatarText, { color: colors.primary }]}>{initials(name)}</Text></View>
@@ -79,6 +80,7 @@ export default function Profile() {
             onValueChange={(value) => { updateProfile({ notify_saved_results: value }).catch(() => setMessage({ text: "Não foi possível salvar a preferência.", tone: "error" })); }}
             trackColor={{ false: colors.secondary, true: colors.primary }}
             thumbColor="#FFFFFF"
+            style={{ alignSelf: "center" }}
           />
         </View>
         <Pressable accessibilityRole="button" onPress={() => router.push("/notifications")} style={[styles.row, styles.divider, { borderTopColor: colors.border }]}>
@@ -109,12 +111,13 @@ export default function Profile() {
         <Text style={[styles.signOutText, { color: colors.destructive }]}>Sair da conta</Text>
       </Pressable>
     </KeyboardAwareScrollViewCompat>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   content: { paddingHorizontal: 20 },
-  nav: { flexDirection: "row", alignItems: "center", marginLeft: -8 },
+  nav: { flexDirection: "row", alignItems: "center" },
   identity: { alignItems: "center", marginTop: 16 },
   avatar: { width: 84, height: 84, borderRadius: 42, alignItems: "center", justifyContent: "center" },
   avatarText: { fontSize: 28, fontFamily: font.bold },
@@ -128,7 +131,8 @@ const styles = StyleSheet.create({
   section: { fontSize: 13, fontFamily: font.semibold, marginTop: 32, marginBottom: 10, marginHorizontal: 4 },
   panel: { borderRadius: 20, paddingHorizontal: 18 },
   row: { minHeight: 60, flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 12 },
-  rowLabel: { flex: 1, fontSize: 15, fontFamily: font.medium },
+  // No extra Android font padding, so the label lines up with the switch beside it.
+  rowLabel: { flex: 1, fontSize: 15, lineHeight: 20, fontFamily: font.medium, includeFontPadding: false, textAlignVertical: "center" },
   divider: { borderTopWidth: 1 },
   count: { fontSize: 13, fontFamily: font.semibold },
   inlineForm: { gap: 10, paddingBottom: 16 },
